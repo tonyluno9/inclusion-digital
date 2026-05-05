@@ -23,7 +23,7 @@ class DisplayUI:
                 cls._font_small = ImageFont.load_default()
 
     @staticmethod
-    def draw_info(frame, mode, current_word, action_status, buffer_size=0, max_buffer=30, emotion="NEUTRAL", confidence=0.0, is_recording=False, stt_text="", stt_recording=False):
+    def draw_info(frame, mode, current_word, action_status, buffer_size=0, max_buffer=30, confidence=0.0, is_recording=False, stt_text="", stt_recording=False):
         h, w, _ = frame.shape
         cls = DisplayUI
         cls._get_fonts()
@@ -68,11 +68,6 @@ class DisplayUI:
         mode_col = (50, 255, 50) if mode == "DETECTION" else (255, 50, 50)
         draw.text((w//2 - 50, 20), mode_text, font=cls._font_small, fill=mode_col)
 
-        # --- EMOCIÓN (Arriba Derecha) ---
-        emo_text = f"Ánimo: {emotion}"
-        ew, eh = draw.textbbox((0, 0), emo_text, font=cls._font_small)[2:]
-        draw.rectangle([w - ew - 55, 40, w - 45, 45 + eh + 10], fill=(0, 0, 0, 100))
-        draw.text((w - ew - 50, 45), emo_text, font=cls._font_small, fill=(255, 255, 255))
 
         # --- Subtítulos HD inferiores ---
         if current_word and current_word != "":
