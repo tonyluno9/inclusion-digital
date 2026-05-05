@@ -44,6 +44,7 @@ def main():
     current_person = "anonimo"
     prediction_counter = {}
     CONFIRM_THRESHOLD = 5 # veces consecutivas para confirmar
+    save_mirror = False
 
     # Iniciar cámara
     cap = cv2.VideoCapture(0)
@@ -165,7 +166,9 @@ def main():
             new_person = input("Ingresa tu nombre (quien graba): ").strip()
             if new_person:
                 current_person = new_person
-            print(f"[OK] Grabando '{label_to_train}' como '{current_person}'")
+            mirror_input = input("¿Guardar también versión espejo? (s/n): ").strip().lower()
+            save_mirror = mirror_input == 's'
+            print(f"[OK] Grabando '{label_to_train}' como '{current_person}' | Espejo: {'Sí' if save_mirror else 'No'}")
         elif key == ord(' '):
             if mode == "TRAINING":
                 if label_to_train == "":
@@ -185,6 +188,16 @@ def main():
                                 resampled.extend(recording_data[int(i)])
                             collector.save_sequence(label_to_train, resampled, person=current_person)
                             print(f"\n[OK] Seña '{label_to_train}' guardada ({len(recording_data)} f -> 30)")
+
+                            if save_mirror:
+                                mirrored = []
+                                for i, val in enumerate(resampled):
+                                    if i % 3 == 0: # Coordenada X
+                                        mirrored.append(-val)
+                                    else:
+                                        mirrored.append(val)
+                                collector.save_sequence(label_to_train, mirrored, person=current_person + "_espejo")
+                                print(f"[OK] Versión espejo guardada.")
                             beep_stop()
                         else:
                             print("\n[!] Error: Grabación muy corta. Intenta de nuevo.")
