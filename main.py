@@ -60,6 +60,7 @@ def main():
     print("'d': Modo detección")
     print("'r': Recargar modelo")
     print("'e': Entrenar modelo")
+    print("'i': Estadísticas del dataset")
     print("'s': Grabar voz (STT)")
     print("'v': Activar/desactivar voz (TTS)")
     print("'f': Pantalla completa")
@@ -210,6 +211,23 @@ def main():
                 print("[TRAIN] Modelo recargado y listo.")
             else:
                 print("[TRAIN] Entrenamiento fallido.")
+        elif key == ord('i'):
+            import pandas as pd
+            dataset_path = os.path.join(DATA_DIR, "dataset.csv")
+            if not os.path.exists(dataset_path):
+                print("\n[INFO] No hay dataset todavía.")
+            else:
+                df = pd.read_csv(dataset_path)
+                print("\n--- ESTADÍSTICAS DEL DATASET ---")
+                print(f"Total de muestras: {len(df)}")
+                print(f"Señas únicas: {df['label'].nunique()}")
+                print("\nMuestras por seña:")
+                print(df['label'].value_counts().to_string())
+                if 'person' in df.columns:
+                    print(f"\nPersonas que grabaron: {list(df['person'].unique())}")
+                    print("\nMuestras por persona:")
+                    print(df['person'].value_counts().to_string())
+                print("--------------------------------\n")
         elif key == ord('v') or key == ord('V'):
             estado = tts.toggle()
             print(f"[TTS] {'Activado' if estado else 'Desactivado'}")
