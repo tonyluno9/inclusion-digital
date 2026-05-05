@@ -15,6 +15,7 @@ from ui.display import DisplayUI
 from modules.tts import TTSEngine
 from modules.beep import beep_start, beep_stop, beep_error
 from modules.stt import STTController
+from train_model import train
 
 
 def main():
@@ -41,6 +42,8 @@ def main():
     current_confidence = 0.0
     action_status = ""
     current_person = "anonimo"
+    prediction_counter = {}
+    CONFIRM_THRESHOLD = 5 # veces consecutivas para confirmar
 
     # Iniciar cámara
     cap = cv2.VideoCapture(0)
@@ -56,6 +59,7 @@ def main():
     print("'t': Entrenar nuevas palabras")
     print("'d': Modo detección")
     print("'r': Recargar modelo")
+    print("'e': Entrenar modelo")
     print("'s': Grabar voz (STT)")
     print("'v': Activar/desactivar voz (TTS)")
     print("'f': Pantalla completa")
@@ -82,14 +86,29 @@ def main():
             if max(hand_landmarks) == 0:
                 prediction = ""
                 current_confidence = 0.0
+                prediction_counter = {}
             elif buffer.is_full() and (time.time() - last_prediction_time > 0.2):
                 sequence = buffer.get_sequence()
                 if sequence is not None:
                     pred, conf = logic.predict(sequence)
                     current_confidence = conf
-                    if pred and pred != prediction:
-                        prediction = pred
-                        tts.speak(prediction)
+
+                    if pred:
+                        prediction_counter[pred] = prediction_counter.get(pred, 0) + 1
+                        # Limpiar contadores de otras palabras
+                        for k in list(prediction_counter.keys()):
+                            if k != pred:
+                                prediction_counter[k] = 0
+
+                        # Confirmar solo si aparece CONFIRM_THRESHOLD veces seguidas
+                        if prediction_counter[pred] >= CONFIRM_THRESHOLD:
+                            if pred != prediction:
+                                prediction = pred
+                                tts.speak(prediction)
+                            prediction_counter[pred] = 0  # reset para permitir repetición
+                    else:
+                        prediction_counter = {}
+
                     last_prediction_time = time.time()
 
         # MODO ENTRENAMIENTO
@@ -180,6 +199,17 @@ def main():
             print("\nRecargando modelo...")
             logic.load_model()
             prediction = ""
+        elif key == ord('e'):
+            print("\n[TRAIN] Iniciando entrenamiento...")
+            mode = "DETECTION"
+            buffer.clear()
+            prediction = ""
+            exito = train()
+            if exito:
+                logic.load_model()
+                print("[TRAIN] Modelo recargado y listo.")
+            else:
+                print("[TRAIN] Entrenamiento fallido.")
         elif key == ord('v') or key == ord('V'):
             estado = tts.toggle()
             print(f"[TTS] {'Activado' if estado else 'Desactivado'}")
