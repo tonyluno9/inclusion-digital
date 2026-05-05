@@ -1,0 +1,28 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.env
+venv/
+env/
+
+# Modelos pesados (no van en git)
+data/model.pkl
+data/vosk-model-small-es-0.42/
+
+# Dataset SÍ se sube
+# data/dataset.csv → se incluye
+
+# Temporales y debug
+scratch/
+debug_*.jpg
+*.log
+backups/
+
+# VS Code
+.vscode/
+
+# Sistema
+.DS_Store
+Thumbs.db
