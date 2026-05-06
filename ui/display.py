@@ -23,7 +23,7 @@ class DisplayUI:
                 cls._font_small = ImageFont.load_default()
 
     @staticmethod
-    def draw_info(frame, mode, current_word, action_status, buffer_size=0, max_buffer=30, confidence=0.0, is_recording=False, stt_text="", stt_recording=False):
+    def draw_info(frame, mode, current_word, action_status, buffer_size=0, max_buffer=30, confidence=0.0, is_recording=False, stt_text="", stt_recording=False, subtitle_history=[], coherent_sentence="", coherence_loading=False):
         h, w, _ = frame.shape
         cls = DisplayUI
         cls._get_fonts()
@@ -111,6 +111,22 @@ class DisplayUI:
             tw, th_t = draw.textbbox((0, 0), stt_text, font=cls._font_small)[2:]
             draw.rectangle([43, 90, 55 + tw, 112], fill=(0, 0, 0, 140))
             draw.text((45, 92), stt_text, font=cls._font_small, fill=(100, 220, 255))
+
+        # --- Historial de subtítulos ---
+        if mode == "DETECTION" and subtitle_history:
+            history_text = "  →  ".join(subtitle_history)
+            hw, hh = draw.textbbox((0, 0), history_text, font=cls._font_small)[2:]
+            draw.rectangle([43, h-140, 55 + hw, h-118], fill=(0, 0, 0, 120))
+            draw.text((45, h-138), history_text, font=cls._font_small, fill=(180, 180, 180))
+
+        # --- Oración Coherente (IA) ---
+        if coherence_loading:
+            draw.text((45, h-180), "Claude está pensando...", font=cls._font_small, fill=(200, 200, 0))
+        elif coherent_sentence:
+            draw.text((45, h-210), "Traducción IA:", font=cls._font_small, fill=(150, 150, 150))
+            tw, th_c = draw.textbbox((0, 0), coherent_sentence, font=cls._font_small)[2:]
+            draw.rectangle([43, h-190, 55 + tw, h-160], fill=(0, 50, 100, 160))
+            draw.text((45, h-188), coherent_sentence, font=cls._font_small, fill=(255, 255, 255))
 
         # Volver a formato OpenCV
         return cv2.cvtColor(np.array(img_pil), cv2.RGB2BGR) if hasattr(cv2, 'RGB2BGR') else cv2.cvtColor(np.array(img_pil), cv2.COLOR_RGB2BGR)

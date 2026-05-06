@@ -3,6 +3,7 @@ import cv2
 import time
 import sys
 import numpy as np
+import threading
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(BASE_DIR)
@@ -16,6 +17,10 @@ from modules.tts import TTSEngine
 from modules.beep import beep_start, beep_stop, beep_error
 from modules.stt import STTController
 from train_model import train
+from clear_word import clear_word
+from modules.coherence import make_coherent
+
+from modules.coherence import make_coherent
 
 
 def main():
@@ -45,6 +50,11 @@ def main():
     prediction_counter = {}
     CONFIRM_THRESHOLD = 5 # veces consecutivas para confirmar
     save_mirror = False
+    subtitle_history = []
+    last_sign_time = time.time()
+    coherent_sentence = [""]
+    coherence_loading = [False]
+    SILENCE_THRESHOLD = 2.5
 
     # Iniciar cámara
     cap = cv2.VideoCapture(0)
@@ -65,6 +75,7 @@ def main():
     print("'s': Grabar voz (STT)")
     print("'v': Activar/desactivar voz (TTS)")
     print("'f': Pantalla completa")
+    print("'x': Borrar seña del dataset")
     print("'q': Salir")
     print("------------------------\n")
 
@@ -89,29 +100,57 @@ def main():
                 prediction = ""
                 current_confidence = 0.0
                 prediction_counter = {}
-            elif buffer.is_full() and (time.time() - last_prediction_time > 0.2):
-                sequence = buffer.get_sequence()
-                if sequence is not None:
-                    pred, conf = logic.predict(sequence)
-                    current_confidence = conf
+                # NO limpiar subtitle_history aquí, lo limpia la coherencia
+            else:
+                last_sign_time = time.time()
+                if buffer.is_full() and (time.time() - last_prediction_time > 0.2):
+                    sequence = buffer.get_sequence()
+                    if sequence is not None:
+                        pred, conf = logic.predict(sequence)
+                        current_confidence = conf
 
-                    if pred:
-                        prediction_counter[pred] = prediction_counter.get(pred, 0) + 1
-                        # Limpiar contadores de otras palabras
-                        for k in list(prediction_counter.keys()):
-                            if k != pred:
-                                prediction_counter[k] = 0
+                        if pred:
+                            prediction_counter[pred] = prediction_counter.get(pred, 0) + 1
+                            # Limpiar contadores de otras palabras
+                            for k in list(prediction_counter.keys()):
+                                if k != pred:
+                                    prediction_counter[k] = 0
 
-                        # Confirmar solo si aparece CONFIRM_THRESHOLD veces seguidas
-                        if prediction_counter[pred] >= CONFIRM_THRESHOLD:
-                            if pred != prediction:
-                                prediction = pred
-                                tts.speak(prediction)
-                            prediction_counter[pred] = 0  # reset para permitir repetición
-                    else:
-                        prediction_counter = {}
+                            # Confirmar solo si aparece CONFIRM_THRESHOLD veces seguidas
+                            if prediction_counter[pred] >= CONFIRM_THRESHOLD:
+                                if pred != prediction:
+                                    prediction = pred
+                                    tts.speak(prediction)
+                                    subtitle_history.append(pred)
+                                    if len(subtitle_history) > 5:
+                                        subtitle_history.pop(0)
+                                prediction_counter[pred] = 0  # reset para permitir repetición
+                        else:
+                            prediction_counter = {}
 
-                    last_prediction_time = time.time()
+                        last_prediction_time = time.time()
+
+            # LÓGICA DE COHERENCIA AUTOMÁTICA (Tras silencio)
+            if (subtitle_history and 
+                time.time() - last_sign_time > SILENCE_THRESHOLD and 
+                not coherence_loading[0]):
+                
+                words_to_process = subtitle_history.copy()
+                subtitle_history = []
+                coherence_loading[0] = True
+                coherent_sentence[0] = ""
+
+                def run_coherence_thread(words):
+                    result = make_coherent(words)
+                    coherent_sentence[0] = result
+                    tts.speak(result)
+                    coherence_loading[0] = False
+
+                threading.Thread(
+                    target=run_coherence_thread,
+                    args=(words_to_process,),
+                    daemon=True
+                ).start()
 
         # MODO ENTRENAMIENTO
         else:
@@ -141,7 +180,10 @@ def main():
             confidence=current_confidence,
             is_recording=is_recording,
             stt_text=stt_text,
-            stt_recording=stt.is_recording
+            stt_recording=stt.is_recording,
+            subtitle_history=subtitle_history,
+            coherent_sentence=coherent_sentence[0],
+            coherence_loading=coherence_loading[0]
         )
 
         cv2.imshow(win_name, frame)
@@ -241,6 +283,29 @@ def main():
                     print("\nMuestras por persona:")
                     print(df['person'].value_counts().to_string())
                 print("--------------------------------\n")
+        elif key == ord('x'):
+            print("\n--- BORRAR SEÑA DEL DATASET ---")
+            import pandas as pd
+            dataset_path = os.path.join(DATA_DIR, "dataset.csv")
+            if not os.path.exists(dataset_path):
+                print("[X] No hay dataset todavía.")
+            else:
+                df = pd.read_csv(dataset_path)
+                senas = df['label'].unique()
+                print(f"Señas disponibles: {list(senas)}")
+                word = input("Ingresa la palabra a borrar (o Enter para cancelar): ").strip()
+                if word:
+                    before = len(df)
+                    df_filtered = df[df['label'].str.upper() != word.upper()]
+                    after = len(df_filtered)
+                    if before == after:
+                        print(f"[X] No se encontró '{word}' en el dataset.")
+                    else:
+                        df_filtered.to_csv(dataset_path, index=False)
+                        print(f"[X] Eliminadas {before - after} muestras de '{word}'.")
+                        print("[X] Recuerda reentrenar con 'E'.")
+                else:
+                    print("[X] Cancelado.")
         elif key == ord('v') or key == ord('V'):
             estado = tts.toggle()
             print(f"[TTS] {'Activado' if estado else 'Desactivado'}")
