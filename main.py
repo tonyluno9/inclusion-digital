@@ -60,6 +60,7 @@ def main():
     cap = cv2.VideoCapture(0)
     if not cap.isOpened():
         print("Error: No se pudo abrir la cámara.")
+
         return
 
     win_name = "Inclusion Vision HD"
