@@ -16,8 +16,22 @@ class DataCollector:
                 headers = ['label', 'person'] + [f'f{i}' for i in range(len(sequence))]
                 writer.writerow(headers)
 
-            row = [label, person] + list(sequence)
+            row = [label.lower().strip(), person] + list(sequence)
             writer.writerow(row)
+
+        # Backup automático cada 50 muestras
+        self._auto_backup()
+
+    def _auto_backup(self):
+        try:
+            import shutil, time
+            df_len = sum(1 for _ in open(self.file_path)) - 1
+            if df_len > 0 and df_len % 50 == 0:
+                backup_path = self.file_path.replace('.csv', f'_backup_{int(time.time())}.csv')
+                shutil.copy2(self.file_path, backup_path)
+                print(f"[BACKUP] Dataset respaldado en {backup_path}")
+        except Exception:
+            pass
 
     def get_persons(self):
         """Devuelve lista de personas únicas en el dataset"""

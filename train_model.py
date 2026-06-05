@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
@@ -34,6 +35,22 @@ def train():
         ('scaler', StandardScaler()),
         ('rf', RandomForestClassifier(n_estimators=200, random_state=42, n_jobs=-1))
     ])
+
+    # Data augmentation: ruido gaussiano
+    import numpy as np
+    print(f"[TRAIN] Aplicando data augmentation...")
+    X_aug = X.copy()
+    y_aug = y.copy()
+
+    for _ in range(2):  # 2 copias con ruido
+        noise = np.random.normal(0, 0.002, X.shape)
+        X_noisy = X + noise
+        X_aug = pd.concat([X_aug, pd.DataFrame(X_noisy, columns=X.columns)], ignore_index=True)
+        y_aug = pd.concat([y_aug, y], ignore_index=True)
+
+    X = X_aug
+    y = y_aug
+    print(f"[TRAIN] Dataset aumentado: {len(X_aug)} muestras (original + 2x ruido)")
 
     model_pipeline.fit(X, y)
     joblib.dump(model_pipeline, model_path)
