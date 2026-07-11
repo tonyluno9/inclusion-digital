@@ -48,7 +48,7 @@ def main():
     action_status = ""
     current_person = "anonimo"
     prediction_counter = {}
-    CONFIRM_THRESHOLD = 5 # veces consecutivas para confirmar
+    CONFIRM_THRESHOLD = 2 # veces consecutivas para confirmar
     save_mirror = False
     subtitle_history = []
     last_sign_time = time.time()
@@ -81,11 +81,15 @@ def main():
     print("------------------------\n")
 
     last_prediction_time = time.time()
+    PREDICTION_STRIDE = 3  # predecir cada 5 frames nuevos
+    frame_counter = 0
 
     while True:
         ret, frame = cap.read()
         if not ret:
             break
+
+        frame_counter += 1
 
         frame = cv2.flip(frame, 1)
         frame, hand_landmarks = detector.process(frame)
@@ -104,7 +108,7 @@ def main():
                 # NO limpiar subtitle_history aquí, lo limpia la coherencia
             else:
                 last_sign_time = time.time()
-                if buffer.is_full() and (time.time() - last_prediction_time > 0.2):
+                if buffer.is_full() and frame_counter % PREDICTION_STRIDE == 0:
                     sequence = buffer.get_sequence()
                     if sequence is not None:
                         pred, conf = logic.predict(sequence)

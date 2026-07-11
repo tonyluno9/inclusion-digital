@@ -33,7 +33,7 @@ def train():
 
     model_pipeline = Pipeline([
         ('scaler', StandardScaler()),
-        ('rf', RandomForestClassifier(n_estimators=200, random_state=42, n_jobs=-1))
+        ('rf', RandomForestClassifier(n_estimators=100, random_state=42, n_jobs=-1, max_depth=15, min_samples_leaf=3))
     ])
 
     # Data augmentation: ruido gaussiano
@@ -42,7 +42,7 @@ def train():
     X_aug = X.copy()
     y_aug = y.copy()
 
-    for _ in range(2):  # 2 copias con ruido
+    for _ in range(4):  # 4 copias con ruido
         noise = np.random.normal(0, 0.002, X.shape)
         X_noisy = X + noise
         X_aug = pd.concat([X_aug, pd.DataFrame(X_noisy, columns=X.columns)], ignore_index=True)
@@ -50,7 +50,7 @@ def train():
 
     X = X_aug
     y = y_aug
-    print(f"[TRAIN] Dataset aumentado: {len(X_aug)} muestras (original + 2x ruido)")
+    print(f"[TRAIN] Dataset aumentado: {len(X_aug)} muestras (original + 4x ruido)")
 
     model_pipeline.fit(X, y)
     joblib.dump(model_pipeline, model_path)
