@@ -1,0 +1,7 @@
+# Voz a texto del interlocutor (tecla 's')
+SpeechRecognition>=3.10
+pyaudio>=0.2.14
+vosk>=0.3.45   # requiere además el modelo data/vosk-model-small-es-0.42/
+
+# Exportar a TFLite (train_tensorflow.py)
+tensorflow>=2.15

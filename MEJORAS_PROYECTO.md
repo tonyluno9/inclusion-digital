@@ -1,60 +1,25 @@
 # Plan de Mejoras - Proyecto INCLUSION 🚀
 
-Este documento detalla las mejoras propuestas para elevar la calidad técnica, funcional y estética del sistema de reconocimiento de señas.
+## ✅ Hecho (pipeline v2)
 
-## 1. Experiencia de Usuario (UI/UX) 🎨
+- **Migración a MediaPipe Tasks:** la API `mp.solutions` ya no existe en las versiones actuales de MediaPipe.
+- **Misma preparación al grabar y al detectar:** cada seña se segmenta (manos arriba → manos abajo), se recorta y se remuestrea a 30 frames. Antes, la detección usaba una ventana deslizante distinta a la del entrenamiento: en una simulación con el dataset viejo, esto bajaba la precisión de ~98% a ~40%.
+- **Features respecto al cuerpo:** posición de la mano relativa a los hombros y escalada por su ancho (antes solo forma de la mano respecto a la muñeca, sin trayectoria).
+- **Manos en lugar fijo:** izquierda y derecha ya no se intercambian entre frames.
+- **Espejo correcto** como aumento de datos al entrenar (para personas zurdas).
+- **Evaluación honesta:** `python train_model.py` mide con personas que el modelo no vio.
+- **Sin `input()` en consola:** las preguntas aparecen en la ventana de la cámara.
+- **Entrenamiento en segundo plano** con la tecla `e`, y deshacer la última muestra con `z`.
+- **Claude opcional:** sin `ANTHROPIC_API_KEY` la app sigue funcionando.
+- **Configuración centralizada** en `config.py` y **pruebas** en `tests/`.
+- **Barra de confianza** y **voz (TTS)**.
 
-### 🔊 Síntesis de Voz (Text-to-Speech)
-- **Descripción:** Integrar `pyttsx3` para que el sistema "hable" la palabra detectada.
-- **Impacto:** Alta accesibilidad. Permite una comunicación fluida sin que la otra persona tenga que mirar la pantalla constantemente.
+## ⏭️ Siguiente
 
-### 📊 Feedback de Confianza (Confidence Bar)
-- **Descripción:** Añadir un anillo de progreso o una barra que se llene según el `predict_proba` del modelo.
-- **Impacto:** Reduce la frustración del usuario al mostrar por qué el sistema no está "seguro" de una seña todavía.
-
-### ⌨️ Interfaz de Entrada Integrada
-- **Descripción:** Reemplazar el `input()` de consola por un campo de texto en el overlay de OpenCV (usando una caja de texto estilizada) para nombrar nuevas señas en el modo entrenamiento.
-- **Impacto:** Elimina la necesidad de alternar entre la ventana de la cámara y la terminal.
-
----
-
-## 2. Mejoras Técnicas y de Inteligencia 🤖
-
-### 🌊 Suavizado de Predicciones (Temporal Smoothing)
-- **Descripción:** Implementar un búfer de resultados recientes. Una palabra solo se muestra como final si aparece en, por ejemplo, 4 de los últimos 5 frames procesados.
-- **Impacto:** Elimina el "parpadeo" entre palabras similares y aumenta la estabilidad visual.
-
-### 🔄 Entrenamiento Automático en Segundo Plano
-- **Descripción:** Trigger automático que detecta cambios en `dataset.csv` y ejecuta el script de entrenamiento en un hilo separado (thread), recargando el modelo `.pkl` en caliente.
-- **Impacto:** Flujo de trabajo continuo; el usuario puede entrenar y probar inmediatamente sin reiniciar la app.
-
-### 🧠 Modelos de Tiempo Real Avanzados
-- **Descripción:** Evaluar el paso de un modelo de Machine Learning tradicional (RandomForest/SVM) a una red neuronal recurrente (LSTM) o un Transformer pequeño para capturar mejor la dinámica de las señas.
-- **Impacto:** Mayor precisión en señas que dependen del movimiento y no solo de la posición.
-
----
-
-## 3. Arquitectura y Código 🛠️
-
-### ⚙️ Sistema de Configuración (config.yaml)
-- **Descripción:** Mover constantes como `SEQUENCE_LENGTH`, `MIN_DETECTION_CONFIDENCE`, y rutas de archivos a un archivo de configuración externo.
-- **Impacto:** Facilita el ajuste del sistema sin tocar el código fuente.
-
-### 🧵 Multi-threading (Procesamiento Distribuido)
-- **Descripción:** Separar la captura de frames, el procesamiento de landmarks y la lógica de predicción en hilos distintos.
-- **Impacto:** Mantiene una tasa de FPS alta y constante (60+) incluso si la predicción del modelo se vuelve más pesada.
-
-### 🧪 Pruebas Unitarias y Tipado
-- **Descripción:** Añadir Type Hints y tests unitarios para los módulos críticos como `SequenceBuffer` y `FaceDetector`.
-- **Impacto:** Código más profesional, mantenible y menos propenso a errores al escalar.
-
----
-
-## Resumen de Prioridades
-
-| Prioridad | Tarea | Dificultad |
+| Prioridad | Tarea | Notas |
 | :--- | :--- | :--- |
-| **CRÍTICA** | **Suavizado de Predicciones (Temporal Filter)** | Baja |
-| **ALTA** | **Síntesis de Voz (TTS)** | Baja |
-| **MEDIA** | **Barra de Confianza en UI** | Media |
-| **BAJA** | **Entrenamiento en Segundo Plano** | Alta |
+| **CRÍTICA** | Volver a grabar el dataset con 3+ personas | El dataset viejo (`data/legacy/`) no tiene la posición de las manos en el cuerpo |
+| **ALTA** | Modelo secuencial (GRU o CNN-1D sobre 30×126) | Evaluar contra el Random Forest con validación por persona |
+| **MEDIA** | Segmentar también por pausas de movimiento | Hoy hay que bajar las manos entre seña y seña |
+| **MEDIA** | Expresiones faciales (marcadores no manuales) | Agregar puntos de la cara al frame crudo |
+| **BAJA** | App móvil (Flutter + TFLite) | `train_tensorflow.py` ya exporta el modelo |

@@ -9,7 +9,7 @@ Esta guía detalla los estándares de calidad necesarios para recolectar datos d
 ### 💡 Iluminación
 *   **Luz Frontal:** Asegúrate de que la fuente de luz esté detrás de la cámara o a los lados, iluminando tu cara y manos de forma uniforme.
 *   **Evita Contraluces:** No grabes con una ventana o luz brillante detrás de ti; esto convertirá tu cuerpo en una sombra y MediaPipe perderá el rastro.
-*   **Sin Sombras Fuertes:** Las sombras proyectadas sobre el rostro pueden engañar al detector de expresiones faciales.
+*   **Sin Sombras Fuertes:** Las sombras sobre las manos hacen que MediaPipe pierda puntos de los dedos.
 
 ### 🖼️ Fondo (Background)
 *   **Neutralidad:** Usa un fondo liso si es posible (pared blanca, gris o azul).
@@ -30,16 +30,20 @@ El programa muestra una guía blanca en pantalla. Debes alinearte de la siguient
 
 ---
 
-## 3. ⏱️ El Proceso de Grabación Manual
+## 3. ⏱️ El Proceso de Grabación
 
-El sistema actual utiliza **Remuestreo Dinámico (Interpolación)**. Esto significa que la IA siempre verá 30 fotogramas, sin importar cuánto dure tu grabación real.
+Cada seña empieza cuando **levantas las manos** y termina cuando **las bajas**. El sistema la recorta y la lleva a 30 fotogramas, sin importar cuánto dure. Es exactamente lo mismo que hace al detectar, por eso es importante grabar igual que como vas a usarlo.
 
 ### 🔴 Instrucciones de Captura:
-1.  Presiona **'t'** para asignar el nombre de la seña.
-2.  Ponte en posición **antes** de empezar.
-3.  Presiona **Espacio** para INICIAR (el sistema solo empezará a contar cuando detecte tus manos).
-4.  Realiza la seña a tu ritmo natural.
-5.  Presiona **Espacio** para TERMINAR inmediatamente después de finalizar el movimiento.
+1.  Presiona **'t'** y escribe en la ventana el nombre de la seña y tu nombre.
+2.  Ponte en posición con las **manos abajo** (fuera de cuadro o sobre las piernas).
+3.  Presiona **Espacio** para activar la grabación.
+4.  Levanta las manos, haz la seña a tu ritmo natural y **baja las manos** al terminar. Oirás un beep al empezar y dos al guardar.
+5.  Repite el paso 4 las veces que quieras: cada seña se guarda sola.
+6.  Si una salió mal, presiona **'z'** para deshacerla. **Espacio** pausa la grabación.
+
+> [!IMPORTANT]
+> Entre seña y seña baja las manos al menos medio segundo; si no, el sistema las junta en una sola.
 
 ---
 
@@ -56,20 +60,23 @@ Para que la IA sea "robusta", no grabes lo mismo 20 veces. Graba **variaciones**
 
 ---
 
-## 5. 😊 Marcadores No Manuales (Expresiones)
+## 5. 👥 Varias Personas
 
-En la Lengua de Señas, la cara es el "tono de voz".
-*   **Coherencia:** Si grabas una seña de "Pregunta", asegúrate de fruncir el ceño (**ENOJADO/SERIO**) durante toda la grabación.
-*   **Enfásis:** Usa el detector de ánimo en la esquina superior derecha para verificar que tus labios y cejas están transmitiendo la emoción correcta antes de presionar Espacio.
+Un modelo entrenado con una sola persona funciona bien con esa persona y mal con las demás.
+*   Graba con **al menos 3 personas** distintas (cada una escribe su nombre al presionar 't').
+*   No hace falta grabar "en espejo": el entrenamiento ya genera la versión para personas zurdas.
+
+> [!NOTE]
+> La versión actual solo usa las manos (y los hombros como referencia). Las expresiones faciales todavía no se toman en cuenta.
 
 ---
 
 ## 6. 🛠️ Ciclo de Mejora Continua
 
-1.  **Graba:** Recolecta al menos 20 muestras por palabra.
-2.  **Entrena:** Cierra `main.py` y ejecuta `train_model.py`.
-3.  **Prueba:** Abre `main.py` en modo DETECCIÓN.
-4.  **Limpia:** Si una palabra se confunde con otra, usa `clear_word.py` para borrar la conflictiva y vuelve a grabarla con más precisión.
+1.  **Graba:** Recolecta al menos 20 muestras por palabra y por persona.
+2.  **Entrena:** Presiona **'e'** en la app, o ejecuta `python train_model.py` para ver además la precisión con personas que el modelo no vio.
+3.  **Prueba:** Presiona **'d'** para el modo DETECCIÓN.
+4.  **Limpia:** Si una palabra se confunde con otra, bórrala con **'x'** y vuelve a grabarla con más precisión.
 
 ---
 *Documento generado para el Proyecto INCLUSION - Visión Inteligente.*

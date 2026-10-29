@@ -5,20 +5,29 @@ __pycache__/
 *.pyd
 .env
 venv/
+.venv/
 env/
 
-# Modelos pesados (no van en git)
+# Modelos pesados o regenerables (no van en git)
 data/model.pkl
+data/models/
 data/vosk-model-small-es-0.42/
 
-# Dataset SÍ se sube
-# data/dataset.csv → se incluye
+# Respaldos automáticos del dataset
+data/backups/
+data/dataset_backup_*.csv
+backups/
+
+# Salidas de train_tensorflow.py
+data/model.tflite
+data/mean.npy
+data/std.npy
+data/clases.txt
 
 # Temporales y debug
 scratch/
 debug_*.jpg
 *.log
-backups/
 
 # VS Code
 .vscode/

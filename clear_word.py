@@ -1,33 +1,26 @@
-import pandas as pd
-import os
+"""Borra todas las muestras de una seña del dataset (también disponible con 'x' en main.py)."""
+import config as C
+from modules.data_collector import DataCollector
+
 
 def clear_word():
-    dataset_path = "data/dataset.csv"
-    if not os.path.exists(dataset_path):
-        print("El dataset no existe todavía.")
+    collector = DataCollector(C.DATASET_PATH, C.BACKUP_DIR, C.BACKUP_EVERY)
+    labels, _ = collector.stats()
+    if not labels:
+        print("El dataset no existe o está vacío.")
         return
-
-    word_to_delete = input("Ingresa la palabra que quieres BORRAR del dataset: ").strip().upper()
-    
-    if not word_to_delete:
+    print(f"Señas disponibles: {sorted(labels)}")
+    word = input("Ingresa la palabra que quieres BORRAR del dataset: ").strip()
+    if not word:
         print("Operación cancelada.")
         return
-
-    df = pd.read_csv(dataset_path)
-    # Convertir labels a mayúsculas para evitar errores de coincidencia
-    df['label'] = df['label'].str.upper()
-    
-    before_count = len(df)
-    df_filtered = df[df['label'] != word_to_delete]
-    after_count = len(df_filtered)
-
-    if before_count == after_count:
-        print(f"No se encontró la palabra '{word_to_delete}' en el dataset.")
+    removed = collector.delete_label(word)
+    if removed:
+        print(f"¡Éxito! Se borraron {removed} muestras de '{word}'.")
+        print("Recuerda volver a entrenar (tecla 'e' o python train_model.py).")
     else:
-        df_filtered.to_csv(dataset_path, index=False)
-        deleted = before_count - after_count
-        print(f"¡Éxito! Se borraron {deleted} muestras de la palabra '{word_to_delete}'.")
-        print("Recuerda volver a ejecutar train_model.py para aplicar los cambios.")
+        print(f"No se encontró la palabra '{word}' en el dataset.")
+
 
 if __name__ == "__main__":
     clear_word()
