@@ -9,20 +9,20 @@ venv/
 env/
 
 # Modelos pesados o regenerables (no van en git)
-data/model.pkl
-data/models/
-data/vosk-model-small-es-0.42/
+app/data/model.pkl
+app/data/models/
+app/data/vosk-model-small-es-0.42/
 
 # Respaldos automáticos del dataset
-data/backups/
-data/dataset_backup_*.csv
+app/data/backups/
+app/data/dataset_backup_*.csv
 backups/
 
 # Salidas de train_tensorflow.py
-data/model.tflite
-data/mean.npy
-data/std.npy
-data/clases.txt
+app/data/model.tflite
+app/data/mean.npy
+app/data/std.npy
+app/data/clases.txt
 
 # Temporales y debug
 scratch/
@@ -35,3 +35,4 @@ debug_*.jpg
 # Sistema
 .DS_Store
 Thumbs.db
+app/data/test_assets/
