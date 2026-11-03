@@ -18,7 +18,7 @@ import cv2
 
 import config as C
 
-WINDOW = "INCLUSION - Lengua de Señas"
+WINDOW = "INCLUSION - LSM"  # solo ASCII: OpenCV en Windows rompe la ñ en el título
 
 
 def parse_args(argv=None):
