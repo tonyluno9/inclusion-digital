@@ -9,6 +9,8 @@ import config as C
 from inclusion_app import InclusionApp
 from modules.data_collector import DataCollector
 from modules.gesture_logic import GestureLogic
+from modules.landmarks import hands_present
+from modules.motion import ClipStore, world_frame
 from tests.synthetic import make_sign, stream
 
 FRAME = np.zeros((720, 1280, 3), dtype=np.uint8)
@@ -19,10 +21,32 @@ class FakeDetector:
     def __init__(self):
         self.queue = []
         self.idle = None
+        self.world = None
+        self.with_world = False     # también inventar el frame 3D, como el detector real
+        self.n = 0
 
     def process(self, frame):
         raw = self.queue.pop(0) if self.queue else self.idle
+        if self.with_world:
+            self.n += 1
+            pose = np.full((33, 3), 0.001 * self.n)
+            hand = np.random.RandomState(self.n).normal(0, 0.05, (21, 3))
+            self.world = world_frame(pose, np.ones(33), [None, hand] if hands_present(raw) else [None, None])
         return frame, raw
+
+
+class FakeSender:
+    def __init__(self):
+        self.frames, self.clips = [], []
+
+    def send_frame(self, world, t):
+        self.frames.append((t, world))
+
+    def send_clip(self, word, path):
+        self.clips.append((word, path))
+
+    def close(self):
+        pass
 
 
 class FakeTTS:
@@ -73,8 +97,11 @@ class AppTest(unittest.TestCase):
             self.sentences.append(list(words))
             return "Oración: " + " ".join(words)
 
+        self.clips = ClipStore(os.path.join(self.tmp.name, "avatar"))
+        self.sender = FakeSender()
         self.app = InclusionApp(self.detector, self.tts, self.stt, collector=self.collector, logic=self.logic,
-                                coherence=coherence, clock=self.clock, background=False)
+                                coherence=coherence, clock=self.clock, background=False,
+                                clips=self.clips, sender=self.sender)
         idle = stream(make_sign("arriba", 1), pad=1)[0]
         self.detector.idle = idle
 
@@ -209,6 +236,67 @@ class AppTest(unittest.TestCase):
         self.keys("niño")
         out = self.app.process_frame(FRAME.copy(), render=True)
         self.assertEqual(self.app.prompt.text, "niño")
+
+    def enter_avatar(self, word):
+        self.detector.with_world = True
+        self.keys("a")
+        self.type_answer(word)
+        self.assertEqual(self.app.mode, "AVATAR")
+
+    def test_avatar_live_and_record_clip(self):
+        """RF-18, RF-19: en modo avatar se envía el movimiento en vivo; con Espacio,
+        cada seña se guarda como clip con unos frames antes y la bajada de brazos."""
+        self.enter_avatar("hola")
+        self.feed([self.detector.idle] * 5, render=True)
+        self.assertEqual(len(self.sender.frames), 5)              # en vivo aunque no se grabe
+        self.assertEqual(self.clips.words(), [])                  # sin Espacio no se graba
+
+        self.keys(" ")
+        self.assertTrue(self.app.armed)
+        sign = make_sign("arriba", 30)
+        self.feed(stream(sign, pad=20), render=True)
+        self.assertEqual(self.clips.words(), ["hola"])
+        self.assertEqual(self.app.flash, (80, 220, 80))
+        clip = self.clips.load("hola")
+        n = len(clip["frames"])
+        # preroll + 30 frames de seña + los frames sin manos que cierran la seña
+        self.assertEqual(n, C.AVATAR_PREROLL_FRAMES + 30 + C.SEGMENT_END_FRAMES)
+        self.assertIsNone(clip["frames"][0]["right"])            # empieza en reposo
+        self.assertIsNotNone(clip["frames"][C.AVATAR_PREROLL_FRAMES + 10]["right"])
+        self.assertAlmostEqual(clip["duration"], (n - 1) / 30, places=2)
+        self.assertEqual(self.sender.clips, [("hola", self.app.last_clip)])
+        self.assertEqual(self.collector.count(), 0)              # no toca el dataset de señas
+
+        self.feed(stream(make_sign("derecha", 40), pad=20))      # otra toma: reemplaza
+        self.assertEqual(len(self.clips.load("hola")["frames"]), C.AVATAR_PREROLL_FRAMES + 40 + C.SEGMENT_END_FRAMES)
+        self.keys("z")                                           # deshacer: vuelve la primera
+        self.assertEqual(len(self.clips.load("hola")["frames"]), n)
+        self.keys("i")
+        self.assertIn("Avatar: 1 clips (hola)", self.app.panel[1])
+
+        self.keys("d")
+        self.assertEqual(self.app.mode, "DETECTION")
+        sent = len(self.sender.frames)
+        self.feed([self.detector.idle] * 3)
+        self.assertEqual(len(self.sender.frames), sent)          # fuera del modo avatar no se envía
+
+    def test_avatar_short_movement_is_discarded(self):
+        """RF-19: un movimiento muy corto no se guarda y se avisa con destello rojo."""
+        self.enter_avatar("gracias")
+        self.keys(" ")
+        self.feed(stream(make_sign("arriba", 5), pad=20))
+        self.assertEqual(self.clips.words(), [])
+        self.assertEqual(self.app.flash, (40, 40, 230))
+
+    def test_avatar_without_3d_frames_does_not_save(self):
+        """Sin frames 3D (detector sin pose) la seña no se guarda vacía."""
+        self.enter_avatar("hola")
+        self.detector.with_world = False
+        self.detector.world = None
+        self.keys(" ")
+        self.feed(stream(make_sign("arriba", 30), pad=20))
+        self.assertEqual(self.clips.words(), [])
+        self.assertIn("no se guardó", self.app.status)
 
 
 if __name__ == "__main__":

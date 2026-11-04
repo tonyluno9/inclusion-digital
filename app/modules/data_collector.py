@@ -6,6 +6,8 @@ from collections import Counter
 
 import numpy as np
 
+from modules.landmarks import OLD_RAW_FRAME_SIZE, RAW_FRAME_SIZE
+
 
 class DataCollector:
     """Guarda cada seña grabada como una fila: label, person, f0..fN
@@ -13,9 +15,12 @@ class DataCollector:
 
     El CSV es UTF-8. Los conteos se mantienen en memoria para no releer el
     archivo en cada muestra, y las reescrituras (deshacer, borrar) son atómicas.
+
+    Con `sequence_length`, un dataset del formato anterior (frames de 135
+    valores, sin codos) se respalda y se convierte al actual al abrirlo.
     """
 
-    def __init__(self, file_path, backup_dir, backup_every=50):
+    def __init__(self, file_path, backup_dir, backup_every=50, sequence_length=None):
         self.file_path = file_path
         self.backup_dir = backup_dir
         self.backup_every = backup_every
@@ -23,7 +28,29 @@ class DataCollector:
         self._labels = Counter()
         self._persons = Counter()
         self._order = []          # (label, person) en el orden del archivo
+        self.migrated = 0         # muestras convertidas del formato anterior al abrir
+        if sequence_length:
+            self._migrate(sequence_length)
         self._load_counts()
+
+    def _migrate(self, sequence_length):
+        header, rows = self._read_rows()
+        if header is None or len(header) - 2 != sequence_length * OLD_RAW_FRAME_SIZE:
+            return
+        os.makedirs(self.backup_dir, exist_ok=True)
+        name = os.path.basename(self.file_path).replace(".csv", f"_formato135_{int(time.time())}.csv")
+        shutil.copy2(self.file_path, os.path.join(self.backup_dir, name))
+        pad = ["0"] * (RAW_FRAME_SIZE - OLD_RAW_FRAME_SIZE)
+        new_rows = []
+        for r in rows:
+            values = r[2:]
+            frames = [values[i:i + OLD_RAW_FRAME_SIZE] for i in range(0, len(values), OLD_RAW_FRAME_SIZE)]
+            new_rows.append(r[:2] + [v for fr in frames for v in fr + pad])
+        width = sequence_length * RAW_FRAME_SIZE
+        self._write_rows(["label", "person"] + [f"f{i}" for i in range(width)], new_rows)
+        self.migrated = len(new_rows)
+        print(f"[DATASET] {len(new_rows)} muestras convertidas al formato con codos "
+              f"(respaldo en {os.path.join(self.backup_dir, name)})")
 
     def _read_rows(self):
         if not os.path.isfile(self.file_path):

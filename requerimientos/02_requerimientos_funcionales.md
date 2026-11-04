@@ -10,18 +10,20 @@ La app toma video de la cámara (índice configurable con `--camera N`) o de un 
 - El video se muestra en espejo (como un espejo) para que la persona se vea natural.
 
 ### RF-02 · Detección de manos y cuerpo — Debe
-Por cada frame se detectan hasta 2 manos (21 puntos cada una) y la referencia corporal (nariz y hombros).
-- Cada mano ocupa siempre su lugar fijo (izquierda / derecha) en el vector, aunque solo se vea una.
-- Las manos detectadas se dibujan sobre el video con un color distinto por mano.
+Por cada frame se detectan hasta 2 manos (21 puntos cada una) y el cuerpo: nariz, hombros, codos y muñecas
+(detalle del brazo completo en [RF-17](06_avatar.md)).
+- Cada mano ocupa siempre su lugar fijo (izquierda / derecha de la persona) en el vector, aunque solo se vea una.
+- Las manos y los brazos detectados se dibujan sobre el video con un color distinto por lado.
 - Los modelos de MediaPipe se descargan solos la primera vez; si no hay internet, se informa cómo obtenerlos.
 
 ### RF-03 · Segmentación de señas — Debe
 Una seña empieza cuando las manos aparecen ≥ 3 frames seguidos y termina cuando desaparecen ≥ 8 frames seguidos
-(o al llegar al máximo de 90 frames).
+(o al llegar al máximo de 120 frames, ~4 s).
 - Parpadeos de detección cortos (≤ 5 frames) dentro de una seña no la parten en dos.
 - Movimientos de < 10 frames se descartan.
 - La seña se recorta y se lleva a 30 frames. **El mismo código prepara las muestras al grabar y al detectar.**
-- La referencia corporal se toma preferentemente de los frames previos a la seña (cuerpo sin tapar por los brazos).
+- La referencia corporal (nariz y hombros) se toma preferentemente de los frames previos a la seña (cuerpo sin tapar
+  por los brazos). Codos y muñecas son los de cada frame: son parte del movimiento.
 
 ## Reconocimiento y comunicación
 
@@ -77,7 +79,7 @@ El modelo se guarda con su versión de features, longitud de secuencia y lista d
 
 ### RF-13 · Ayuda y estado — Debe
 - `h` muestra/oculta la lista de teclas sobre el video.
-- Siempre se ve el modo actual (DETECCIÓN / ENTRENAMIENTO) y el estado de la voz.
+- Siempre se ve el modo actual (DETECCIÓN / ENTRENAMIENTO / AVATAR) y el estado de la voz.
 
 ### RF-14 · Control de la ventana — Debe
 `f` alterna pantalla completa; `q`, `Esc` o cerrar la ventana con la X terminan la app liberando cámara e hilos.
@@ -89,3 +91,7 @@ El modelo se guarda con su versión de features, longitud de secuencia y lista d
 ### RF-16 · Exportación móvil — Podría
 `python train_tensorflow.py` entrena una red y exporta `model.tflite`, `mean.npy`, `std.npy` y `clases.txt`
 con validación separada antes del aumento de datos.
+
+## Avatar
+
+RF-17 a RF-24 (brazo completo, modo avatar, clips por palabra, Blender) están en [06_avatar.md](06_avatar.md).

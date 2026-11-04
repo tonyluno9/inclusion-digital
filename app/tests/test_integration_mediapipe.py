@@ -51,6 +51,27 @@ class MediaPipeIntegrationTest(unittest.TestCase):
             det.close()
         self.assertTrue(np.any(raw[:HAND_SIZE]) and np.any(raw[HAND_SIZE:HANDS_SIZE]))
 
+    def test_detector_gives_3d_frame_for_the_avatar(self):
+        """RF-17, RF-20 con MediaPipe real: cuerpo 3D (33 puntos) y manos pegadas a
+        las muñecas del cuerpo, en metros. Usa la foto sin bordes: ahí se ven los codos."""
+        from modules.landmarks import ARMS_START, RAW_FRAME_SIZE
+        det = DETECTOR_CLS(C.MODELS_DIR, pose_every=1)
+        try:
+            for _ in range(5):
+                _, raw = det.process(cv2.flip(cv2.imread(SAMPLE_PATH), 1))
+            world = det.world
+        finally:
+            det.close()
+        self.assertEqual(raw.shape, (RAW_FRAME_SIZE,))
+        self.assertTrue(np.any(raw[ARMS_START:]))                 # se ven codos o muñecas
+        self.assertEqual(world["pose"].shape, (33, 3))
+        self.assertEqual(world["vis"].shape, (33,))
+        self.assertLess(np.abs(world["pose"]).max(), 2.0)         # metros, no píxeles
+        for side, wrist in (("left", 15), ("right", 16)):
+            self.assertEqual(world[side].shape, (21, 3))
+            np.testing.assert_allclose(world[side][0], world["pose"][wrist], atol=1e-5)
+            self.assertLess(np.linalg.norm(world[side][12] - world[side][0]), 0.3)   # mano de tamaño real
+
     def test_app_records_a_real_sample(self):
         """RF-01..RF-03, RF-09 con MediaPipe real: aparecen manos -> se guarda una muestra."""
         from inclusion_app import InclusionApp
@@ -76,15 +97,21 @@ class MediaPipeIntegrationTest(unittest.TestCase):
     def test_main_runs_headless_on_video(self):
         """RF-01, RF-15, RNF-01, RNF-06: main.py procesa un video sin ventana, reporta rendimiento
         y termina con código 1 (sin traceback) si el video no existe."""
+        from unittest import mock
         import main
         with tempfile.TemporaryDirectory() as tmp:
+            # Datos de la app en un temporal: la prueba nunca toca el dataset ni los clips reales
+            datos = {"DATASET_PATH": os.path.join(tmp, "dataset.csv"), "BACKUP_DIR": os.path.join(tmp, "backups"),
+                     "MODEL_PATH": os.path.join(tmp, "model.pkl"), "AVATAR_DIR": os.path.join(tmp, "avatar")}
             path = os.path.join(tmp, "demo.avi")
             writer = cv2.VideoWriter(path, cv2.VideoWriter_fourcc(*"MJPG"), 30, (1280, 720))
             blank = np.zeros_like(SIGN_FRAME)
             for frame in [blank] * 10 + [SIGN_FRAME] * 30 + [blank] * 15:
                 writer.write(frame)
             writer.release()
-            self.assertEqual(main.main(["--video", path, "--headless", "--benchmark"]), 0)
+            with mock.patch.multiple(C, **datos):
+                self.assertEqual(main.main(["--video", path, "--headless", "--benchmark"]), 0)
+            self.assertEqual(sorted(os.listdir(tmp)), ["demo.avi"])   # solo leyó, no escribió nada
         self.assertEqual(main.main(["--video", os.path.join(tmp, "no_existe.mp4"), "--headless"]), 1)
 
 

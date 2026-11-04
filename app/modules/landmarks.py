@@ -1,31 +1,44 @@
 """
 Formato de datos compartido por la grabación, el entrenamiento y la detección.
 
-Frame "crudo" (RAW_FRAME_SIZE = 135 valores), lo que guarda el dataset:
+Frame "crudo" (RAW_FRAME_SIZE = 147 valores), lo que guarda el dataset:
     [0:63]    mano izquierda: 21 puntos x (x, y, z)
     [63:126]  mano derecha:   21 puntos x (x, y, z)
-    [126:135] cuerpo: nariz, hombro izquierdo, hombro derecho (x, y, z)
+    [126:147] cuerpo: nariz, hombro izq., hombro der., codo izq., codo der.,
+              muñeca izq., muñeca der. (x, y, z)
 x e y van en unidades de la altura de la imagen (x ya viene multiplicada por
 ancho/alto), así el formato no depende de la resolución de la cámara.
-Una mano o el cuerpo ausentes se guardan como ceros.
+Izquierda y derecha son las de la persona (ver landmark_detector.py).
+Una mano o un punto del cuerpo ausentes se guardan como ceros.
 
-Las features (FEATURE_FRAME_SIZE = 252 valores) se calculan a partir del frame
-crudo, en dos bloques de 126:
-  - posición: cada punto de la mano respecto al centro de los hombros, dividida
-    entre el ancho de hombros. Conserva hacia dónde se mueve la mano y a qué
-    altura está, sin depender de la distancia a la cámara.
-  - forma: cada punto respecto a su muñeca, dividido entre el tamaño de la mano.
-    Describe la configuración de los dedos sin importar dónde esté la mano.
+El formato anterior (135 valores, sin codos ni muñecas del cuerpo) es un prefijo
+de este: `upgrade_raw` lo completa con ceros.
+
+Las features (FEATURE_FRAME_SIZE = 260 valores) se calculan a partir del frame
+crudo, en tres bloques:
+  - posición (126): cada punto de la mano respecto al centro de los hombros,
+    dividida entre el ancho de hombros. Conserva hacia dónde se mueve la mano y
+    a qué altura está, sin depender de la distancia a la cámara.
+  - forma (126): cada punto respecto a su muñeca, dividido entre el tamaño de la
+    mano. Describe la configuración de los dedos sin importar dónde esté la mano.
+  - brazos (8): codos y muñecas del cuerpo (x, y) respecto a los hombros, igual
+    que la posición. Distingue señas con el mismo recorrido de la mano pero con
+    el brazo en otra postura.
 """
 import numpy as np
 
 HAND_POINTS = 21
 HAND_SIZE = HAND_POINTS * 3          # 63
 HANDS_SIZE = HAND_SIZE * 2           # 126
-POSE_POINTS = (0, 11, 12)            # índices de MediaPipe Pose: nariz, hombros
-POSE_SIZE = len(POSE_POINTS) * 3     # 9
+# Índices de MediaPipe Pose: nariz, hombros, codos, muñecas (pares izquierda, derecha)
+POSE_POINTS = (0, 11, 12, 13, 14, 15, 16)
+POSE_SIZE = len(POSE_POINTS) * 3     # 21
+BODY_SIZE = 9                        # nariz y hombros: la referencia del cuerpo
+ARMS_START = HANDS_SIZE + BODY_SIZE  # codos y muñecas: se mueven con la seña
 RAW_FRAME_SIZE = HANDS_SIZE + POSE_SIZE
-FEATURE_FRAME_SIZE = HANDS_SIZE * 2
+OLD_RAW_FRAME_SIZE = HANDS_SIZE + BODY_SIZE   # 135, formato anterior
+ARM_FEATURES = 8                     # 2 codos y 2 muñecas, (x, y)
+FEATURE_FRAME_SIZE = HANDS_SIZE * 2 + ARM_FEATURES
 
 # Ancho de hombros típico (en alturas de imagen) cuando no se ve el cuerpo
 DEFAULT_SCALE = 0.3
@@ -85,10 +98,25 @@ def hands_present(frame) -> bool:
     return bool(np.any(np.asarray(frame)[:HANDS_SIZE] != 0))
 
 
+def upgrade_raw(frames):
+    """Completa frames del formato anterior (135 valores) con ceros en codos y
+    muñecas del cuerpo. Los frames que ya tienen el formato actual no cambian."""
+    frames = np.asarray(frames, dtype=np.float32)
+    if frames.shape[-1] == RAW_FRAME_SIZE:
+        return frames
+    if frames.shape[-1] != OLD_RAW_FRAME_SIZE:
+        raise ValueError(f"frame de {frames.shape[-1]} valores: se esperaban {RAW_FRAME_SIZE} u {OLD_RAW_FRAME_SIZE}")
+    pad = np.zeros(frames.shape[:-1] + (RAW_FRAME_SIZE - OLD_RAW_FRAME_SIZE,), dtype=np.float32)
+    return np.concatenate([frames, pad], axis=-1)
+
+
 def _slots(width):
+    """Partes que se rellenan por separado: cada mano, nariz y hombros juntos, y
+    cada codo y muñeca (se puede perder uno sin el otro)."""
     slots = [(0, HAND_SIZE), (HAND_SIZE, HANDS_SIZE)]
     if width >= RAW_FRAME_SIZE:
-        slots.append((HANDS_SIZE, RAW_FRAME_SIZE))
+        slots.append((HANDS_SIZE, ARMS_START))
+        slots += [(i, i + 3) for i in range(ARMS_START, RAW_FRAME_SIZE, 3)]
     return slots
 
 
@@ -138,7 +166,8 @@ def pose_valid(frame) -> bool:
 def drop_resting_hands(frame, body, margin):
     """Quita las manos cuya muñeca está más de `margin` anchos de hombro por
     debajo de la línea de los hombros (manos apoyadas en la mesa o las piernas,
-    que no están haciendo una seña). `body` es una pose de 9 valores."""
+    que no están haciendo una seña). `body` es la pose del cuerpo (sus primeros
+    9 valores son nariz y hombros)."""
     if body is None:
         return frame
     shoulders = np.asarray(body, dtype=np.float32)[3:9].reshape(2, 3)
@@ -157,8 +186,9 @@ def drop_resting_hands(frame, body, margin):
 
 
 def body_reference_pose(frames, min_valid=3):
-    """Mediana de la pose (nariz y hombros) en frames donde se ven ambos hombros.
-    Devuelve None si no hay suficientes."""
+    """Mediana de la pose del cuerpo en frames donde se ven ambos hombros.
+    Devuelve None si no hay suficientes. Como referencia solo se usan nariz y
+    hombros; codos y muñecas van incluidos para que el tamaño coincida."""
     frames = np.asarray(frames, dtype=np.float32)
     if len(frames) == 0 or frames.shape[1] < RAW_FRAME_SIZE:
         return None
@@ -175,8 +205,9 @@ def prepare_sequence(frames, length, min_frames, body=None):
     recortar, rellenar huecos y remuestrear. Devuelve None si es muy corta.
 
     `body` es la pose de referencia tomada antes de la seña (con las manos
-    abajo, los brazos no tapan los hombros). Si se da, reemplaza la pose de
-    todos los frames de la seña."""
+    abajo, los brazos no tapan los hombros). Si se da, reemplaza nariz y
+    hombros en todos los frames de la seña; codos y muñecas siguen siendo los
+    de cada frame, porque son parte del movimiento."""
     if len(frames) == 0:
         return None
     frames = trim(frames)
@@ -185,7 +216,7 @@ def prepare_sequence(frames, length, min_frames, body=None):
     out = resample(fill_gaps(frames), length)
     if body is not None and out.shape[1] >= RAW_FRAME_SIZE:
         out = out.copy()
-        out[:, HANDS_SIZE:RAW_FRAME_SIZE] = body
+        out[:, HANDS_SIZE:ARMS_START] = np.asarray(body, dtype=np.float32)[:BODY_SIZE]
     return out
 
 
@@ -207,7 +238,8 @@ def _body_reference(seq):
 
 
 def sequence_features(seq):
-    """(T, 135) crudo -> (T, 252) features: posición respecto al cuerpo y forma de la mano."""
+    """(T, 147) crudo -> (T, 260) features: posición respecto al cuerpo, forma
+    de la mano y postura de los brazos."""
     seq = np.asarray(seq, dtype=np.float32)
     center, scale = _body_reference(seq)
     hands = seq[:, :HANDS_SIZE].reshape(len(seq), 2, HAND_POINTS, 3)
@@ -223,15 +255,24 @@ def sequence_features(seq):
     shape = shape / np.maximum(size, 1e-3)[..., None, None]
     shape[~present] = 0
 
-    return np.concatenate([position, shape], axis=1).reshape(len(seq), FEATURE_FRAME_SIZE)
+    arms = seq[:, ARMS_START:RAW_FRAME_SIZE].reshape(len(seq), 4, 3)[..., :2]   # codos, muñecas
+    seen = np.any(arms != 0, axis=-1)
+    arms = (arms - center) / scale
+    arms[~seen] = 0
+
+    hands_part = np.concatenate([position, shape], axis=1).reshape(len(seq), HANDS_SIZE * 2)
+    return np.concatenate([hands_part, arms.reshape(len(seq), ARM_FEATURES)], axis=1)
 
 
 def mirror_features(feat):
-    """Versión espejo de una o varias secuencias de features: intercambia la
-    mano izquierda con la derecha e invierte x (para personas zurdas)."""
+    """Versión espejo de una o varias secuencias de features: intercambia el
+    lado izquierdo con el derecho e invierte x (para personas zurdas)."""
     feat = np.asarray(feat, dtype=np.float32)
-    shape = feat.shape
-    blocks = feat.reshape(*shape[:-1], 2, 2, HAND_POINTS, 3)   # bloque, mano, punto, xyz
-    mirrored = blocks[..., ::-1, :, :].copy()
-    mirrored[..., 0] *= -1
-    return mirrored.reshape(shape)
+    lead = feat.shape[:-1]
+    blocks = feat[..., :HANDS_SIZE * 2].reshape(*lead, 2, 2, HAND_POINTS, 3)   # bloque, mano, punto, xyz
+    hands = blocks[..., ::-1, :, :].copy()
+    hands[..., 0] *= -1
+    arms = feat[..., HANDS_SIZE * 2:].reshape(*lead, 2, 2, 2)                  # codo/muñeca, lado, xy
+    arms = arms[..., ::-1, :].copy()
+    arms[..., 0] *= -1
+    return np.concatenate([hands.reshape(*lead, HANDS_SIZE * 2), arms.reshape(*lead, ARM_FEATURES)], axis=-1)

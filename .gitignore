@@ -36,3 +36,7 @@ debug_*.jpg
 .DS_Store
 Thumbs.db
 app/data/test_assets/
+
+# Datos grabados por cada persona (puntos del cuerpo): se comparten a propósito, no por defecto
+app/data/dataset_v2.csv
+app/data/avatar/

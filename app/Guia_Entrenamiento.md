@@ -69,11 +69,26 @@ Un modelo entrenado con una sola persona funciona bien con esa persona y mal con
 *   No hace falta grabar "en espejo": el entrenamiento ya genera la versión para personas zurdas.
 
 > [!NOTE]
-> La versión actual solo usa las manos (y los hombros como referencia). Las expresiones faciales todavía no se toman en cuenta.
+> La versión actual usa las manos y los brazos (hombros, codos y muñecas). Las expresiones faciales todavía no se toman en cuenta.
+> Si grabaste muestras antes de que la app leyera los codos, se conservan, pero conviene regrabarlas.
 
 ---
 
-## 6. 🛠️ Ciclo de Mejora Continua
+## 6. 🧍 Grabar movimientos para el avatar
+
+El avatar no se entrena: copia tus movimientos grabados, uno por palabra.
+1.  En Blender: abre el add-on (`blender/inclusion_avatar.py`), **Crear puntos** y **Escuchar en vivo**.
+2.  En la app: **'a'**, escribe la palabra. Los puntos de Blender te siguen en vivo.
+3.  **Espacio**, haz la seña una vez, con calma y bien hecha, y baja las manos: destello verde = guardado.
+4.  Si no te gustó, vuelve a hacerla (reemplaza la anterior) o **'z'** para deshacer.
+
+*   Una toma limpia por palabra basta: aquí importa la calidad, no la cantidad.
+*   Que se vean tus hombros, codos y manos completos; de frente a la cámara.
+*   Empieza y termina con los brazos abajo, quieto: así la animación arranca y acaba en reposo.
+
+---
+
+## 7. 🛠️ Ciclo de Mejora Continua
 
 1.  **Graba:** Recolecta al menos 20 muestras por palabra y por persona.
 2.  **Entrena:** Presiona **'e'** en la app, o ejecuta `python train_model.py` para ver además la precisión con personas que el modelo no vio.

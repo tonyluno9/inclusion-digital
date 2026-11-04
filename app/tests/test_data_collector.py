@@ -8,8 +8,10 @@ import numpy as np
 
 import config as C
 from modules.data_collector import DataCollector
+from modules.landmarks import OLD_RAW_FRAME_SIZE, RAW_FRAME_SIZE
+from train_model import load_dataset
 
-SEQ = np.zeros((C.SEQUENCE_LENGTH, 135), dtype=np.float32)
+SEQ = np.zeros((C.SEQUENCE_LENGTH, RAW_FRAME_SIZE), dtype=np.float32)
 
 
 class DataCollectorTest(unittest.TestCase):
@@ -42,7 +44,7 @@ class DataCollectorTest(unittest.TestCase):
             dc.save_sequence(label, SEQ, person="Ana_espejo")
         raw, y, groups = train_model.load_dataset(self.path)
         self.assertEqual(list(y), ["null", "niño", "none", "na"])
-        self.assertEqual(raw.shape, (4, C.SEQUENCE_LENGTH, 135))
+        self.assertEqual(raw.shape, (4, C.SEQUENCE_LENGTH, RAW_FRAME_SIZE))
         self.assertEqual(set(groups), {"ana"})
 
     def test_conteos_en_memoria_coinciden_con_el_archivo(self):
@@ -108,6 +110,43 @@ class DataCollectorTest(unittest.TestCase):
         dc.save_sequence("b", SEQ)
         self.assertEqual(len(os.listdir(self.backup)), 1)
         self.assertTrue(os.listdir(self.backup)[0].endswith(".csv"))
+
+    def write_old_format(self, rows):
+        os.makedirs(os.path.dirname(self.path), exist_ok=True)
+        width = C.SEQUENCE_LENGTH * OLD_RAW_FRAME_SIZE
+        with open(self.path, "w", newline="", encoding="utf-8") as f:
+            w = csv.writer(f)
+            w.writerow(["label", "person"] + [f"f{i}" for i in range(width)])
+            for label, person, value in rows:
+                w.writerow([label, person] + [f"{value:.5f}"] * width)
+
+    def test_migracion_del_formato_sin_codos(self):
+        """RNF-09 / RF-17: un dataset del formato anterior se respalda y se convierte
+        al abrirlo; las muestras viejas conservan sus valores y se pueden agregar nuevas."""
+        self.write_old_format([("hola", "tony", 0.25), ("buenas tardes", "tony", 0.5)])
+        dc = DataCollector(self.path, self.backup, sequence_length=C.SEQUENCE_LENGTH)
+        self.assertEqual(dc.migrated, 2)
+        self.assertEqual(dc.count(), 2)
+        backups = os.listdir(self.backup)
+        self.assertEqual(len(backups), 1)
+        self.assertIn("formato135", backups[0])
+
+        raw, y, groups = load_dataset(self.path)
+        self.assertEqual(raw.shape, (2, C.SEQUENCE_LENGTH, RAW_FRAME_SIZE))
+        np.testing.assert_allclose(raw[0, :, :OLD_RAW_FRAME_SIZE], 0.25)
+        self.assertTrue(np.all(raw[:, :, OLD_RAW_FRAME_SIZE:] == 0))
+        self.assertEqual(list(y), ["hola", "buenas tardes"])
+
+        dc.save_sequence("hola", SEQ, person="tony")             # ya no choca con el formato
+        self.assertEqual(dc.count("hola"), 2)
+        again = DataCollector(self.path, self.backup, sequence_length=C.SEQUENCE_LENGTH)
+        self.assertEqual(again.migrated, 0)                      # no se migra dos veces
+
+    def test_entrenar_lee_el_formato_anterior_sin_migrar(self):
+        """RF-11: train_model.py acepta un dataset viejo que no se ha abierto con la app."""
+        self.write_old_format([("hola", "tony", 0.1)])
+        raw, _, _ = load_dataset(self.path)
+        self.assertEqual(raw.shape, (1, C.SEQUENCE_LENGTH, RAW_FRAME_SIZE))
 
     def test_formato_distinto_lanza_value_error(self):
         """RNF-09: un CSV con otro número de columnas se rechaza sin tocarlo."""

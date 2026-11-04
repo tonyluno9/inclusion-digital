@@ -35,8 +35,9 @@ En la ventana, presiona `h` para ver todas las teclas:
 | Tecla | Acción |
 |---|---|
 | `t` | Entrenar una palabra (pide palabra y nombre en la ventana) |
-| Espacio | En entrenamiento: activar o pausar la grabación automática |
-| `z` | En entrenamiento: deshacer la última muestra |
+| `a` | Avatar: grabar el movimiento de una palabra (pide la palabra) |
+| Espacio | En entrenamiento o avatar: activar o pausar la grabación automática |
+| `z` | En entrenamiento o avatar: deshacer la última toma |
 | `d` | Modo detección |
 | `e` | Entrenar el modelo (en segundo plano) |
 | `r` | Recargar el modelo |
@@ -56,26 +57,41 @@ Para ver la precisión real del modelo con personas que no vio:
 python train_model.py
 ```
 
+## Avatar
+
+El avatar aprende grabando: en modo avatar (`a`) la app manda tu movimiento en vivo a Blender (UDP
+`127.0.0.1:5005`) y, con Espacio, cada seña (manos arriba → abajo) se guarda como clip en
+`data/avatar/<palabra>.json`, con el movimiento 3D de cuerpo, brazos y dedos a su velocidad real.
+
+En Blender se usa [`../blender/inclusion_avatar.py`](../blender/README.md): crea los puntos, los mueve en vivo e importa
+los clips como animación. Conectar esos puntos al rig del personaje es la siguiente etapa
+([06_avatar.md](../requerimientos/06_avatar.md)).
+
 ## Cómo funciona
 
-1. **Detección** (`modules/landmark_detector.py`): MediaPipe Tasks detecta las dos manos y los hombros. Cada mano
-   ocupa siempre su lugar (izquierda / derecha), con continuidad entre frames.
+1. **Detección** (`modules/landmark_detector.py`): MediaPipe Tasks detecta las dos manos y el cuerpo (hombros, codos,
+   muñecas), en paralelo. Izquierda y derecha son siempre las de la persona, con continuidad entre frames. También
+   arma el frame 3D para el avatar (`modules/motion.py`).
 2. **Segmentación** (`modules/segmenter.py`): una seña empieza al levantar las manos y termina al bajarlas. Las manos
    apoyadas abajo se ignoran. La seña se recorta y se lleva a 30 frames. **El mismo paso prepara las muestras al grabar
    y al detectar.** La referencia del cuerpo se toma de los frames previos, donde los brazos no tapan los hombros.
 3. **Features** (`modules/landmarks.py`): por frame, la posición de cada mano respecto a los hombros (trayectoria y
-   altura) y la forma de la mano respecto a su muñeca (configuración de los dedos), sin depender de la distancia a la cámara.
+   altura), la forma de la mano respecto a su muñeca (configuración de los dedos) y la postura de codos y muñecas, sin
+   depender de la distancia a la cámara.
 4. **Modelo** (`train_model.py`): Random Forest con aumento de datos (espejo para personas zurdas, versión sin cuerpo
    visible, variaciones de corte y ruido). La evaluación es por persona.
 5. **App** (`inclusion_app.py`): toda la lógica, separada del bucle de cámara (`main.py`) para poder probarla completa
    con frames y teclas simuladas.
 
 El dataset (`data/dataset_v2.csv`) guarda los puntos crudos, así que si cambian las features no hay que volver a grabar.
+Un dataset del formato anterior (sin codos) se respalda y se convierte solo al abrir la app; esas muestras quedan con
+los codos en cero, así que conviene regrabarlas.
 
 ## Configuración
 
 Todo en [`config.py`](config.py): cámara, segmentación, umbral de confianza, silencio para armar la oración,
-servicios en línea (`USE_CLAUDE`, `USE_ONLINE_TTS`, `USE_ONLINE_STT`) y nombres con acento (`DISPLAY_NAMES`).
+servicios en línea (`USE_CLAUDE`, `USE_ONLINE_TTS`, `USE_ONLINE_STT`), avatar (`AVATAR_UDP_PORT`, carpeta de clips) y
+nombres con acento (`DISPLAY_NAMES`).
 
 ## Pruebas
 

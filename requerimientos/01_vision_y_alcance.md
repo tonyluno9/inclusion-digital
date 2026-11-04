@@ -31,11 +31,13 @@ traduce señas a texto y voz, y la voz del interlocutor a texto.
 - Aplicación de escritorio en Python (Windows prioritario).
 - Grabación de dataset, entrenamiento y evaluación dentro del mismo proyecto.
 - Servicios en línea opcionales: voz (gTTS), oración natural (Claude), voz a texto (Google).
+- **Avatar (en curso):** captura del movimiento del brazo completo y las manos, grabación de un clip por palabra y
+  reproducción en un personaje de Blender. Etapas y requerimientos en [06_avatar.md](06_avatar.md).
 
 ## Fuera de alcance (por ahora)
 
 - Reconocimiento de **señas continuas** sin bajar las manos y gramática de LSM completa.
 - Deletreo manual (alfabeto dactilológico).
 - Marcadores no manuales (expresión facial, movimiento de cabeza).
-- Traducción de español a LSM con avatar.
+- Traducción de español a LSM con gramática de LSM (el avatar encadena señas palabra por palabra, ver [06](06_avatar.md)).
 - App móvil (existe la exportación a TFLite como base, ver RF-16).
