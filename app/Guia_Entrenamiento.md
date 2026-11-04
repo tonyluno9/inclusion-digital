@@ -88,7 +88,8 @@ El avatar no se entrena: copia tus movimientos grabados, uno por palabra.
 
 **Si al sistema le cuesta detectar tu cuerpo** (el personaje se queda quieto o los brazos saltan):
 *   Aléjate hasta que se vean **la cabeza, los hombros, los codos y la cintura**. Muy cerca de la cámara, el
-    modelo tiene que adivinar el cuerpo y se equivoca.
+    modelo tiene que adivinar el cuerpo y se equivoca. Si estás demasiado cerca, la app lo avisa arriba en naranja:
+    **"Aléjate: no veo tus codos"**.
 *   Luz de frente y pareja; nada brillante detrás de ti (ventana, lámpara). Una habitación oscura o a contraluz
     es la causa más común.
 *   Ropa que contraste con el fondo: camisa oscura en pared clara o al revés, y mangas que dejen ver dónde está el codo.

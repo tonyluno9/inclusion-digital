@@ -39,6 +39,10 @@ Con `a` se pide la palabra y se entra al modo AVATAR.
   (configurable). El envío nunca bloquea ni detiene la app si nadie escucha.
 - En el video se dibujan hombros, codos, muñecas y manos, para que la persona vea qué se está capturando.
 - El movimiento enviado en vivo se suaviza (filtro One Euro) para que el avatar no tiemble.
+- **Aviso de encuadre:** si en el último segundo los codos se vieron en menos del 30 % de los frames, la barra
+  superior dice **"Aléjate: no veo tus codos"** (en naranja, como "No veo tus hombros"). Cuenta siempre en modo
+  avatar y, en los otros modos, solo mientras hay manos. En la prueba en vivo, muy cerca de la cámara el cuerpo se
+  detectó en el 1 % de los frames; bien encuadrado, en el 100 %.
 
 ### RF-19 · Grabación de clips por palabra — Debe
 En modo avatar, Espacio activa o pausa la grabación. La seña se detecta igual que en RF-03 (manos arriba → manos abajo).

@@ -21,6 +21,7 @@ _FONT_PATHS = [
 
 WHITE = (255, 255, 255)
 GRAY = (170, 170, 170)
+WARNING = (255, 165, 60)     # avisos de encuadre (RGB)
 PLATE = (0, 0, 0, 255)
 MARGIN = 40
 MIN_HEIGHT = 720
@@ -55,6 +56,7 @@ class View:
     tts_enabled: bool = True
     tts_speaking: bool = False
     body_visible: bool = True
+    framing_hint: str = ""
     show_guide: bool = True
 
 
@@ -139,12 +141,16 @@ class DisplayUI:
         indicators = [f"Voz: {'sí' if v.tts_enabled else 'no'}"]
         if v.tts_speaking:
             indicators.append("Hablando...")
-        if not v.body_visible:
-            indicators.append("No veo tus hombros")
+        warning = "No veo tus hombros" if not v.body_visible else v.framing_hint
+        if warning:
+            indicators.append(warning)
         top = "   ".join([mode] + indicators)
         y = 22
         y += cls._text_block(draw, [top], small, MARGIN, y, WHITE) + 14
         draw.text((MARGIN, 22), mode, font=small, fill=mode_col)
+        if warning:   # el aviso de encuadre resalta (va al final de la barra)
+            x = MARGIN + draw.textlength(top[:-len(warning)], font=small)
+            draw.text((x, 22), warning, font=small, fill=WARNING)
 
         # --- Estado de la acción (entrenamiento / avisos) ---
         if v.action_status:
@@ -258,7 +264,7 @@ class DisplayUI:
 
         key = (w, h, v.mode, v.word, round(v.confidence, 2), v.action_status, v.stt_text, v.stt_recording,
                tuple(v.history), v.sentence, v.sentence_loading, v.prompt_question, v.prompt_text, v.status,
-               v.panel_title, tuple(v.panel_lines or ()), v.tts_enabled, v.tts_speaking, v.body_visible)
+               v.panel_title, tuple(v.panel_lines or ()), v.tts_enabled, v.tts_speaking, v.body_visible, v.framing_hint)
         if key != cls._cache_key:
             cls._cache = cls._render_layer(w, h, v)
             cls._cache_key = key

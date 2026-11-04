@@ -9,7 +9,7 @@ cd app
 python -m unittest discover -s tests -t .
 ```
 
-109 pruebas, 30–50 s, sin cámara. La prueba de integración con MediaPipe descarga la primera vez los modelos y una foto
+112 pruebas, 30–50 s, sin cámara. La prueba de integración con MediaPipe descarga la primera vez los modelos y una foto
 de muestra oficial (≈ 14 MB); sin internet se omite. Las pruebas de Blender corren si está instalado (variable
 `BLENDER_EXE` o `C:\Program Files\Blender Foundation\Blender *`); el CI no lo tiene y las omite. CI: [`.github/workflows/ci.yml`](../.github/workflows/ci.yml)
 (Windows y Ubuntu, Python 3.10–3.12).
@@ -51,7 +51,7 @@ de muestra oficial (≈ 14 MB); sin internet se omite. Las pruebas de Blender co
 | ID | Requerimiento | Verificación automática | Estado |
 |---|---|---|---|
 | RF-17 | Brazo completo | `test_motion.test_body_sides_are_anatomical`, `test_landmarks.test_arm_features`, `test_landmarks.test_fill_gaps_fills_each_arm_point_alone`, `test_segmenter.test_arms_move_with_the_sign`, `test_integration_mediapipe.test_detector_gives_3d_frame_for_the_avatar`, `test_data_collector.test_migracion_*`, `test_data_collector.test_manos_grabadas_del_lado_cambiado_*`, `test_motion.HandSideTest` (la mano de cada lado tiene la forma de ese lado, también con MediaPipe real) | 🟡 falta confirmar codos con la webcam |
-| RF-18 | Modo avatar en vivo | `test_app.test_avatar_live_and_record_clip`, `test_motion.LiveSenderTest`, `test_motion.SmoothingTest` | 🟡 falta probar con la webcam y Blender abiertos |
+| RF-18 | Modo avatar en vivo | `test_app.test_avatar_live_and_record_clip`, `test_app.test_framing_hint_*` / `test_no_framing_hint_*`, `test_motion.LiveSenderTest`, `test_motion.SmoothingTest`; prueba en vivo observada (29 fps, cuerpo y manos 100 % bien encuadrado) | 🟡 falta probar con la webcam y Blender abiertos |
 | RF-19 | Clips por palabra | `test_app.test_avatar_*`, `test_motion.ClipTest`, `test_motion.RecorderTest` | ✅ (con frames simulados) |
 | RF-20 | Formato neutral | `test_motion.WorldFrameTest`, `test_motion.test_make_clip_has_the_documented_format`, `test_blender_script.test_clip_real_de_la_app_en_blender` | ✅ |
 | RF-21 | Blender: en vivo | `blender/tests/test_inclusion_avatar.py` (UDP real, sin el timer modal) | 🟡 falta ver el panel y el timer en Blender abierto |
@@ -96,6 +96,7 @@ Marca cada punto. Lo que falle se registra como requerimiento no cumplido.
 - [ ] En la app, `a`, palabra: aparece "● AVATAR" y se dibujan hombros, codos y muñecas (RF-17, RF-18).
 - [ ] Al levantar el brazo **derecho**, en Blender se mueve `cuerpo.right_*` y `mano_der.*` (lados anatómicos, RF-17).
 - [ ] Los puntos siguen el movimiento sin temblar y sin retraso notable (RF-18).
+- [ ] Muy cerca de la cámara aparece "Aléjate: no veo tus codos" y desaparece al alejarse (RF-18).
 - [ ] Espacio, seña, manos abajo: destello verde y aparece `app/data/avatar/<palabra>.json` (RF-19).
 - [ ] Con "Importar clips automáticamente", el clip queda como acción `seña_<palabra>`; al detener e importarlo, se reproduce (RF-22).
 - [ ] `z` deshace la toma (RF-19).

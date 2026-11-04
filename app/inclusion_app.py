@@ -7,6 +7,7 @@ frames y teclas simuladas (ver tests/test_app.py).
 """
 import threading
 import time
+from collections import deque
 
 import cv2
 
@@ -15,7 +16,7 @@ from modules.beep import beep_error, beep_start, beep_stop
 from modules.coherence import make_coherent
 from modules.data_collector import DataCollector
 from modules.gesture_logic import GestureLogic
-from modules.landmarks import hands_present, pose_valid
+from modules.landmarks import elbows_visible, hands_present, pose_valid
 from modules.motion import ClipStore, LiveSender, LiveSmoother, MotionRecorder, make_clip
 from modules.segmenter import SignSegmenter
 from train_model import train
@@ -86,6 +87,8 @@ class InclusionApp:
         self.training = False
         self.reload_pending = False
         self.body_visible = True
+        self.framing_hint = ""       # aviso de encuadre ("Aléjate: no veo tus codos")
+        self._elbows_seen = deque(maxlen=C.FRAMING_WINDOW)   # ¿se vieron los codos? en los frames que cuentan
         self.last_saved = None       # última muestra guardada (para pruebas y estadísticas)
         self.timings = {"detect": [], "logic": [], "render": []}
 
@@ -118,6 +121,7 @@ class InclusionApp:
 
     def _set_mode(self, mode):
         self.mode = mode
+        self._elbows_seen.clear()
         self.armed = False
         self.prediction = ""
         self.segmenter.reset()
@@ -240,6 +244,7 @@ class InclusionApp:
         if hands_present(raw):
             self.last_hands_time = now
         self.body_visible = pose_valid(raw) or self.segmenter.body_visible
+        self.framing_hint = self._framing(raw)
 
         if self.reload_pending:
             self.reload_pending = False
@@ -290,6 +295,7 @@ class InclusionApp:
                 tts_enabled=self.tts.enabled,
                 tts_speaking=self.tts.speaking,
                 body_visible=self.body_visible,
+                framing_hint=self.framing_hint,
             )
             frame = DisplayUI.render(frame, view)
         t3 = time.perf_counter()
@@ -297,6 +303,19 @@ class InclusionApp:
         self.timings["logic"].append(t2 - t1)
         self.timings["render"].append(t3 - t2)
         return frame
+
+    def _framing(self, raw):
+        """Aviso cuando la persona está tan cerca de la cámara que no se ven sus
+        codos. Cuenta en modo avatar siempre, y en los otros modos solo mientras
+        hay manos (con las manos abajo, que los codos queden fuera es normal)."""
+        if not pose_valid(raw):
+            return ""                # sin hombros ya se avisa "No veo tus hombros"
+        if self.mode == "AVATAR" or hands_present(raw):
+            self._elbows_seen.append(elbows_visible(raw))
+        seen = self._elbows_seen
+        if len(seen) == seen.maxlen and sum(seen) < C.FRAMING_MIN_SEEN * len(seen):
+            return "Aléjate: no veo tus codos"
+        return ""
 
     def _avatar(self, raw, world, now):
         """Modo avatar: la seña se corta igual que al grabar muestras (manos
