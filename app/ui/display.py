@@ -24,6 +24,11 @@ GRAY = (170, 170, 170)
 PLATE = (0, 0, 0, 255)
 MARGIN = 40
 MIN_HEIGHT = 720
+MODE_LABELS = {   # texto y color (RGB) de cada modo en la barra superior
+    "DETECTION": ("● DETECCIÓN", (60, 230, 90)),
+    "TRAINING": ("● ENTRENAMIENTO", (255, 90, 90)),
+    "AVATAR": ("● AVATAR", (190, 130, 255)),
+}
 
 
 @dataclass
@@ -130,8 +135,7 @@ class DisplayUI:
         max_w = w - 2 * MARGIN
 
         # --- Barra superior: modo e indicadores ---
-        mode = "● DETECCIÓN" if v.mode == "DETECTION" else "● ENTRENAMIENTO"
-        mode_col = (60, 230, 90) if v.mode == "DETECTION" else (255, 90, 90)
+        mode, mode_col = MODE_LABELS.get(v.mode, MODE_LABELS["DETECTION"])
         indicators = [f"Voz: {'sí' if v.tts_enabled else 'no'}"]
         if v.tts_speaking:
             indicators.append("Hablando...")
@@ -265,12 +269,13 @@ class DisplayUI:
             frame[partial] = (base * (1 - partial_a) + partial_bgr * partial_a).astype(np.uint8)
 
         # Elementos que cambian en cada frame
-        if v.mode == "TRAINING" and v.capturing:
+        recording_mode = v.mode in ("TRAINING", "AVATAR")
+        if recording_mode and v.capturing:
             cv2.rectangle(frame, (8, 8), (w - 8, h - 8), (0, 0, 230), 6)
             x0, y0 = w - MARGIN - 220, 18
             cv2.rectangle(frame, (x0, y0), (x0 + 220, y0 + 14), (90, 90, 90), 1)
             cv2.rectangle(frame, (x0, y0), (x0 + int(220 * min(v.capture_progress, 1.0)), y0 + 14), (0, 200, 255), -1)
-        elif v.mode == "TRAINING" and v.armed:
+        elif recording_mode and v.armed:
             cv2.rectangle(frame, (8, 8), (w - 8, h - 8), (0, 200, 255), 2)
         if v.flash is not None:
             cv2.rectangle(frame, (0, 0), (w - 1, h - 1), v.flash, 18)

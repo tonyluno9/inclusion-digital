@@ -17,11 +17,22 @@ orden sugerido para las próximas iteraciones.
 - Voz sin internet con la voz del sistema (pyttsx3); servicios en línea apagables en `config.py`.
 - Scripts `instalar.bat` / `iniciar.bat`, CI en GitHub Actions, 74 pruebas automáticas.
 
+## ✅ Iteración 3 (avatar, etapas A1 y A2)
+
+- El detector lee el brazo completo (hombros, codos, muñecas) con lados anatómicos, en paralelo con las manos.
+- Reconocedor con features v4 (incluye la postura de los brazos). El dataset anterior se migra solo, con respaldo.
+- Modo avatar (`a`): envío en vivo por UDP con suavizado One Euro y grabación de un clip 3D por palabra.
+- Add-on de Blender: puntos en vivo e importación de clips como acción `seña_<palabra>`.
+- Prueba de punta a punta: MediaPipe real → clip → Blender. 103 pruebas.
+
 ## ⏭️ Siguiente
 
 | Prioridad | Tarea | Requerimiento |
 | :--- | :--- | :--- |
 | **CRÍTICA** | Grabar el dataset del protocolo (3+ personas, 20 muestras por seña) y medir | RNF-02 |
+| **ALTA** | Conectar los puntos al rig del personaje y hornear una acción por palabra | RF-23 |
+| **ALTA** | Probar el modo avatar con la webcam y Blender abiertos ([checklist](../requerimientos/05_verificacion.md)) | RF-17, RF-18, RF-21 |
+| **MEDIA** | Reproducir frases con el avatar (encadenar clips) | RF-24 |
 | **ALTA** | Prueba manual con cámara completa ([checklist](../requerimientos/05_verificacion.md)) | RF-01, RF-06, RF-08, RF-14 |
 | **ALTA** | Comparar el Random Forest con un modelo secuencial (GRU o CNN-1D) usando validación por persona | RNF-02 |
 | **MEDIA** | Segmentar también por pausas de movimiento (sin bajar las manos) | nuevo RF |

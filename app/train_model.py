@@ -14,7 +14,8 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(BASE_DIR)
 
 import config as C
-from modules.landmarks import HANDS_SIZE, RAW_FRAME_SIZE, mirror_features, resample, sequence_features
+from modules.landmarks import (HANDS_SIZE, OLD_RAW_FRAME_SIZE, RAW_FRAME_SIZE, mirror_features, resample,
+                               sequence_features, upgrade_raw)
 
 MIN_SAMPLES_PER_SIGN = 5
 # Deja núcleos libres para que la cámara no se congele al entrenar desde la app
@@ -22,15 +23,19 @@ N_JOBS = max(1, (os.cpu_count() or 2) - 2)
 
 
 def load_dataset(dataset_path):
-    """Devuelve raw (n, T, 135), y (labels) y groups (persona)."""
+    """Devuelve raw (n, T, 147), y (labels) y groups (persona).
+    Acepta también el formato anterior (sin codos), que completa con ceros."""
     df = pd.read_csv(dataset_path, encoding="utf-8", keep_default_na=False,
                      dtype={"label": str, "person": str})
     values = df.drop(columns=["label", "person"]).values.astype(np.float32)
-    if values.shape[1] != C.SEQUENCE_LENGTH * RAW_FRAME_SIZE:
+    for frame_size in (RAW_FRAME_SIZE, OLD_RAW_FRAME_SIZE):
+        if values.shape[1] == C.SEQUENCE_LENGTH * frame_size:
+            break
+    else:
         raise ValueError(
             f"El dataset tiene {values.shape[1]} columnas y se esperaban "
             f"{C.SEQUENCE_LENGTH * RAW_FRAME_SIZE}. ¿Es un dataset de la versión anterior?")
-    raw = values.reshape(len(df), C.SEQUENCE_LENGTH, RAW_FRAME_SIZE)
+    raw = upgrade_raw(values.reshape(len(df), C.SEQUENCE_LENGTH, frame_size))
     y = df["label"].values
     groups = df["person"].str.replace("_espejo", "", regex=False).values
     return raw, y, groups

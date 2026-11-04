@@ -53,10 +53,18 @@ class SegmenterTest(unittest.TestCase):
         """RF-03: la referencia del cuerpo viene de los frames sin manos, no de la seña."""
         sign = make_sign("arriba", 30)
         frames = stream(sign)
-        idle_pose = frames[0, 126:].copy()
-        frames[20:50, 126:] = 0          # durante la seña los brazos tapan los hombros
+        idle_body = frames[0, 126:135].copy()
+        frames[20:50, 126:135] = 0       # durante la seña los brazos tapan nariz y hombros
         outs = run(self.make(), frames)
-        np.testing.assert_allclose(outs[0][:, 126:], np.tile(idle_pose, (30, 1)))
+        np.testing.assert_allclose(outs[0][:, 126:135], np.tile(idle_body, (30, 1)))
+
+    def test_arms_move_with_the_sign(self):
+        """RF-17: codos y muñecas del cuerpo son los de cada frame, no la referencia en reposo."""
+        outs = run(self.make(), stream(make_sign("arriba", 30, hand_slot=1)))
+        self.assertEqual(len(outs), 1)
+        right_wrist = outs[0][:, 144:146]            # muñeca derecha del cuerpo
+        np.testing.assert_allclose(right_wrist, outs[0][:, 63:65], atol=1e-6)   # sigue a la mano derecha
+        self.assertGreater(np.ptp(right_wrist[:, 1]), 0.2)                     # y se mueve
 
 
 if __name__ == "__main__":

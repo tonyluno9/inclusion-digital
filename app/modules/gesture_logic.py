@@ -37,7 +37,7 @@ class GestureLogic:
         print(f"[Gestures] Modelo cargado: {len(self.classes)} señas.")
 
     def predict(self, raw_sequence):
-        """raw_sequence: (SEQUENCE_LENGTH, 135). Devuelve (seña o "", confianza)."""
+        """raw_sequence: (SEQUENCE_LENGTH, 147). Devuelve (seña o "", confianza)."""
         if self.model is None or len(raw_sequence) != self.sequence_length:
             return "", 0.0
         features = sequence_features(raw_sequence).reshape(1, -1)

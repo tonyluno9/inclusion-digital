@@ -36,15 +36,23 @@ Detalle práctico en [`app/Guia_Entrenamiento.md`](../app/Guia_Entrenamiento.md)
 
 ## Formato del dataset (`app/data/dataset_v2.csv`)
 
-- CSV UTF-8 con encabezado: `label, person, f0 … f4049`.
-- Cada fila es una seña: **30 frames × 135 valores crudos**, aplanados por frame.
+- CSV UTF-8 con encabezado: `label, person, f0 … f4409`.
+- Cada fila es una seña: **30 frames × 147 valores crudos**, aplanados por frame.
 - Valores por frame:
   - `[0:63]` mano izquierda, 21 puntos × (x, y, z)
   - `[63:126]` mano derecha, 21 puntos × (x, y, z)
   - `[126:135]` nariz, hombro izquierdo, hombro derecho × (x, y, z)
+  - `[135:147]` codo izquierdo, codo derecho, muñeca izquierda, muñeca derecha (del cuerpo) × (x, y, z)
+- Izquierda y derecha son las de la persona.
 - `x` e `y` en unidades de la altura de la imagen (x multiplicada por ancho/alto); `z` de la mano relativa a la muñeca.
-- Mano o cuerpo ausente → ceros.
+- Mano o punto del cuerpo ausente → ceros.
+- **Formato anterior** (135 valores, sin codos): la app lo respalda en `data/backups/` y lo convierte al abrirlo
+  (codos en cero); `train_model.py` también lo lee. Conviene regrabar esas señas para que el modelo aprenda los brazos.
 - Las features del modelo se calculan desde estos valores crudos (`app/modules/landmarks.py`), por lo que se pueden cambiar sin regrabar.
+
+## Clips del avatar
+
+Un archivo JSON por palabra en `app/data/avatar/` con el movimiento 3D. Formato en [06_avatar.md](06_avatar.md).
 
 ## Dataset anterior
 

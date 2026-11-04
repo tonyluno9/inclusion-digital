@@ -1,7 +1,7 @@
 """Señas sintéticas en formato crudo para probar el pipeline sin cámara."""
 import numpy as np
 
-from modules.landmarks import HAND_POINTS, HAND_SIZE, HANDS_SIZE, RAW_FRAME_SIZE
+from modules.landmarks import ARMS_START, HAND_POINTS, HAND_SIZE, HANDS_SIZE, RAW_FRAME_SIZE
 
 _SHAPE = np.random.RandomState(7).normal(0, 0.15, (HAND_POINTS, 3))
 _SHAPE[0] = 0  # muñeca
@@ -31,13 +31,33 @@ def make_sign(label, n_frames, center=(0.9, 0.6), scale=0.3, hand_slot=1, mirror
         pts[:, :2] = (path[i] + shape[:, :2] + rng.normal(0, noise, (HAND_POINTS, 2))) * scale + (cx, cy)
         pts[:, 2] = shape[:, 2] * scale
         frames[i, off:off + HAND_SIZE] = pts.reshape(-1)
-        pose = [(cx, cy - 0.6 * scale, -0.5), (cx - scale / 2, cy, -0.3), (cx + scale / 2, cy, -0.3)]
-        frames[i, HANDS_SIZE:] = np.array(pose).reshape(-1)
+        frames[i, HANDS_SIZE:] = body_pose(center, scale)
+        # El brazo que seña sigue a la mano: muñeca del cuerpo en la muñeca de
+        # la mano y codo abajo, entre el hombro y la muñeca
+        side = hand_slot
+        shoulder = np.array((cx + (side - 0.5) * scale, cy))
+        wrist = pts[0, :2]
+        elbow = (shoulder + wrist) / 2 + (0, 0.5 * scale)
+        frames[i, ARMS_START + side * 3: ARMS_START + side * 3 + 2] = elbow
+        frames[i, ARMS_START + 6 + side * 3: ARMS_START + 6 + side * 3 + 2] = wrist
     return frames
 
 
+def body_pose(center=(0.9, 0.6), scale=0.3):
+    """Pose del cuerpo (21 valores) con los brazos abajo, en reposo."""
+    cx, cy = center
+    left, right = cx - scale / 2, cx + scale / 2
+    pose = [(cx, cy - 0.6 * scale, -0.5), (left, cy, -0.3), (right, cy, -0.3),
+            (left, cy + 0.9 * scale, -0.2), (right, cy + 0.9 * scale, -0.2),     # codos
+            (left, cy + 1.7 * scale, -0.2), (right, cy + 1.7 * scale, -0.2)]     # muñecas
+    return np.array(pose, dtype=np.float32).reshape(-1)
+
+
 def stream(sign, pad=20):
-    """Frames sin manos (pero con cuerpo) antes y después de la seña."""
+    """Frames sin manos (pero con cuerpo, brazos abajo) antes y después de la seña."""
     empty = np.zeros((pad, RAW_FRAME_SIZE), dtype=np.float32)
-    empty[:, HANDS_SIZE:] = sign[0, HANDS_SIZE:]
+    shoulders = sign[0, HANDS_SIZE + 3:HANDS_SIZE + 9].reshape(2, 3)
+    scale = float(shoulders[1, 0] - shoulders[0, 0])
+    center = (float(shoulders[:, 0].mean()), float(shoulders[0, 1]))
+    empty[:, HANDS_SIZE:] = body_pose(center, abs(scale) or 0.3)
     return np.concatenate([empty, sign, empty])

@@ -4,7 +4,7 @@ from modules.data_collector import DataCollector
 
 
 def clear_word():
-    collector = DataCollector(C.DATASET_PATH, C.BACKUP_DIR, C.BACKUP_EVERY)
+    collector = DataCollector(C.DATASET_PATH, C.BACKUP_DIR, C.BACKUP_EVERY, C.SEQUENCE_LENGTH)
     labels, _ = collector.stats()
     if not labels:
         print("El dataset no existe o está vacío.")

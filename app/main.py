@@ -126,6 +126,7 @@ def main(argv=None):
         tts.shutdown()
         stt.stop_recording()
         detector.close()
+        app.close()
         cap.release()
         cv2.destroyAllWindows()
 

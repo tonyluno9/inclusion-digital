@@ -7,5 +7,6 @@ reconoce señas con la webcam y las muestra como texto y voz, y pasa la voz del 
 |---|---|
 | [`app/`](app/) | La aplicación: código, pruebas, scripts de instalación. Empieza por [app/README.md](app/README.md) |
 | [`requerimientos/`](requerimientos/) | Qué debe cumplir el sistema, cómo se verifica y el estado de cada requerimiento |
+| [`blender/`](blender/) | Add-on de Blender para el avatar: puntos en vivo e importación de clips ([blender/README.md](blender/README.md)) |
 
 Inicio rápido en Windows: doble clic en `app/instalar.bat` y después en `app/iniciar.bat`.

@@ -7,6 +7,7 @@ import numpy as np
 
 import config as C
 from modules.data_collector import DataCollector
+from modules.landmarks import RAW_FRAME_SIZE
 from modules.gesture_logic import GestureLogic
 from modules.segmenter import SignSegmenter
 from tests.synthetic import TRAJECTORIES, make_sign, stream
@@ -64,7 +65,7 @@ class PipelineTest(unittest.TestCase):
             with open(path, encoding="utf-8") as f:
                 header, row = list(csv.reader(f))
             self.assertEqual(header[:2], ["label", "person"])
-            self.assertEqual(len(row), 2 + C.SEQUENCE_LENGTH * 135)
+            self.assertEqual(len(row), 2 + C.SEQUENCE_LENGTH * RAW_FRAME_SIZE)
             [float(v) for v in row[2:]]
 
     def test_old_model_is_rejected(self):

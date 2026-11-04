@@ -16,6 +16,7 @@ from modules.coherence import make_coherent
 from modules.data_collector import DataCollector
 from modules.gesture_logic import GestureLogic
 from modules.landmarks import hands_present, pose_valid
+from modules.motion import ClipStore, LiveSender, LiveSmoother, MotionRecorder, make_clip
 from modules.segmenter import SignSegmenter
 from train_model import train
 from ui.display import DisplayUI, View
@@ -23,8 +24,9 @@ from ui.text_input import TextPrompt
 
 HELP_LINES = [
     "t\tEntrenar una palabra",
-    "Espacio\t(entrenamiento) activar / pausar la grabación",
-    "z\t(entrenamiento) deshacer la última muestra",
+    "a\tAvatar: grabar el movimiento de una palabra",
+    "Espacio\t(entrenamiento / avatar) activar / pausar la grabación",
+    "z\t(entrenamiento / avatar) deshacer la última toma",
     "d\tModo detección",
     "e\tEntrenar el modelo",
     "r\tRecargar el modelo",
@@ -43,12 +45,18 @@ RED = (40, 40, 230)
 
 class InclusionApp:
     def __init__(self, detector, tts, stt, collector=None, logic=None, coherence=make_coherent,
-                 trainer=train, clock=time.monotonic, background=True):
+                 trainer=train, clock=time.monotonic, background=True, clips=None, sender=None):
         self.detector = detector
         self.tts = tts
         self.stt = stt
-        self.collector = collector or DataCollector(C.DATASET_PATH, C.BACKUP_DIR, C.BACKUP_EVERY)
+        self.collector = collector or DataCollector(C.DATASET_PATH, C.BACKUP_DIR, C.BACKUP_EVERY, C.SEQUENCE_LENGTH)
         self.logic = logic or GestureLogic(C.MODEL_PATH, C.FEATURE_VERSION, C.SEQUENCE_LENGTH, C.MIN_CONFIDENCE)
+        self.clips = clips or ClipStore(C.AVATAR_DIR)
+        self.sender = sender or LiveSender(C.AVATAR_UDP_HOST, C.AVATAR_UDP_PORT)
+        # La seña empieza SEGMENT_START_FRAMES frames después de levantar las manos
+        self.recorder = MotionRecorder(C.AVATAR_PREROLL_FRAMES + C.SEGMENT_START_FRAMES)
+        self.smoother = LiveSmoother()
+        self.last_clip = None        # ruta del último clip guardado
         self.coherence = coherence
         self.trainer = trainer
         self.clock = clock
@@ -105,7 +113,15 @@ class InclusionApp:
         # Mientras se escribe no se graba (las manos van al teclado)
         self.armed = False
         self.segmenter.reset()
+        self.recorder.cancel()
         self.prompt = prompt
+
+    def _set_mode(self, mode):
+        self.mode = mode
+        self.armed = False
+        self.prediction = ""
+        self.segmenter.reset()
+        self.recorder.cancel()
 
     # ------------------------------------------------------------- acciones
     def ask_label(self):
@@ -123,14 +139,24 @@ class InclusionApp:
             self.label = word.lower()
             if person:
                 self.person = person.lower()
-            self.mode = "TRAINING"
-            self.armed = False
-            self.prediction = ""
-            self.segmenter.reset()
+            self._set_mode("TRAINING")
             n = self.collector.count(self.label)
             self.notify(f"'{self.label}' por {self.person} ({n} muestras). Espacio para empezar.")
 
         self._open_prompt(TextPrompt("Palabra a entrenar:", on_label, initial=self.label))
+
+    def ask_avatar_word(self):
+        def on_word(word):
+            self.prompt = None
+            if not word:
+                return
+            self.label = word.lower()
+            self._set_mode("AVATAR")
+            exists = self.label in self.clips.words()
+            self.notify(f"Avatar: '{self.label}'{' (ya tiene clip: se reemplaza)' if exists else ''}. "
+                        f"Espacio para grabar.")
+
+        self._open_prompt(TextPrompt("Palabra para el avatar:", on_word, initial=self.label))
 
     def ask_delete(self):
         labels, _ = self.collector.stats()
@@ -193,6 +219,8 @@ class InclusionApp:
         lines.append("Personas: " + (", ".join(f"{p} ({n})" for p, n in sorted(persons.items())) or "ninguna"))
         if self.logic.model is not None:
             lines.append(f"Modelo cargado: {len(self.logic.classes)} señas")
+        clips = self.clips.words()
+        lines.append(f"Avatar: {len(clips)} clips" + (f" ({', '.join(clips)})" if clips else ""))
         self._show_panel(f"Dataset: {total} muestras, {len(labels)} señas", lines or ["Sin muestras"], seconds=10)
         print("\n".join([f"Dataset: {total} muestras"] + lines))
 
@@ -203,7 +231,11 @@ class InclusionApp:
 
         t0 = time.perf_counter()
         frame, raw = self.detector.process(frame)
+        world = getattr(self.detector, "world", None)
         t1 = time.perf_counter()
+
+        if self.mode == "AVATAR" and world is not None:
+            self.sender.send_frame(self.smoother(world, now), now)
 
         if hands_present(raw):
             self.last_hands_time = now
@@ -215,7 +247,7 @@ class InclusionApp:
 
         action_status = ""
         if self.prompt is None:
-            action_status = self._segment(raw)
+            action_status = self._avatar(raw, world, now) if self.mode == "AVATAR" else self._segment(raw)
 
         stt_result = self.stt.get_result()
         if stt_result:
@@ -265,6 +297,37 @@ class InclusionApp:
         self.timings["logic"].append(t2 - t1)
         self.timings["render"].append(t3 - t2)
         return frame
+
+    def _avatar(self, raw, world, now):
+        """Modo avatar: la seña se corta igual que al grabar muestras (manos
+        arriba -> abajo), pero se guarda el movimiento 3D con su ritmo real."""
+        was_active = self.segmenter.active
+        sequence = self.segmenter.update(raw) if self.armed else None
+        if world is not None:
+            self.recorder.push(world, now)
+        if self.armed and not was_active and self.segmenter.active:
+            self.recorder.begin()
+            beep_start()
+        if was_active and not self.segmenter.active:
+            frames = self.recorder.finish()
+            if sequence is not None and len(frames) > 1:
+                clip = make_clip(frames, self.label, self.person)
+                self.last_clip = self.clips.save(clip)
+                self.sender.send_clip(self.label, self.last_clip)
+                beep_stop()
+                self._flash(GREEN)
+                self.notify(f"Movimiento guardado: '{self.label}' ({clip['duration']:.1f} s)")
+            else:
+                beep_error()
+                self._flash(RED)
+                self.notify("Seña muy corta o sin cuerpo detectado, no se guardó.")
+
+        if self.segmenter.active:
+            return f"GRABANDO movimiento de '{self.label}'... baja las manos al terminar"
+        target = f"en vivo a {C.AVATAR_UDP_HOST}:{C.AVATAR_UDP_PORT}"
+        if self.armed:
+            return f"Avatar '{self.label}' ({target}): levanta las manos y haz la seña"
+        return f"Avatar '{self.label}' ({target}): Espacio para grabar"
 
     def _segment(self, raw):
         """Segmentación: el mismo camino al grabar y al detectar."""
@@ -351,19 +414,25 @@ class InclusionApp:
                 self._show_panel("Teclas", HELP_LINES)
         elif ch == "t":
             self.ask_label()
-        elif ch == " " and self.mode == "TRAINING":
+        elif ch == "a":
+            self.ask_avatar_word()
+        elif ch == " " and self.mode in ("TRAINING", "AVATAR"):
             self.armed = not self.armed
             self.segmenter.reset()
+            self.recorder.cancel()
             self.notify("Grabación activada" if self.armed else "Grabación en pausa")
         elif ch == "z" and self.mode == "TRAINING":
             removed = self.collector.remove_last()
             self._flash(RED if removed else GRAY_FLASH)
             self.notify(f"Se deshizo la última muestra ('{removed}')" if removed else "No hay muestras.")
+        elif ch == "z" and self.mode == "AVATAR":
+            result = self.clips.undo(self.label)
+            self._flash(RED if result else GRAY_FLASH)
+            self.notify({"restaurado": f"Se deshizo la toma: '{self.label}' vuelve a la anterior",
+                         "borrado": f"Se borró el clip de '{self.label}'",
+                         None: f"'{self.label}' no tiene clip."}[result])
         elif ch == "d":
-            self.mode = "DETECTION"
-            self.armed = False
-            self.prediction = ""
-            self.segmenter.reset()
+            self._set_mode("DETECTION")
             self.logic.load_model()
             self.notify("Modo detección")
         elif ch == "r":
@@ -385,6 +454,9 @@ class InclusionApp:
             else:
                 self.stt.stop_recording()
         return True
+
+    def close(self):
+        self.sender.close()
 
     def benchmark_summary(self):
         import numpy as np
