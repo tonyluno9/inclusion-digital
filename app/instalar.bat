@@ -79,6 +79,10 @@ if errorlevel 1 (
     echo [OK] Instalacion completa y pruebas correctas. Abre iniciar.bat para usar la app.
 )
 
+echo.
+choice /C SN /M "Crear el acceso directo INCLUSION en el Escritorio"
+if not errorlevel 2 call "%~dp0crear_acceso_directo.bat"
+
 :fin
 echo.
 popd

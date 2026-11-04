@@ -9,7 +9,7 @@ cd app
 python -m unittest discover -s tests -t .
 ```
 
-112 pruebas, 30–50 s, sin cámara. La prueba de integración con MediaPipe descarga la primera vez los modelos y una foto
+123 pruebas de Python (incluyen las de JavaScript con Node y las de Blender, si están instalados), 30–60 s, sin cámara. La prueba de integración con MediaPipe descarga la primera vez los modelos y una foto
 de muestra oficial (≈ 14 MB); sin internet se omite. Las pruebas de Blender corren si está instalado (variable
 `BLENDER_EXE` o `C:\Program Files\Blender Foundation\Blender *`); el CI no lo tiene y las omite. CI: [`.github/workflows/ci.yml`](../.github/workflows/ci.yml)
 (Windows y Ubuntu, Python 3.10–3.12).
@@ -37,7 +37,7 @@ de muestra oficial (≈ 14 MB); sin internet se omite. Las pruebas de Blender co
 | RNF-01 | Rendimiento | Detección con manos y pose en paralelo, pose en cada frame, 1280×720: modelo `lite` 20–34 ms, **`full` 31 ms (~32 fps)**, `heavy` 76 ms (descartado); app completa con `--benchmark`: 16–20 fps; avatar (suavizado + UDP) 0.25 ms; entrenar 2 000 muestras: **7 s** | 🟡 medir con la webcam |
 | RNF-02 | Precisión ≥ 90 % por persona | `test_pipeline` (sintético). Requiere el dataset de ≥ 3 personas | ⏳ falta grabar el dataset |
 | RNF-03 | Sin internet | `test_tts` (respaldo con voz local), `test_coherence` (sin clave), `test_stt` | ✅ |
-| RNF-04 | Privacidad | `test_pipeline.test_dataset_only_has_coordinates`, `test_coherence` | ✅ |
+| RNF-04 | Privacidad | `test_pipeline.test_dataset_only_has_coordinates`, `test_coherence` | 🟡 nuestro código cumple; MediaPipe trae un registro de uso de Google que no se puede apagar desde Python (ver 03) |
 | RNF-05 | Accesibilidad | `test_app.test_render_long_texts…`, revisión de capturas (texto ajustado, destellos) | 🟡 falta revisión con usuarios Sordos |
 | RNF-06 | Robustez | `test_app.test_training_failure…`, `test_stt`, `test_integration…` (video inexistente) | ✅ |
 | RNF-07 | Portabilidad | CI en Windows y Ubuntu | 🟡 hasta que corra el primer CI |
@@ -58,7 +58,18 @@ de muestra oficial (≈ 14 MB); sin internet se omite. Las pruebas de Blender co
 | RF-22 | Blender: importar clips | `blender/tests/test_inclusion_avatar.py`, `test_blender_script.test_clip_real_de_la_app_en_blender` | ✅ |
 | RF-23 | Retargeting al rig | `blender/tests/test_retarget.py` (vía `test_blender_script.test_retargeting_al_personaje`): reposo sin giros, pose conocida (brazos < 1.5°, dedos y palmas 0°), partes perdidas, horneado y en vivo por UDP; revisión visual con fotos de MediaPipe | 🟡 falta probar con la webcam |
 | RF-25 | Contactos exactos | — | ⏳ |
-| RF-24 | Reproducción por palabras | — | ⏳ |
+
+### App unificada ([07_app_unificada.md](07_app_unificada.md))
+
+| ID | Requerimiento | Verificación automática | Estado |
+|---|---|---|---|
+| RF-26 | Una sola app con su ventana | `test_servidor_web` (interfaz, recursos, cierre al cerrar la ventana); arranque real con Edge en modo app y cierre comprobados | ✅ |
+| RF-27 | Avatar dentro de la app | `web/tests/retarget.test.mjs` (mismo resultado que Blender: 0.003°), `test_servidor_web.test_eventos_traen_estado_y_movimiento`; revisión en el navegador (imita en vivo, reproduce clips) | 🟡 falta con la webcam |
+| RF-28 | Pantallas | `test_servidor_web.test_estado_y_acciones`, `test_app` (mismas acciones); revisión de las 5 pantallas en el navegador | 🟡 falta con la webcam |
+| RF-29 | Texto a señas | `web/tests/texto.test.mjs`; revisión en el navegador («Hola, prueba» → seña «prueba» y aviso de «hola») | ✅ |
+| RF-30 | Verificación de señas | `python verificar_senas.py` con el dataset real: 89.4 % por la cámara simulada (ver [MEJORAS](../app/MEJORAS_PROYECTO.md)) | ✅ |
+| RNF-12 | Seguridad local | `test_servidor_web.test_no_sale_de_la_carpeta_web`; servidor en `127.0.0.1` | ✅ |
+| RF-24 | Reproducción por palabras | Cubierto por RF-29 (app unificada) | 🟡 falta probar con frases reales |
 
 ## Prueba manual con cámara (antes de cada versión)
 
@@ -91,6 +102,13 @@ Marca cada punto. Lo que falle se registra como requerimiento no cumplido.
 - [ ] `s`, hablar, `s`: el texto aparece arriba en grande (RF-08).
 - [ ] `f` alterna pantalla completa; cerrar con la X termina la app y apaga la cámara (RF-14).
 - [ ] `python main.py --benchmark` reporta ≥ 15 fps (RNF-01).
+
+**App unificada** (`iniciar.bat`)
+- [ ] Se abre la ventana INCLUSION con el logo; al cerrarla, la app termina (RF-26).
+- [ ] Traducir: la seña reconocida aparece en grande y el avatar la repite si tiene movimiento (RF-28, RF-27).
+- [ ] Escribir en «El interlocutor dice» hace que el avatar diga en señas las palabras que sabe (RF-29).
+- [ ] Entrenar: grabar, deshacer, ver el conteo y entrenar desde el botón (RF-28).
+- [ ] Avatar: el personaje te imita en vivo; grabar una palabra y verla en «Movimientos grabados» (RF-27).
 
 **Avatar** (Blender abierto con `blender/inclusion_avatar.py`: Crear puntos → Escuchar en vivo)
 - [ ] En la app, `a`, palabra: aparece "● AVATAR" y se dibujan hombros, codos y muñecas (RF-17, RF-18).

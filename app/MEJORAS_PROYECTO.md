@@ -33,11 +33,26 @@ orden sugerido para las próximas iteraciones.
 - Protecciones contra cuerpos mal detectados y límites de giro.
 - Pruebas en Blender: reposo exacto, pose conocida (< 1.5°), en vivo por UDP; revisión con fotos reales de MediaPipe.
 
+## ✅ Iteración 5 (app unificada)
+
+- Una sola aplicación en su ventana (Edge/Chrome en modo app): Inicio, Traducir, Entrenar, Avatar y Ayuda.
+- Avatar dentro de la app con three.js: imita en vivo, repite cada seña reconocida y dice en señas lo que escribe o
+  dicta el interlocutor. Mismo retargeting que Blender (0.003° de diferencia).
+- Identidad visual: logo, 20 íconos, ilustraciones y fondos generados (Nano Banana 2.1) y fuente Lexend.
+- `verificar_senas.py`: pasa cada muestra por la cámara simulada con un modelo que no la vio.
+- Traductor reentrenado con el dataset corregido: 97.9 % en validación cruzada; 89.4 % por la cámara simulada.
+  Las fallas son 5 muestras concretas: «hola» se hace con una mano y «buenas tardes» con dos, y en #27 y #28 no se
+  detectó la mano izquierda (parecen «hola»); en #24 apareció una mano izquierda en «hola». **Regrabarlas con la
+  versión actual** (que también guarda codos y muñecas del cuerpo) debería subir el acierto.
+- 123 pruebas.
+
 ## ⏭️ Siguiente
 
 | Prioridad | Tarea | Requerimiento |
 | :--- | :--- | :--- |
 | **CRÍTICA** | Grabar el dataset del protocolo (3+ personas, 20 muestras por seña) y medir | RNF-02 |
+| **ALTA** | Regrabar las muestras que fallan (`python verificar_senas.py`) con la versión que guarda codos | RNF-02 |
+| **ALTA** | Grabar el movimiento del avatar para cada seña del vocabulario | RF-27, RF-29 |
 | **ALTA** | Probar el modo avatar con la webcam y el personaje en Blender ([checklist](../requerimientos/05_verificacion.md)) | RF-17, RF-18, RF-21, RF-23 |
 | **ALTA** | Reproducir frases con el avatar (encadenar clips, desde texto o voz del interlocutor) | RF-24 |
 | **MEDIA** | Contactos exactos con IK (mano en la cara, el pecho o la otra mano) | RF-25 |

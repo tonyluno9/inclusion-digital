@@ -44,3 +44,6 @@ app/data/dataset_v2.meta.json
 
 # Copias de respaldo que Blender crea al guardar
 *.blend1
+
+# Perfil del navegador de la ventana de la app (cookies, caché)
+app/data/navegador/

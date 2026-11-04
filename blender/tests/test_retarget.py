@@ -276,4 +276,5 @@ def main():
     print("TODO OK")
 
 
-main()
+if __name__ == "__main__":
+    main()

@@ -22,6 +22,12 @@ Detección, reconocimiento, subtítulos, grabación y entrenamiento funcionan si
 - A servicios externos solo se envía texto: palabras reconocidas (Claude, gTTS) y audio del interlocutor solo cuando se presiona `s` (Google STT).
 - Cada servicio externo se puede desactivar en `config.py`.
 - La clave de API vive en `.env`, que está excluido de git.
+- **Riesgo conocido (MediaPipe):** la librería nativa de MediaPipe 0.10.35 incluye un registro de uso de Google
+  (`tasks/cc/core/logging/.../clearcut_logging_client.cc`, envía a `https://play.googleapis.com/log`); en la consola
+  aparece como `Failed to send to clearcut`. Por su diseño registra el uso de las tareas (no hay evidencia de que mande
+  imágenes ni puntos, pero no se ha verificado el contenido). La API de Python no ofrece cómo apagarlo
+  (`BaseOptions` solo tiene modelo y delegado). Pendiente: revisar qué envía y, si hace falta, fijar una versión sin
+  ese registro o bloquearlo para el proceso de la app.
 
 ### RNF-05 · Accesibilidad — Debe
 - Toda retroalimentación necesaria para la persona Sorda es **visual** (los sonidos son complementarios).

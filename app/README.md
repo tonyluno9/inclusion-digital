@@ -17,11 +17,39 @@ pip install -r requirements.txt
 Opcional, para voz a texto del interlocutor y exportar a TFLite: `pip install -r requirements-opcional.txt`.
 Para armar oraciones con Claude, crea `app/.env` con `ANTHROPIC_API_KEY=...`. Sin la clave, la app muestra las palabras tal cual.
 
-La primera vez que corre, la app descarga los modelos de MediaPipe a `data/models/` (unos 13 MB, de Google).
+La primera vez que corre, la app descarga los modelos de MediaPipe a `data/models/` (unos 25 MB, de Google).
 
 ## Uso
 
-**Windows:** doble clic en `iniciar.bat`, o desde la consola:
+**Windows:** doble clic en `iniciar.bat` (o en el acceso directo INCLUSION del Escritorio, que crea `instalar.bat`
+o `crear_acceso_directo.bat`). Se abre INCLUSION en su propia ventana, con cinco pantallas:
+
+| Pantalla | Para qué |
+|---|---|
+| **Inicio** | Qué hace la app y el estado de la cámara, el traductor y el avatar |
+| **Traducir** | Tus señas se vuelven subtítulos y voz; el avatar repite cada seña. Lo que el interlocutor dicta o escribe, el avatar lo dice en señas |
+| **Entrenar** | Grabar ejemplos de una seña y entrenar el traductor |
+| **Avatar** | El avatar te imita en vivo; grabar el movimiento de cada palabra |
+| **Ayuda** | Cómo colocarse, cómo enseñar una seña nueva y teclas |
+
+Teclas: `Espacio` grabar / pausar, `Z` deshacer, `V` voz, `S` micrófono, `F` pantalla completa, `H` ayuda.
+Al cerrar la ventana, la app termina sola.
+
+Desde la consola:
+
+```bash
+python servidor_web.py                    # cámara 0, en su ventana
+python servidor_web.py --camera 1         # otra cámara
+python servidor_web.py --video demo.mp4   # un video en vez de la cámara (se repite)
+python verificar_senas.py                 # comprobar que cada seña grabada se reconozca
+```
+
+Cómo está hecha: [07_app_unificada.md](../requerimientos/07_app_unificada.md) (motor en Python, interfaz web en
+`web/`, avatar con three.js).
+
+### Versión clásica (ventana de OpenCV)
+
+`iniciar_clasico.bat`, o:
 
 ```bash
 python main.py                    # cámara 0

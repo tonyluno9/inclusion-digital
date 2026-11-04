@@ -1,0 +1,65 @@
+{
+  "proyecto": "INCLUSION - app de Lengua de Señas Mexicana (señas a subtítulos y avatar)",
+  "salida": "diseno/generadas",
+  "reglas_generales": [
+    "Modelo: Nano Banana 2.1, calidad 1K como máximo.",
+    "Exactamente UNA generación por imagen. Nunca reintentar, aunque el resultado no sea perfecto: se anota y se sigue.",
+    "Ninguna imagen debe tener texto, letras, números, marcas de agua ni firmas.",
+    "Guardar en PNG con el nombre de 'archivo'."
+  ],
+  "estilo_comun": "Modern, clean, friendly and accessible visual style for an inclusive communication app for Deaf people who use Mexican Sign Language. Color palette: deep navy #0F1724, teal #2EC4B6, violet #7C5CFF, coral #FF6B6B, warm amber #FFC857. High quality, crisp, professional product design.",
+  "negativo_comun": "text, letters, words, numbers, watermark, signature, logo text, blurry, low quality, distorted hands, extra fingers, jpeg artifacts, cluttered",
+  "imagenes": [
+    {
+      "id": "logo",
+      "archivo": "logo.png",
+      "para_que": "Ícono de la ventana, pantalla de inicio y encabezado. Sin texto: el nombre lo escribe la app.",
+      "ancho": 1024,
+      "alto": 1024,
+      "aspecto": "1:1",
+      "prompt": "Minimal modern app icon for a sign language communication app. A stylized open human hand making a gentle sign gesture, merged with a rounded speech bubble shape behind it. Flat vector illustration made of smooth geometric shapes, soft gradient from teal #2EC4B6 to violet #7C5CFF, one small warm amber #FFC857 accent dot. Perfectly centered, the symbol fills about 70% of the canvas, generous padding, plain solid pure white background, no shadow on the background. Clean crisp edges, balanced and iconic, works at small sizes. No text, no letters.",
+      "revision": "Una sola figura centrada sobre fondo blanco liso; mano con 5 dedos bien formados; sin texto."
+    },
+    {
+      "id": "iconos",
+      "archivo": "iconos.png",
+      "para_que": "Hoja de 20 íconos en cuadrícula de 5 columnas × 4 filas. La app la corta en celdas iguales y pinta cada ícono del color que toque.",
+      "ancho": 1024,
+      "alto": 819,
+      "aspecto": "5:4",
+      "prompt": "A sprite sheet of 20 user interface icons arranged in a perfectly regular grid of 5 columns and 4 rows, every icon centered in its own equal square cell with lots of empty space around it, all icons the same visual size. Style: consistent minimalist line icons like the Lucide or Feather icon sets, solid pure black strokes of uniform thickness with rounded line caps, on a plain solid pure white background, no grid lines, no borders, no shadows, no color, no text, no labels. Row 1, left to right: an open human hand with three short motion lines (sign language); a webcam; a person bust with a small four-point sparkle (avatar); a speech bubble containing three horizontal lines (subtitles); a microphone. Row 2: a speaker with two sound waves; a speaker with a small x (muted); a record button (filled circle inside a ring); a stop button (rounded square); a play button (triangle). Row 3: an undo curved arrow; a trash can; a brain with a small sparkle (train model); a database cylinder; a bar chart. Row 4: a gear (settings); a question mark inside a circle (help); four arrows pointing to the corners (fullscreen); a person silhouette with a small plus sign (add person); a house (home).",
+      "revision": "Exactamente 20 íconos en 5 columnas × 4 filas, alineados, todos negros de línea sobre blanco, en el orden pedido, sin texto."
+    },
+    {
+      "id": "fondo_avatar",
+      "archivo": "fondo_avatar.png",
+      "para_que": "Escenario donde se ve el avatar 3D dentro de la app (el avatar se dibuja encima).",
+      "ancho": 1024,
+      "alto": 576,
+      "aspecto": "16:9",
+      "prompt": "Empty minimalist photographic studio backdrop for a 3D character presentation. Seamless smooth gradient wall, deep navy #141A2E at the edges blending to a softly lit slate blue in the center where a character will stand, a gentle circular soft light spot on the floor at bottom center, subtle violet #7C5CFF rim glow on the far edges, very subtle vignette and fine film grain. Completely empty: no objects, no people, no furniture, no text. Calm, premium, uncluttered, 16:9.",
+      "revision": "Fondo vacío, centro más claro, sin objetos ni personas ni texto."
+    },
+    {
+      "id": "fondo_inicio",
+      "archivo": "fondo_inicio.png",
+      "para_que": "Pantalla de bienvenida. El tercio izquierdo queda oscuro para poner el nombre y los botones encima.",
+      "ancho": 1024,
+      "alto": 576,
+      "aspecto": "16:9",
+      "prompt": "Abstract modern background for an inclusive communication app home screen. On the right two thirds: soft flowing translucent ribbons and rounded shapes that evoke the movement of signing hands and gentle sound waves, glowing teal #2EC4B6, violet #7C5CFF and a few warm amber #FFC857 accents, with small connected dots like motion-tracking points along the ribbons. The left third is calm, dark and nearly empty deep navy #0F1724 negative space for interface text. Smooth gradients, subtle depth of field, fine grain, elegant and hopeful. No people, no faces, no hands drawn realistically, no text.",
+      "revision": "Tercio izquierdo oscuro y limpio; formas fluidas a la derecha; sin personas ni texto."
+    },
+    {
+      "id": "ilustraciones",
+      "archivo": "ilustraciones.png",
+      "para_que": "4 ilustraciones para pantallas de ayuda y estados vacíos, en cuadrícula 2 × 2 (la app las recorta).",
+      "ancho": 1024,
+      "alto": 1024,
+      "aspecto": "1:1",
+      "prompt": "Four spot illustrations arranged in a perfectly regular 2 by 2 grid, each one centered in its own equal quadrant with generous empty margins, all in exactly the same flat vector style with soft rounded shapes, limited palette of teal #2EC4B6, violet #7C5CFF, coral #FF6B6B, warm amber #FFC857 and navy #0F1724, on a plain solid pure white background, no grid lines, no borders, no text. Top left: two diverse young Mexican adults in friendly conversation, one signing with both hands, the other listening and smiling, a small friendly 3D-style avatar character between them waving. Top right: a person seated at a desk facing a laptop webcam, upper body visible from head to waist including both elbows, with a dashed rounded rectangle guide framing the head, shoulders and elbows. Bottom left: a webcam with a soft diagonal slash and a small question mark, meaning camera not found. Bottom right: a stylized open hand made of connected dots and lines like motion-tracking landmarks, next to a small progress bar, meaning training. Hands drawn simply and correctly with five fingers.",
+      "revision": "4 ilustraciones en 2 × 2, mismo estilo, fondo blanco, manos con 5 dedos, sin texto."
+    }
+  ],
+  "modelo": "Nano Banana 2.1 (WaveSpeedAI), texto a imagen, resolución 1K como máximo"
+}

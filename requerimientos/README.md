@@ -11,6 +11,7 @@ Cada cambio al proyecto debe mantener estos requerimientos o actualizarlos aquí
 | [04_vocabulario_y_datos.md](04_vocabulario_y_datos.md) | Señas soportadas, protocolo de grabación y formato del dataset |
 | [05_verificacion.md](05_verificacion.md) | Cómo se verifica cada requerimiento: pruebas automáticas y prueba manual con cámara |
 | [06_avatar.md](06_avatar.md) | Avatar: captura de movimiento, clips por palabra, Blender (RF-17…RF-25, RNF-11) y formato de los clips |
+| [07_app_unificada.md](07_app_unificada.md) | La app en una sola ventana: interfaz, avatar dentro de la app, texto a señas (RF-26…RF-30, RNF-12) |
 
 ## Convenciones
 

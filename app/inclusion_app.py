@@ -58,6 +58,11 @@ class InclusionApp:
         self.recorder = MotionRecorder(C.AVATAR_PREROLL_FRAMES + C.SEGMENT_START_FRAMES)
         self.smoother = LiveSmoother()
         self.last_clip = None        # ruta del último clip guardado
+        self.live_world = None       # frame 3D suavizado (modo avatar), para el avatar de la app web
+        self.word_seq = 0            # sube con cada seña reconocida
+        self.text_seq = 0            # sube con cada texto nuevo del interlocutor
+        self.clip_seq = 0            # sube con cada clip guardado
+        self.action_status = ""
         self.coherence = coherence
         self.trainer = trainer
         self.clock = clock
@@ -140,25 +145,15 @@ class InclusionApp:
             self.prompt = None
             if person is None:
                 return
-            self.label = word.lower()
-            if person:
-                self.person = person.lower()
-            self._set_mode("TRAINING")
-            n = self.collector.count(self.label)
-            self.notify(f"'{self.label}' por {self.person} ({n} muestras). Espacio para empezar.")
+            self.train_word(word, person)
 
         self._open_prompt(TextPrompt("Palabra a entrenar:", on_label, initial=self.label))
 
     def ask_avatar_word(self):
         def on_word(word):
             self.prompt = None
-            if not word:
-                return
-            self.label = word.lower()
-            self._set_mode("AVATAR")
-            exists = self.label in self.clips.words()
-            self.notify(f"Avatar: '{self.label}'{' (ya tiene clip: se reemplaza)' if exists else ''}. "
-                        f"Espacio para grabar.")
+            if word:
+                self.avatar_word(word)
 
         self._open_prompt(TextPrompt("Palabra para el avatar:", on_word, initial=self.label))
 
@@ -167,16 +162,102 @@ class InclusionApp:
 
         def on_word(word):
             self.prompt = None
-            if not word:
-                return
-            removed = self.collector.delete_label(word)
-            if removed:
-                self.notify(f"Borradas {removed} muestras de '{word}'. Reentrena con 'e'.")
-            else:
-                self.notify(f"No se encontró '{word}'.")
+            if word:
+                self.delete_sign(word)
 
         question = "Seña a BORRAR: " + (", ".join(sorted(labels)) if labels else "(dataset vacío)")
         self._open_prompt(TextPrompt(question[:70], on_word))
+
+    def train_word(self, word, person=""):
+        """Modo entrenamiento para grabar muestras de `word`."""
+        self.label = word.strip().lower()
+        if person and person.strip():
+            self.person = person.strip().lower()
+        self._set_mode("TRAINING")
+        n = self.collector.count(self.label)
+        self.notify(f"'{self.label}' por {self.person} ({n} muestras). Espacio para empezar.")
+
+    def avatar_word(self, word):
+        """Modo avatar para grabar el movimiento de `word`. Sin palabra, el avatar
+        solo imita a la persona en vivo (no se puede grabar)."""
+        self.label = word.strip().lower()
+        self._set_mode("AVATAR")
+        if not self.label:
+            self.notify("Avatar en vivo. Escribe una palabra para grabar su movimiento.")
+            return
+        exists = self.label in self.clips.words()
+        self.notify(f"Avatar: '{self.label}'{' (ya tiene clip: se reemplaza)' if exists else ''}. "
+                    f"Espacio para grabar.")
+
+    def detection_mode(self):
+        self._set_mode("DETECTION")
+        self.logic.load_model()
+        self.notify("Modo detección")
+
+    def toggle_recording(self):
+        if self.mode not in ("TRAINING", "AVATAR"):
+            return False
+        if not self.label:
+            self.notify("Primero escribe la palabra que vas a grabar.")
+            return False
+        self.armed = not self.armed
+        self.segmenter.reset()
+        self.recorder.cancel()
+        self.notify("Grabación activada" if self.armed else "Grabación en pausa")
+        return self.armed
+
+    def undo(self):
+        """Deshace la última muestra (entrenamiento) o la última toma (avatar)."""
+        if self.mode == "TRAINING":
+            removed = self.collector.remove_last()
+            self._flash(RED if removed else GRAY_FLASH)
+            self.notify(f"Se deshizo la última muestra ('{removed}')" if removed else "No hay muestras.")
+        elif self.mode == "AVATAR":
+            result = self.clips.undo(self.label)
+            self._flash(RED if result else GRAY_FLASH)
+            self.notify({"restaurado": f"Se deshizo la toma: '{self.label}' vuelve a la anterior",
+                         "borrado": f"Se borró el clip de '{self.label}'",
+                         None: f"'{self.label}' no tiene clip."}[result])
+
+    def reload_model(self):
+        self.logic.load_model()
+        self.prediction = ""
+        self.notify("Modelo recargado" if self.logic.model is not None else "No hay modelo para cargar")
+
+    def toggle_voice(self):
+        enabled = self.tts.toggle()
+        self.notify(f"Voz {'activada' if enabled else 'desactivada'}")
+        return enabled
+
+    def toggle_listening(self):
+        """Voz del interlocutor a texto: iniciar / terminar."""
+        if not self.stt.is_recording:
+            self.stt_text = ""
+            self.stt.start_recording()
+        else:
+            self.stt.stop_recording()
+        return self.stt.is_recording
+
+    def delete_sign(self, word):
+        removed = self.collector.delete_label(word)
+        if removed:
+            self.notify(f"Borradas {removed} muestras de '{word}'. Reentrena con 'e'.")
+        else:
+            self.notify(f"No se encontró '{word}'.")
+        return removed
+
+    def delete_clip(self, word):
+        """Borra el clip del avatar de `word` (y su toma anterior)."""
+        removed = 0
+        while self.clips.undo(word):
+            removed += 1
+        self.notify(f"Se borró el movimiento de '{word}'." if removed else f"'{word}' no tiene movimiento.")
+        return bool(removed)
+
+    def interlocutor_text(self, text):
+        """Texto del interlocutor escrito a mano (en vez de dictado)."""
+        self.stt_text = text.strip()
+        self.text_seq += 1
 
     def start_training(self):
         if self.training:
@@ -238,8 +319,10 @@ class InclusionApp:
         world = getattr(self.detector, "world", None)
         t1 = time.perf_counter()
 
+        self.live_world = None
         if self.mode == "AVATAR" and world is not None:
-            self.sender.send_frame(self.smoother(world, now), now)
+            self.live_world = self.smoother(world, now)
+            self.sender.send_frame(self.live_world, now)
 
         if hands_present(raw):
             self.last_hands_time = now
@@ -253,10 +336,12 @@ class InclusionApp:
         action_status = ""
         if self.prompt is None:
             action_status = self._avatar(raw, world, now) if self.mode == "AVATAR" else self._segment(raw)
+        self.action_status = action_status
 
         stt_result = self.stt.get_result()
         if stt_result:
             self.stt_text = stt_result
+            self.text_seq += 1
         if self.stt.last_error:
             self.notify(self.stt.last_error, seconds=5)
             self.stt.last_error = ""
@@ -332,6 +417,7 @@ class InclusionApp:
             if sequence is not None and len(frames) > 1:
                 clip = make_clip(frames, self.label, self.person)
                 self.last_clip = self.clips.save(clip)
+                self.clip_seq += 1
                 self.sender.send_clip(self.label, self.last_clip)
                 beep_stop()
                 self._flash(GREEN)
@@ -382,6 +468,7 @@ class InclusionApp:
             self.confidence = conf
             if pred:
                 self.prediction = pred
+                self.word_seq += 1          # la app web reproduce la seña con el avatar
                 shown = C.display_name(pred)
                 self.tts.speak(shown)
                 self.pending_words.append(shown)
@@ -435,29 +522,14 @@ class InclusionApp:
             self.ask_label()
         elif ch == "a":
             self.ask_avatar_word()
-        elif ch == " " and self.mode in ("TRAINING", "AVATAR"):
-            self.armed = not self.armed
-            self.segmenter.reset()
-            self.recorder.cancel()
-            self.notify("Grabación activada" if self.armed else "Grabación en pausa")
-        elif ch == "z" and self.mode == "TRAINING":
-            removed = self.collector.remove_last()
-            self._flash(RED if removed else GRAY_FLASH)
-            self.notify(f"Se deshizo la última muestra ('{removed}')" if removed else "No hay muestras.")
-        elif ch == "z" and self.mode == "AVATAR":
-            result = self.clips.undo(self.label)
-            self._flash(RED if result else GRAY_FLASH)
-            self.notify({"restaurado": f"Se deshizo la toma: '{self.label}' vuelve a la anterior",
-                         "borrado": f"Se borró el clip de '{self.label}'",
-                         None: f"'{self.label}' no tiene clip."}[result])
+        elif ch == " ":
+            self.toggle_recording()
+        elif ch == "z":
+            self.undo()
         elif ch == "d":
-            self._set_mode("DETECTION")
-            self.logic.load_model()
-            self.notify("Modo detección")
+            self.detection_mode()
         elif ch == "r":
-            self.logic.load_model()
-            self.prediction = ""
-            self.notify("Modelo recargado" if self.logic.model is not None else "No hay modelo para cargar")
+            self.reload_model()
         elif ch == "e":
             self.start_training()
         elif ch == "i":
@@ -465,17 +537,45 @@ class InclusionApp:
         elif ch == "x":
             self.ask_delete()
         elif ch == "v":
-            self.notify(f"Voz {'activada' if self.tts.toggle() else 'desactivada'}")
+            self.toggle_voice()
         elif ch == "s":
-            if not self.stt.is_recording:
-                self.stt_text = ""
-                self.stt.start_recording()
-            else:
-                self.stt.stop_recording()
+            self.toggle_listening()
         return True
 
     def close(self):
         self.sender.close()
+
+    def state(self):
+        """Estado para la interfaz web (lo que la ventana de OpenCV dibuja con View)."""
+        flash = {GREEN: "ok", RED: "error", GRAY_FLASH: "neutro"}.get(self.flash) if self.flash else None
+        return {
+            "modo": self.mode,
+            "palabra": self.label,
+            "persona": self.person,
+            "muestras_palabra": self.collector.count(self.label) if self.label else 0,
+            "armado": self.armed,
+            "grabando": self.segmenter.active,
+            "progreso": min(1.0, self.segmenter.captured / C.SEGMENT_MAX_FRAMES),
+            "prediccion": C.display_name(self.prediction) if self.prediction else "",
+            "confianza": round(float(self.confidence), 3),
+            "historial": list(self.history),
+            "oracion": self.sentence,
+            "oracion_cargando": self.sentence_loading,
+            "interlocutor": self.stt_text,
+            "escuchando": bool(self.stt.is_recording),
+            "aviso": self.status,
+            "accion": self.action_status,
+            "destello": flash,
+            "voz": bool(self.tts.enabled),
+            "hablando": bool(self.tts.speaking),
+            "cuerpo_visible": self.body_visible,
+            "aviso_encuadre": self.framing_hint,
+            "entrenando": self.training,
+            "modelo_senas": sorted(self.logic.classes) if self.logic.model is not None else [],
+            "seq_palabra": self.word_seq,
+            "seq_texto": self.text_seq,
+            "seq_clip": self.clip_seq,
+        }
 
     def benchmark_summary(self):
         import numpy as np

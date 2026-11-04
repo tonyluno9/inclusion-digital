@@ -1,4 +1,5 @@
 @echo off
+rem INCLUSION en su ventana (interfaz nueva). La version anterior, con la ventana de OpenCV: iniciar_clasico.bat
 chcp 65001 >nul
 pushd "%~dp0"
 
@@ -8,7 +9,7 @@ if exist ".venv\Scripts\activate.bat" (
     echo [AVISO] No hay entorno .venv; se usa el Python del sistema. Ejecuta instalar.bat primero.
 )
 
-python main.py %*
+python servidor_web.py %*
 set "CODIGO=%errorlevel%"
 
 popd
