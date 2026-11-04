@@ -102,9 +102,9 @@ def celdas(img, columnas, filas):
             yield img[f * h // filas:(f + 1) * h // filas, c * w // columnas:(c + 1) * w // columnas]
 
 
-def iconos(lado=128):
-    hoja = cv2.cvtColor(leer("iconos.png"), cv2.COLOR_BGR2GRAY)
-    for nombre, celda in zip(ICONOS, celdas(hoja, 5, 4)):
+def iconos(lado=128, archivo="iconos.png", nombres=ICONOS):
+    hoja = cv2.cvtColor(leer(archivo), cv2.COLOR_BGR2GRAY)
+    for nombre, celda in zip(nombres, celdas(hoja, 5, 4)):
         tinta = 255 - celda.astype(np.float32)                 # negro = tinta
         tinta[tinta < 30] = 0                                  # papel
         ys, xs = np.nonzero(tinta > 60)
@@ -118,7 +118,7 @@ def iconos(lado=128):
         alfa = cv2.resize(np.clip(lienzo * 1.15, 0, 255), (lado, lado), interpolation=cv2.INTER_AREA).astype(np.uint8)
         rgba = np.dstack([np.full_like(alfa, 255)] * 3 + [alfa])
         cv2.imwrite(os.path.join(DESTINO, "iconos", f"{nombre}.png"), rgba)
-    return f"{len(ICONOS)} íconos"
+    return f"{len(nombres)} íconos"
 
 
 def ilustraciones(lado=480):
@@ -137,8 +137,57 @@ def fondos():
     return "2 fondos"
 
 
+# ---------------------------------------------------------------- app completa
+# Imágenes de diseno/generadas/app_completa (prompts en diseno/prompts/app_completa.json)
+COMPLETA = "app_completa"
+ICONOS_2 = [
+    "diccionario", "aprender", "trofeo", "estrella", "racha",
+    "conversacion", "buscar", "recortar", "cronometro", "lento",
+    "una_mano", "dos_manos", "correcto", "incorrecto", "consejo",
+    "tema", "escenario", "exportar", "info", "repetir",
+]
+# (hoja, columnas, filas, carpeta de destino, nombres, lado en px)
+HOJAS = [
+    ("insignias.png", 3, 3, "insignias", ["primera_sena", "diez_senas", "racha_3", "racha_7", "saludos",
+                                          "primer_movimiento", "traductor", "conversacion", "explorador"], 256),
+    ("bienvenida.png", 2, 2, "tutorial", ["paso_1", "paso_2", "paso_3", "paso_4"], 420),
+    ("categorias.png", 3, 2, "categorias", ["saludos", "cortesia", "preguntas", "familia", "emociones",
+                                            "numeros"], 200),
+    ("estados.png", 2, 2, "estados", ["bien_hecho", "otra_vez", "sin_conexion", "entrenado"], 360),
+]
+ESCENARIOS = ["escenario_maya", "escenario_aula", "escenario_plaza"]
+
+
+def iconos_2():
+    return iconos(archivo=os.path.join(COMPLETA, "iconos_2.png"), nombres=ICONOS_2)
+
+
+def hojas():
+    hechas = 0
+    for archivo, columnas, filas, carpeta, nombres, lado in HOJAS:
+        os.makedirs(os.path.join(DESTINO, "img", carpeta), exist_ok=True)
+        hoja = leer(os.path.join(COMPLETA, archivo))
+        for nombre, celda in zip(nombres, celdas(hoja, columnas, filas)):
+            # Cada dibujo se recorta por su contenido (las celdas generadas no son exactas)
+            rgba = recortar(quitar_fondo_blanco(celda), margen=0.03)
+            cv2.imwrite(os.path.join(DESTINO, "img", carpeta, f"{nombre}.png"),
+                        cv2.resize(rgba, (lado, lado), interpolation=cv2.INTER_AREA))
+            hechas += 1
+    return f"{hechas} imágenes de {len(HOJAS)} hojas"
+
+
+def escenarios():
+    os.makedirs(os.path.join(DESTINO, "img", "escenarios"), exist_ok=True)
+    for nombre in ESCENARIOS:
+        cv2.imwrite(os.path.join(DESTINO, "img", "escenarios", nombre.replace("escenario_", "") + ".jpg"),
+                    leer(os.path.join(COMPLETA, f"{nombre}.png")), [cv2.IMWRITE_JPEG_QUALITY, 88])
+    cv2.imwrite(os.path.join(DESTINO, "img", "portada.jpg"), leer(os.path.join(COMPLETA, "portada.png")),
+                [cv2.IMWRITE_JPEG_QUALITY, 88])
+    return f"{len(ESCENARIOS)} escenarios y la portada"
+
+
 if __name__ == "__main__":
     for carpeta in ("img", "iconos"):
         os.makedirs(os.path.join(DESTINO, carpeta), exist_ok=True)
-    for paso in (logo, iconos, ilustraciones, fondos):
+    for paso in (logo, iconos, ilustraciones, fondos, iconos_2, hojas, escenarios):
         print("ok:", paso())
