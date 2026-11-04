@@ -1,12 +1,15 @@
 import os
 import csv
+import json
 import shutil
 import time
 from collections import Counter
 
 import numpy as np
 
-from modules.landmarks import OLD_RAW_FRAME_SIZE, RAW_FRAME_SIZE
+from modules.landmarks import HAND_SIZE, HANDS_SIZE, OLD_RAW_FRAME_SIZE, RAW_FRAME_SIZE
+
+MANOS_ANATOMICAS = "anatomicas"   # marca del .meta.json: manos en el lado real de la persona
 
 
 class DataCollector:
@@ -16,8 +19,12 @@ class DataCollector:
     El CSV es UTF-8. Los conteos se mantienen en memoria para no releer el
     archivo en cada muestra, y las reescrituras (deshacer, borrar) son atómicas.
 
-    Con `sequence_length`, un dataset del formato anterior (frames de 135
-    valores, sin codos) se respalda y se convierte al actual al abrirlo.
+    Con `sequence_length`, al abrir un dataset de versiones anteriores se
+    respalda y se corrige:
+    - formato de 135 valores (sin codos): se completa con ceros;
+    - manos grabadas con el lado cambiado (antes de usar las muñecas del cuerpo
+      para ubicarlas): se intercambian. Un archivo `.meta.json` al lado del CSV
+      marca que ya está corregido.
     """
 
     def __init__(self, file_path, backup_dir, backup_every=50, sequence_length=None):
@@ -29,17 +36,48 @@ class DataCollector:
         self._persons = Counter()
         self._order = []          # (label, person) en el orden del archivo
         self.migrated = 0         # muestras convertidas del formato anterior al abrir
+        self.hands_fixed = 0      # muestras con las manos cambiadas de lado al abrir
+        self.meta_path = os.path.splitext(self.file_path)[0] + ".meta.json"
         if sequence_length:
             self._migrate(sequence_length)
+            self._fix_hand_sides(sequence_length)
         self._load_counts()
+
+    def _backup(self, tag):
+        os.makedirs(self.backup_dir, exist_ok=True)
+        name = os.path.basename(self.file_path).replace(".csv", f"_{tag}_{int(time.time())}.csv")
+        path = os.path.join(self.backup_dir, name)
+        shutil.copy2(self.file_path, path)
+        return path
+
+    def _write_meta(self):
+        with open(self.meta_path, "w", encoding="utf-8") as f:
+            json.dump({"manos": MANOS_ANATOMICAS}, f)
+
+    def _fix_hand_sides(self, sequence_length):
+        if os.path.isfile(self.meta_path):
+            with open(self.meta_path, encoding="utf-8") as f:
+                if json.load(f).get("manos") == MANOS_ANATOMICAS:
+                    return
+        header, rows = self._read_rows()
+        if header is None or len(header) - 2 != sequence_length * RAW_FRAME_SIZE:
+            return
+        if rows:
+            backup = self._backup("manos_cambiadas")
+            for r in rows:
+                for start in range(2, len(r), RAW_FRAME_SIZE):
+                    left, right = r[start:start + HAND_SIZE], r[start + HAND_SIZE:start + HANDS_SIZE]
+                    r[start:start + HANDS_SIZE] = right + left
+            self._write_rows(header, rows)
+            self.hands_fixed = len(rows)
+            print(f"[DATASET] {len(rows)} muestras con las manos corregidas de lado (respaldo en {backup})")
+        self._write_meta()
 
     def _migrate(self, sequence_length):
         header, rows = self._read_rows()
         if header is None or len(header) - 2 != sequence_length * OLD_RAW_FRAME_SIZE:
             return
-        os.makedirs(self.backup_dir, exist_ok=True)
-        name = os.path.basename(self.file_path).replace(".csv", f"_formato135_{int(time.time())}.csv")
-        shutil.copy2(self.file_path, os.path.join(self.backup_dir, name))
+        backup = self._backup("formato135")
         pad = ["0"] * (RAW_FRAME_SIZE - OLD_RAW_FRAME_SIZE)
         new_rows = []
         for r in rows:
@@ -49,8 +87,7 @@ class DataCollector:
         width = sequence_length * RAW_FRAME_SIZE
         self._write_rows(["label", "person"] + [f"f{i}" for i in range(width)], new_rows)
         self.migrated = len(new_rows)
-        print(f"[DATASET] {len(new_rows)} muestras convertidas al formato con codos "
-              f"(respaldo en {os.path.join(self.backup_dir, name)})")
+        print(f"[DATASET] {len(new_rows)} muestras convertidas al formato con codos (respaldo en {backup})")
 
     def _read_rows(self):
         if not os.path.isfile(self.file_path):
@@ -94,6 +131,8 @@ class DataCollector:
             if not file_exists:
                 writer.writerow(["label", "person"] + [f"f{i}" for i in range(len(values))])
             writer.writerow([label, person] + [f"{v:.5f}" for v in values])
+        if not file_exists:
+            self._write_meta()       # un dataset nuevo ya nace con las manos en su lado
         self._order.append((label, person))
         self._labels[label] += 1
         self._persons[person] += 1

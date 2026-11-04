@@ -64,13 +64,15 @@ El avatar aprende grabando: en modo avatar (`a`) la app manda tu movimiento en v
 `data/avatar/<palabra>.json`, con el movimiento 3D de cuerpo, brazos y dedos a su velocidad real.
 
 En Blender se usa [`../blender/inclusion_avatar.py`](../blender/README.md): crea los puntos, los mueve en vivo e importa
-los clips como animación. Conectar esos puntos al rig del personaje es la siguiente etapa
+los clips como animación, también en el personaje (`../blender/personaje/avatar_inclusion.blend`), que te sigue en vivo y
+guarda una acción por palabra. Encadenar palabras en frases es la siguiente etapa
 ([06_avatar.md](../requerimientos/06_avatar.md)).
 
 ## Cómo funciona
 
 1. **Detección** (`modules/landmark_detector.py`): MediaPipe Tasks detecta las dos manos y el cuerpo (hombros, codos,
-   muñecas), en paralelo. Izquierda y derecha son siempre las de la persona, con continuidad entre frames. También
+   muñecas), en paralelo. Izquierda y derecha son siempre las de la persona: cada mano va al lado de la muñeca del
+   cuerpo más cercana, con continuidad entre frames. También
    arma el frame 3D para el avatar (`modules/motion.py`).
 2. **Segmentación** (`modules/segmenter.py`): una seña empieza al levantar las manos y termina al bajarlas. Las manos
    apoyadas abajo se ignoran. La seña se recorta y se lleva a 30 frames. **El mismo paso prepara las muestras al grabar

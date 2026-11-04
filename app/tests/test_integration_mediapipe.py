@@ -55,6 +55,7 @@ class MediaPipeIntegrationTest(unittest.TestCase):
         """RF-17, RF-20 con MediaPipe real: cuerpo 3D (33 puntos) y manos pegadas a
         las muñecas del cuerpo, en metros. Usa la foto sin bordes: ahí se ven los codos."""
         from modules.landmarks import ARMS_START, RAW_FRAME_SIZE
+        from modules.motion import hand_side_from_shape
         det = DETECTOR_CLS(C.MODELS_DIR, pose_every=1)
         try:
             for _ in range(5):
@@ -71,6 +72,9 @@ class MediaPipeIntegrationTest(unittest.TestCase):
             self.assertEqual(world[side].shape, (21, 3))
             np.testing.assert_allclose(world[side][0], world["pose"][wrist], atol=1e-5)
             self.assertLess(np.linalg.norm(world[side][12] - world[side][0]), 0.3)   # mano de tamaño real
+            # La mano en el lugar izquierdo tiene forma de mano izquierda (y viceversa):
+            # si no, el personaje la cierra al revés
+            self.assertEqual(hand_side_from_shape(world[side]), side)
 
     def test_app_records_a_real_sample(self):
         """RF-01..RF-03, RF-09 con MediaPipe real: aparecen manos -> se guarda una muestra."""
@@ -82,7 +86,7 @@ class MediaPipeIntegrationTest(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             collector = DataCollector(os.path.join(tmp, "d.csv"), os.path.join(tmp, "b"))
             logic = GestureLogic(os.path.join(tmp, "m.pkl"), C.FEATURE_VERSION, C.SEQUENCE_LENGTH)
-            det = DETECTOR_CLS(C.MODELS_DIR, pose_every=C.POSE_EVERY_N_FRAMES)
+            det = DETECTOR_CLS(C.MODELS_DIR, pose_every=C.POSE_EVERY_N_FRAMES, pose_model=C.POSE_MODEL)
             app = InclusionApp(det, FakeTTS(), FakeSTT(), collector=collector, logic=logic, background=False)
             app.mode, app.label, app.person, app.armed = "TRAINING", "hola", "test", True
             blank = np.zeros_like(SIGN_FRAME)

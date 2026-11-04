@@ -1,10 +1,12 @@
-"""INCLUSION · Avatar LSM para Blender (RF-21, RF-22).
+"""INCLUSION · Avatar LSM para Blender (RF-21, RF-22, RF-23).
 
 Add-on de un solo archivo:
   * Crea un esqueleto de puntos (empties) para cuerpo (33) y manos (21 + 21).
   * Escucha por UDP los frames que envía la app y mueve los puntos en vivo.
   * Importa clips ``.json`` (formato ``inclusion-movimiento``, version 1) como
     animación de esos puntos, con una acción por palabra.
+  * Conecta un personaje con rig (perfil conocido, p. ej. el de Tripo): en vivo
+    lo mueve con la persona y al importar un clip hornea su acción ``seña_<palabra>``.
 
 Ejes: el clip usa x = izquierda de la persona, y = arriba, z = hacia adelante.
 En Blender (personaje mirando a -Y): (X, Y, Z) = (x, -z, y).
@@ -16,7 +18,7 @@ archivo en el Text Editor y pulsar "Run Script".
 bl_info = {
     "name": "INCLUSION Avatar LSM",
     "author": "Proyecto INCLUSION",
-    "version": (1, 0, 0),
+    "version": (1, 1, 0),
     "blender": (4, 4, 0),
     "location": "Vista 3D > Barra lateral (N) > INCLUSION",
     "description": "Puntos en vivo (UDP) e importación de clips de Lengua de Señas Mexicana",
@@ -31,10 +33,10 @@ import socket
 
 try:
     import bpy
-    from bpy.props import BoolProperty, IntProperty, StringProperty
+    from bpy.props import BoolProperty, IntProperty, PointerProperty, StringProperty
     from bpy.types import Operator, Panel
     from bpy_extras.io_utils import ImportHelper
-    from mathutils import Matrix, Vector
+    from mathutils import Matrix, Quaternion, Vector
 except ImportError:  # permite probar las funciones puras fuera de Blender
     bpy = None
     Operator = Panel = ImportHelper = object
@@ -213,6 +215,11 @@ def frame_de_tiempo(t, fps_escena, inicio=1):
     return int(inicio) + int(round(float(t) * float(fps_escena)))
 
 
+def nombre_accion_puntos(palabra):
+    """Acción de los puntos de una palabra: 'puntos_<palabra>'."""
+    return "puntos_" + nombre_accion(palabra)[len("seña_"):]
+
+
 def nombre_accion(palabra):
     """Nombre de la acción de una palabra: 'seña_<palabra>' (sin caracteres raros)."""
     limpia = re.sub(r"[^\w\-]+", "_", str(palabra or "sin_nombre"), flags=re.UNICODE).strip("_")
@@ -315,11 +322,15 @@ def _fps_escena(escena):
     return escena.render.fps / (escena.render.fps_base or 1.0)
 
 
-def soltar_acciones(empties=None):
-    """Quita la animación asignada a los puntos (las acciones quedan guardadas),
-    para que el movimiento en vivo no lo pise un clip al cambiar de frame."""
+def soltar_acciones(empties=None, escena=None):
+    """Quita la animación asignada a los puntos y al personaje (las acciones
+    quedan guardadas), para que el movimiento en vivo no lo pise un clip."""
     empties = empties if empties is not None else obtener_empties()
-    for obj in empties.values():
+    objetos = list(empties.values())
+    arm = personaje(escena or bpy.context.scene)
+    if arm is not None:
+        objetos.append(arm)
+    for obj in objetos:
         if obj.animation_data is not None:
             obj.animation_data.action = None
 
@@ -336,7 +347,7 @@ def importar_clip(ruta, escena=None, inicio=None, asignar=True):
     if inicio is None:
         inicio = getattr(escena, "inc_inicio", 1)
     palabra = datos.get("word") or os.path.splitext(os.path.basename(ruta))[0]
-    nombre = nombre_accion(palabra)
+    nombre = nombre_accion_puntos(palabra)
     fps = _fps_escena(escena)
 
     crear_puntos(escena)
@@ -382,6 +393,13 @@ def importar_clip(ruta, escena=None, inicio=None, asignar=True):
             fc.update()
             total += len(serie)
 
+    Estado.accion_personaje = None
+    arm = personaje(escena)
+    perfil = detectar_perfil(b.name for b in arm.data.bones) if arm else None
+    if perfil is not None:
+        Estado.accion_personaje = hornear_clip(datos, arm, PERFILES[perfil], nombre_accion(palabra),
+                                               fps, inicio, asignar)
+
     if asignar:
         ultimo = frame_de_tiempo(datos.get("duration", datos["frames"][-1]["t"]), fps, inicio)
         ultimo = max(ultimo, frame_de_tiempo(datos["frames"][-1]["t"], fps, inicio))
@@ -389,6 +407,371 @@ def importar_clip(ruta, escena=None, inicio=None, asignar=True):
         escena.frame_end = max(int(inicio) + 1, ultimo)
         escena.frame_set(int(inicio))
     return accion, total
+
+
+# ---------------------------------------------------------------------------
+# Personaje: retargeting de los puntos al rig (RF-23)
+# ---------------------------------------------------------------------------
+# Cada hueso gira para apuntar en la dirección del segmento de la persona
+# (hombro -> codo, codo -> muñeca, cada falange...). Se usan direcciones y no
+# posiciones, así que no importa que el personaje mida distinto que la persona.
+# El giro sobre el propio eje (roll) sale de una segunda referencia:
+#   brazo y antebrazo: hacia dónde dobla el codo;
+#   mano: la línea de nudillos índice -> meñique;
+#   dedos: la misma línea (el pulgar, la normal de la palma).
+# Todo se calcula en el espacio de la armadura como "giro respecto a la pose
+# de descanso" (pose T con palmas abajo, mirando a -Y).
+
+CADENAS_DEDO = {             # puntos de la mano de MediaPipe por dedo
+    "thumb": (1, 2, 3, 4),
+    "index": (5, 6, 7, 8),
+    "middle": (9, 10, 11, 12),
+    "ring": (13, 14, 15, 16),
+    "pinky": (17, 18, 19, 20),
+}
+LADOS = (("L", "left", 11, 13, 15), ("R", "right", 12, 14, 16))   # lado, mano del clip, hombro, codo, muñeca
+CABEZA_INCLINACION = 0.35    # rad: la nariz está más abajo que las orejas con la cabeza derecha
+REPARTO_PRONACION = 0.5      # parte del giro de la muñeca que toma el antebrazo
+VISIBLE = 0.5
+# Protecciones contra datos imposibles (MediaPipe a veces inventa el cuerpo cuando no lo ve)
+ANCHO_HOMBROS_MIN = 0.15     # m: hombros más juntos que esto = cuerpo mal detectado, no se usa
+CADERAS_MAX = math.radians(40)   # caderas -> hombros más inclinado que esto: se usa la vertical
+GIRO_MAX = {"pecho": math.radians(35), "cabeza": math.radians(70), "clavicula": math.radians(25)}
+
+
+def perfil_tripo():
+    """Nombres de huesos del rig humanoide de Tripo (L_/R_, 3 falanges por dedo)."""
+    dedos = {"thumb": "Thumb", "index": "Index", "middle": "Mid", "ring": "Ring", "pinky": "Pinky"}
+    lados = {}
+    for s, *_ in LADOS:
+        lados[s] = {
+            "clavicula": f"{s}_Clavicle", "brazo": f"{s}_Upperarm", "antebrazo": f"{s}_Forearm",
+            "mano": f"{s}_Hand",
+            "dedos": {d: tuple(f"{s}_{n}{k}" for k in (1, 2, 3)) for d, n in dedos.items()},
+        }
+    return {"columna": ("Waist", "Spine01", "Spine02"), "cabeza": "Head", "caderas": ("L_Thigh", "R_Thigh"),
+            "lados": lados}
+
+
+PERFILES = {"Tripo": perfil_tripo()}
+
+
+def huesos_del_perfil(perfil):
+    nombres = list(perfil["columna"]) + [perfil["cabeza"]]
+    for lado in perfil["lados"].values():
+        nombres += [lado["clavicula"], lado["brazo"], lado["antebrazo"], lado["mano"]]
+        for cadena in lado["dedos"].values():
+            nombres += list(cadena)
+    return nombres
+
+
+def detectar_perfil(nombres_huesos):
+    """Nombre del perfil cuyos huesos están todos en el rig, o None."""
+    nombres = set(nombres_huesos)
+    for nombre, perfil in PERFILES.items():
+        if all(h in nombres for h in huesos_del_perfil(perfil) + list(perfil["caderas"])):
+            return nombre
+    return None
+
+
+def suavizar_frames(frames, ventana=5):
+    """Promedio móvil centrado de cada punto (pose y manos) a lo largo del clip.
+    Solo promedia frames donde esa parte existe; no inventa partes ausentes."""
+    r = ventana // 2
+    out = [dict(fr) for fr in frames]
+    for clave in ("pose", "left", "right"):
+        for i, fr in enumerate(frames):
+            if fr.get(clave) is None:
+                continue
+            vecinos = [frames[j][clave] for j in range(max(0, i - r), min(len(frames), i + r + 1))
+                       if frames[j].get(clave) is not None]
+            n = len(vecinos)
+            out[i][clave] = [[sum(v[p][e] for v in vecinos) / n for e in range(3)] for p in range(len(fr[clave]))]
+    return out
+
+
+def _limitar(q, maximo):
+    """El mismo giro, recortado a `maximo` radianes."""
+    angulo = q.angle if q.angle <= math.pi else 2 * math.pi - q.angle
+    return q if angulo <= maximo else Quaternion().slerp(q, maximo / angulo)
+
+
+def _transicion(x, a, b):
+    t = min(1.0, max(0.0, (x - a) / (b - a)))
+    return t * t * (3 - 2 * t)
+
+
+class Retarget:
+    """Convierte frames de movimiento en rotaciones de los huesos de un rig."""
+
+    def __init__(self, armadura, perfil):
+        self.arm = armadura
+        self.perfil = perfil
+        huesos = armadura.data.bones
+        self.reposo = {b.name: b.matrix_local.copy() for b in huesos}
+        self.orden = []                       # padres antes que hijos
+        pendientes = [b for b in huesos if b.parent is None]
+        while pendientes:
+            b = pendientes.pop(0)
+            self.orden.append(b.name)
+            pendientes.extend(b.children)
+        self.padre = {b.name: (b.parent.name if b.parent else None) for b in huesos}
+        self.ultimo = {}                      # última rotación de cada hueso (para partes perdidas)
+        mw = armadura.matrix_world
+        self.escala = mw.to_scale().x         # de unidades de la armadura a metros
+        a_arm = mw.inverted().to_3x3()          # ejes del mundo vistos desde la armadura
+        self.vertical = (a_arm @ Vector((0, 0, 1))).normalized()
+        self.frente = (a_arm @ Vector((0, -1, 0))).normalized()   # el personaje mira a -Y
+        self.lateral = (a_arm @ Vector((1, 0, 0))).normalized()
+        self._marcos_reposo(huesos)
+
+    # -- marcos de referencia --------------------------------------------------
+    @staticmethod
+    def marco(primario, secundario):
+        """Base ortonormal (columnas x, y, z) con y = primario y x hacia secundario."""
+        if primario.length < 1e-9:
+            return None
+        y = primario.normalized()
+        x = secundario - y * secundario.dot(y)
+        if x.length < 1e-9:
+            return None
+        x.normalize()
+        return Matrix((x, y, x.cross(y))).transposed()
+
+    def _puntos_mano_reposo(self, lado):
+        h = self.arm.data.bones
+        pts = [None] * N_MANO
+        pts[0] = h[lado["mano"]].head_local.copy()
+        for dedo, cadena in lado["dedos"].items():
+            idx = CADENAS_DEDO[dedo]
+            for k, nombre in enumerate(cadena):
+                pts[idx[k]] = h[nombre].head_local.copy()
+            pts[idx[3]] = h[cadena[2]].tail_local.copy()
+        return pts
+
+    def _marcos_reposo(self, h):
+        p = self.perfil
+        self.r = {}
+        hombros = {}
+        for s, *_ in LADOS:
+            lado = p["lados"][s]
+            hombro, codo, muneca = (h[lado[k]].head_local.copy() for k in ("brazo", "antebrazo", "mano"))
+            hombros[s] = hombro
+            mano = self._puntos_mano_reposo(lado)
+            frente = self.frente
+            dir_mano, nudillos = mano[9] - mano[0], mano[5] - mano[17]
+            # El codo dobla hacia adelante. Si el rig ya trae el codo algo doblado,
+            # se usa ese doblez real (así en reposo el brazo no gira nada).
+            u, f = codo - hombro, muneca - codo
+            doblez = f - u.normalized() * f.dot(u.normalized())
+            self.r[s] = {
+                "u": u, "f": f,
+                "brazo": self.marco(u, doblez if doblez.length > 0.2 * f.length else frente),
+                "mano": self.marco(dir_mano, nudillos),
+                "dedos": self._marcos_dedos(mano, dir_mano, nudillos),
+            }
+        centro = (hombros["L"] + hombros["R"]) / 2
+        for s, *_ in LADOS:
+            self.r[s]["clavicula"] = self.marco(hombros[s] - centro, self.frente)
+        # Con caderas visibles, el pecho se inclina según la línea caderas -> hombros;
+        # sin ellas solo se sabe la línea de hombros y se compara con la vertical
+        caderas = (h[p["caderas"][0]].head_local + h[p["caderas"][1]].head_local) / 2
+        self.r["pecho"] = self.marco(hombros["L"] - hombros["R"], centro - caderas)
+        self.r["pecho_vertical"] = self.marco(hombros["L"] - hombros["R"], self.vertical)
+        self.r["cabeza"] = self.marco(self.lateral, self.frente * math.cos(CABEZA_INCLINACION)
+                                      - self.vertical * math.sin(CABEZA_INCLINACION))
+
+    def _marcos_dedos(self, mano, dir_mano, nudillos):
+        normal = dir_mano.cross(nudillos)
+        marcos = {}
+        for dedo, idx in CADENAS_DEDO.items():
+            ref = normal if dedo == "thumb" else nudillos
+            marcos[dedo] = [self.marco(mano[idx[k + 1]] - mano[idx[k]], ref) for k in range(3)]
+        return marcos
+
+    # -- resolver un frame -----------------------------------------------------
+    def _delta(self, marco_destino, marco_reposo):
+        if marco_destino is None or marco_reposo is None:
+            return None
+        return (marco_destino @ marco_reposo.transposed()).to_quaternion()
+
+    def resolver(self, frame):
+        """Frame de movimiento (coordenadas del clip) -> {hueso: giro respecto al reposo}
+        en el espacio de la armadura. Las partes ausentes conservan su último giro."""
+        a_local = self.arm.matrix_world.inverted()
+
+        def puntos(clave):
+            datos = frame.get(clave)
+            return None if datos is None else [a_local @ Vector(convertir_ejes(q)) for q in datos]
+
+        pose, vis = puntos("pose"), frame.get("vis") or [1.0] * N_CUERPO
+        manos = {"left": puntos("left"), "right": puntos("right")}
+        p, giros = self.perfil, {}
+
+        if pose is not None and (pose[11] - pose[12]).length * self.escala < ANCHO_HOMBROS_MIN:
+            pose = None                       # cuerpo imposible: se conserva la pose anterior
+        if pose is not None:
+            hombro_l, hombro_r = pose[11], pose[12]
+            centro = (hombro_l + hombro_r) / 2
+            arriba, ref = self.vertical, self.r["pecho_vertical"]
+            if vis[23] > VISIBLE and vis[24] > VISIBLE:
+                columna = centro - (pose[23] + pose[24]) / 2
+                if columna.length > 1e-6 and columna.angle(self.vertical) < CADERAS_MAX:
+                    arriba, ref = columna, self.r["pecho"]
+            q = self._delta(self.marco(hombro_l - hombro_r, arriba), ref)
+            if q is not None:
+                q = _limitar(q, GIRO_MAX["pecho"])
+                for k, nombre in enumerate(p["columna"]):
+                    giros[nombre] = Quaternion().slerp(q, (k + 1) / len(p["columna"]))
+            if vis[7] > VISIBLE and vis[8] > VISIBLE:
+                orejas = (pose[7] + pose[8]) / 2
+                q = self._delta(self.marco(pose[7] - pose[8], pose[0] - orejas), self.r["cabeza"])
+                if q is not None:
+                    giros[p["cabeza"]] = _limitar(q, GIRO_MAX["cabeza"])
+            for s, clave_mano, i_hombro, i_codo, i_muneca in LADOS:
+                lado, r = p["lados"][s], self.r[s]
+                q = self._delta(self.marco(pose[i_hombro] - centro, self.frente), r["clavicula"])
+                if q is not None:
+                    giros[lado["clavicula"]] = _limitar(q, GIRO_MAX["clavicula"])
+                giros.update(self._brazo(lado, r, pose[i_hombro], pose[i_codo], pose[i_muneca],
+                                         manos[clave_mano]))
+        for s, clave_mano, *_ in LADOS:
+            if manos[clave_mano] is not None:
+                giros.update(self._dedos(p["lados"][s], self.r[s], manos[clave_mano]))
+
+        for nombre, q in giros.items():
+            previo = self.ultimo.get(nombre)
+            if previo is not None and previo.dot(q) < 0:   # mismo hemisferio: sin saltos al interpolar
+                q.negate()
+            self.ultimo[nombre] = q
+        return dict(self.ultimo)
+
+    def _brazo(self, lado, r, hombro, codo, muneca, mano):
+        u, f = codo - hombro, muneca - codo
+        if u.length < 1e-6 or f.length < 1e-6:
+            return {}
+        giros = {}
+        uh = u.normalized()
+        doblez = f - uh * f.dot(uh)
+        q_giro = r["u"].rotation_difference(u)                     # solo dirección
+        q_marco = self._delta(self.marco(u, doblez), r["brazo"])  # dirección y plano del codo
+        peso = _transicion(doblez.length / f.length, 0.2, 0.45)  # brazo casi recto: el plano no es confiable
+        if q_marco is None or peso == 0:
+            q_brazo = q_giro
+        else:
+            if q_giro.dot(q_marco) < 0:
+                q_marco.negate()
+            q_brazo = q_giro.slerp(q_marco, peso)
+        q_ante = (q_brazo @ r["f"]).rotation_difference(f) @ q_brazo
+        giros[lado["brazo"]] = q_brazo
+        if mano is not None:
+            q_mano = self._delta(self.marco(mano[9] - mano[0], mano[5] - mano[17]), r["mano"])
+            if q_mano is not None:
+                # Parte del giro de la muñeca (pronación) pasa al antebrazo
+                rel = q_ante.inverted() @ q_mano
+                eje = r["f"].normalized()
+                proy = eje * Vector(rel[1:]).dot(eje)
+                torsion = Quaternion((rel[0], proy.x, proy.y, proy.z))
+                if torsion.magnitude > 1e-9:
+                    torsion.normalize()
+                    q_ante = q_ante @ Quaternion().slerp(torsion, REPARTO_PRONACION)
+                giros[lado["mano"]] = q_mano
+        giros[lado["antebrazo"]] = q_ante
+        return giros
+
+    def _dedos(self, lado, r, mano):
+        dir_mano, nudillos = mano[9] - mano[0], mano[5] - mano[17]
+        normal = dir_mano.cross(nudillos)
+        giros = {}
+        for dedo, idx in CADENAS_DEDO.items():
+            ref = normal if dedo == "thumb" else nudillos
+            for k, nombre in enumerate(lado["dedos"][dedo]):
+                q = self._delta(self.marco(mano[idx[k + 1]] - mano[idx[k]], ref), r["dedos"][dedo][k])
+                if q is not None:
+                    giros[nombre] = q
+        return giros
+
+    # -- de giros a la pose de Blender -----------------------------------------
+    def bases(self, giros):
+        """{hueso: giro absoluto} -> {hueso: rotación local (matrix_basis) en cuaternión}."""
+        pb = self.arm.pose.bones
+        posada, salida = {}, {}
+        for nombre in self.orden:
+            reposo, padre = self.reposo[nombre], self.padre[nombre]
+            base_padre = posada[padre] @ self.reposo[padre].inverted() if padre else Matrix.Identity(4)
+            sin_giro = base_padre @ reposo
+            if nombre in giros:
+                destino = Matrix.Translation(sin_giro.translation) @ \
+                    (giros[nombre].to_matrix() @ reposo.to_3x3()).to_4x4()
+                q = (sin_giro.inverted() @ destino).to_quaternion()
+                salida[nombre] = q
+                posada[nombre] = destino
+            else:
+                posada[nombre] = sin_giro @ pb[nombre].matrix_basis
+        return salida
+
+    def aplicar(self, frame):
+        """Pone al personaje en la pose del frame (modo en vivo)."""
+        pb = self.arm.pose.bones
+        for nombre, q in self.bases(self.resolver(frame)).items():
+            pb[nombre].rotation_mode = 'QUATERNION'
+            pb[nombre].rotation_quaternion = q
+
+
+def personaje(escena):
+    """La armadura conectada en la escena, si existe y tiene un perfil conocido."""
+    obj = getattr(escena, "inc_personaje", None)
+    if obj is None or obj.type != 'ARMATURE':
+        return None
+    return obj
+
+
+def retarget_para(escena):
+    obj = personaje(escena)
+    if obj is None:
+        return None
+    perfil = detectar_perfil(b.name for b in obj.data.bones)
+    if perfil is None:
+        return None
+    if Estado.retarget is None or Estado.retarget.arm != obj:
+        Estado.retarget = Retarget(obj, PERFILES[perfil])
+    return Estado.retarget
+
+
+def hornear_clip(datos, armadura, perfil, nombre, fps, inicio, asignar=True):
+    """Hornea el clip en una acción del personaje (rotaciones de los huesos)."""
+    rt = Retarget(armadura, perfil)
+    frames = suavizar_frames(datos["frames"])
+    series = {}
+    for fr in frames:
+        f = frame_de_tiempo(fr["t"], fps, inicio)
+        for hueso, q in rt.bases(rt.resolver(fr)).items():
+            series.setdefault(hueso, []).append((f, q))
+    previa = bpy.data.actions.get(nombre)
+    if previa is not None:
+        if armadura.animation_data is not None and armadura.animation_data.action == previa:
+            armadura.animation_data.action = None
+        bpy.data.actions.remove(previa)
+    accion = bpy.data.actions.new(nombre)
+    accion.use_fake_user = True
+    tira = accion.layers.new("Capa").strips.new(type='KEYFRAME')
+    slot = accion.slots.new(id_type='OBJECT', name=armadura.name)
+    canal = tira.channelbag(slot, ensure=True)
+    for hueso, serie in series.items():
+        armadura.pose.bones[hueso].rotation_mode = 'QUATERNION'
+        ruta = f'pose.bones["{hueso}"].rotation_quaternion'
+        for eje in range(4):
+            fc = canal.fcurves.new(ruta, index=eje, group_name=hueso)
+            fc.keyframe_points.add(len(serie))
+            for kp, (f, q) in zip(fc.keyframe_points, serie):
+                kp.co = (float(f), q[eje])
+                kp.interpolation = 'LINEAR'
+            fc.update()
+    if asignar:
+        ad = armadura.animation_data_create()
+        ad.action = accion
+        ad.action_slot = slot
+    return accion
 
 
 # ---------------------------------------------------------------------------
@@ -401,6 +784,8 @@ class Estado:
     frames = 0
     clips = 0
     ultimo_error = ""
+    retarget = None            # Retarget del personaje conectado (se rehace si cambia)
+    accion_personaje = None    # última acción horneada en el personaje
 
 
 def abrir_socket(host, puerto):
@@ -454,6 +839,9 @@ def procesar_datagramas(escena, sock=None, empties=None):
             clips.append(msg)
     if ultimo is not None:
         aplicar_frame(ultimo, empties)
+        rt = retarget_para(escena)
+        if rt is not None:
+            rt.aplicar(ultimo)
         Estado.frames += recibidos
     for msg in clips:
         Estado.clips += 1
@@ -550,6 +938,50 @@ class INCLUSION_OT_detener(Operator):
         return {'FINISHED'}
 
 
+class INCLUSION_OT_conectar_personaje(Operator):
+    bl_idname = "inclusion.conectar_personaje"
+    bl_label = "Conectar personaje"
+    bl_description = "Busca el rig del personaje (perfil conocido) y lo conecta a los puntos"
+
+    def execute(self, context):
+        esc = context.scene
+        candidatos = [esc.inc_personaje] if esc.inc_personaje else []
+        if context.active_object is not None:
+            candidatos.append(context.active_object)
+        candidatos += [o for o in esc.objects if o.type == 'ARMATURE']
+        for obj in candidatos:
+            if obj is None or obj.type != 'ARMATURE':
+                continue
+            perfil = detectar_perfil(b.name for b in obj.data.bones)
+            if perfil is not None:
+                esc.inc_personaje = obj
+                Estado.retarget = None
+                for nombre in huesos_del_perfil(PERFILES[perfil]):
+                    obj.pose.bones[nombre].rotation_mode = 'QUATERNION'
+                self.report({'INFO'}, f"Personaje conectado: '{obj.name}' (rig {perfil}).")
+                return {'FINISHED'}
+        self.report({'ERROR'}, "No hay un rig con un perfil conocido (" + ", ".join(PERFILES) + ").")
+        return {'CANCELLED'}
+
+
+class INCLUSION_OT_pose_reposo(Operator):
+    bl_idname = "inclusion.pose_reposo"
+    bl_label = "Pose de descanso"
+    bl_description = "Quita la animación y devuelve el personaje a su pose de descanso"
+
+    def execute(self, context):
+        arm = personaje(context.scene)
+        if arm is None:
+            return {'CANCELLED'}
+        if arm.animation_data is not None:
+            arm.animation_data.action = None
+        for pb in arm.pose.bones:
+            pb.matrix_basis = Matrix.Identity(4)
+        if Estado.retarget is not None:
+            Estado.retarget.ultimo.clear()
+        return {'FINISHED'}
+
+
 class INCLUSION_OT_importar_clip(Operator, ImportHelper):
     bl_idname = "inclusion.importar_clip"
     bl_label = "Importar clip"
@@ -564,7 +996,8 @@ class INCLUSION_OT_importar_clip(Operator, ImportHelper):
         except ClipInvalido as e:
             self.report({'ERROR'}, str(e))
             return {'CANCELLED'}
-        self.report({'INFO'}, f"Clip importado: '{accion.name}' ({n} keyframes).")
+        extra = f"; personaje: '{Estado.accion_personaje.name}'" if Estado.accion_personaje else ""
+        self.report({'INFO'}, f"Clip importado: '{accion.name}' ({n} keyframes){extra}.")
         return {'FINISHED'}
 
 
@@ -585,6 +1018,18 @@ class INCLUSION_PT_panel(Panel):
         caja = lay.box()
         caja.label(text="Puntos")
         caja.operator("inclusion.crear_puntos", icon='EMPTY_AXIS')
+
+        caja = lay.box()
+        caja.label(text="Personaje")
+        caja.prop(esc, "inc_personaje", text="Rig")
+        fila = caja.row(align=True)
+        fila.operator("inclusion.conectar_personaje", icon='ARMATURE_DATA')
+        fila.operator("inclusion.pose_reposo", icon='LOOP_BACK')
+        arm = personaje(esc)
+        if arm is not None:
+            perfil = detectar_perfil(b.name for b in arm.data.bones)
+            caja.label(text=f"Perfil: {perfil}" if perfil else "Rig sin perfil conocido",
+                       icon='CHECKMARK' if perfil else 'ERROR')
 
         caja = lay.box()
         caja.label(text="En vivo (UDP)")
@@ -617,11 +1062,13 @@ _CLASES = (
     INCLUSION_OT_crear_puntos,
     INCLUSION_OT_escuchar,
     INCLUSION_OT_detener,
+    INCLUSION_OT_conectar_personaje,
+    INCLUSION_OT_pose_reposo,
     INCLUSION_OT_importar_clip,
     INCLUSION_PT_panel,
 )
 
-_PROPS = ("inc_host", "inc_puerto", "inc_auto_importar", "inc_inicio")
+_PROPS = ("inc_host", "inc_puerto", "inc_auto_importar", "inc_inicio", "inc_personaje")
 
 
 def register():
@@ -635,10 +1082,15 @@ def register():
         name="Importar clips automáticamente", default=True,
         description="Al recibir el aviso de un clip guardado por la app, importarlo")
     S.inc_inicio = IntProperty(name="Frame de inicio", default=1, min=0)
+    S.inc_personaje = PointerProperty(
+        name="Personaje", type=bpy.types.Object,
+        poll=lambda _self, obj: obj.type == 'ARMATURE',
+        description="Rig que se mueve con la persona y recibe los clips")
 
 
 def unregister():
     cerrar_socket()
+    Estado.retarget = None
     for c in reversed(_CLASES):
         try:
             bpy.utils.unregister_class(c)

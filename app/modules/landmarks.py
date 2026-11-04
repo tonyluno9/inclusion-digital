@@ -163,6 +163,14 @@ def pose_valid(frame) -> bool:
     return bool(np.any(frame[HANDS_SIZE + 3:HANDS_SIZE + 6] != 0) and np.any(frame[HANDS_SIZE + 6:HANDS_SIZE + 9] != 0))
 
 
+def elbows_visible(frame) -> bool:
+    """True si el frame trae al menos un codo."""
+    frame = np.asarray(frame)
+    if len(frame) < RAW_FRAME_SIZE:
+        return False
+    return bool(np.any(frame[ARMS_START:ARMS_START + 6] != 0))
+
+
 def drop_resting_hands(frame, body, margin):
     """Quita las manos cuya muñeca está más de `margin` anchos de hombro por
     debajo de la línea de los hombros (manos apoyadas en la mesa o las piernas,

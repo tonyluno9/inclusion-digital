@@ -76,7 +76,7 @@ def main(argv=None):
     if cap is None:
         return 1
     try:
-        detector = LandmarkDetector(C.MODELS_DIR, pose_every=C.POSE_EVERY_N_FRAMES)
+        detector = LandmarkDetector(C.MODELS_DIR, pose_every=C.POSE_EVERY_N_FRAMES, pose_model=C.POSE_MODEL)
     except RuntimeError as e:
         print(f"Error: {e}")
         cap.release()

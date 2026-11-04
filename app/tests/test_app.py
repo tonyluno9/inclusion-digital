@@ -9,7 +9,7 @@ import config as C
 from inclusion_app import InclusionApp
 from modules.data_collector import DataCollector
 from modules.gesture_logic import GestureLogic
-from modules.landmarks import hands_present
+from modules.landmarks import ARMS_START, hands_present
 from modules.motion import ClipStore, world_frame
 from tests.synthetic import make_sign, stream
 
@@ -279,6 +279,36 @@ class AppTest(unittest.TestCase):
         sent = len(self.sender.frames)
         self.feed([self.detector.idle] * 3)
         self.assertEqual(len(self.sender.frames), sent)          # fuera del modo avatar no se envía
+
+    def without_elbows(self, frames):
+        frames = np.array(frames, dtype=np.float32, copy=True)
+        frames[:, ARMS_START:] = 0            # tan cerca de la cámara que no se ven codos ni muñecas
+        return frames
+
+    def test_framing_hint_when_too_close(self):
+        """RF-18: en modo avatar, si casi no se ven los codos, la app pide alejarse;
+        el aviso se va cuando vuelven a verse."""
+        self.enter_avatar("hola")
+        self.feed(self.without_elbows([self.detector.idle] * (C.FRAMING_WINDOW + 5)), render=True)
+        self.assertEqual(self.app.framing_hint, "Aléjate: no veo tus codos")
+        self.feed([self.detector.idle] * (C.FRAMING_WINDOW + 5), render=True)
+        self.assertEqual(self.app.framing_hint, "")
+
+    def test_no_framing_hint_with_hands_down_outside_avatar(self):
+        """En detección, con las manos abajo es normal no ver los codos: sin aviso.
+        Mientras se seña sin codos a la vista, sí."""
+        self.feed(self.without_elbows([self.detector.idle] * (C.FRAMING_WINDOW + 5)))
+        self.assertEqual(self.app.framing_hint, "")
+        self.feed(self.without_elbows(make_sign("circulo", C.FRAMING_WINDOW + 5)))
+        self.assertEqual(self.app.framing_hint, "Aléjate: no veo tus codos")
+
+    def test_no_framing_hint_without_shoulders(self):
+        """Sin hombros ya se avisa "No veo tus hombros"; no se encima otro aviso."""
+        self.enter_avatar("hola")
+        sin_cuerpo = np.array([self.detector.idle] * (C.FRAMING_WINDOW + 5), dtype=np.float32)
+        sin_cuerpo[:, 126:] = 0
+        self.feed(sin_cuerpo, render=True)
+        self.assertEqual(self.app.framing_hint, "")
 
     def test_avatar_short_movement_is_discarded(self):
         """RF-19: un movimiento muy corto no se guarda y se avisa con destello rojo."""

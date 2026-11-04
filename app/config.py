@@ -22,6 +22,7 @@ CAMERA_INDEX = 0
 CAMERA_WIDTH = 1280
 CAMERA_HEIGHT = 720
 POSE_EVERY_N_FRAMES = 1     # la pose (hombros, codos, muñecas) se calcula 1 de cada N frames
+POSE_MODEL = "full"         # modelo de pose de MediaPipe: "lite" (rápido), "full" o "heavy" (más preciso)
 
 # Segmentación de señas (en frames, ~30 fps)
 SEGMENT_START_FRAMES = 3    # frames seguidos con manos para empezar una seña
@@ -36,6 +37,11 @@ AVATAR_DIR = os.path.join(DATA_DIR, "avatar")   # un clip de movimiento por pala
 AVATAR_UDP_HOST = "127.0.0.1"   # a dónde se envía el movimiento en vivo (Blender)
 AVATAR_UDP_PORT = 5005
 AVATAR_PREROLL_FRAMES = 15      # frames antes de levantar las manos que entran al clip (~0.5 s)
+
+# Aviso de encuadre: si en el último segundo los codos se vieron en menos del 30 %
+# de los frames, la app pide alejarse de la cámara
+FRAMING_WINDOW = 30
+FRAMING_MIN_SEEN = 0.3
 
 # Detección
 MIN_CONFIDENCE = 0.6        # debajo de esto no se muestra la predicción

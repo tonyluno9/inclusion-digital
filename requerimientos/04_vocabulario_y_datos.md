@@ -46,6 +46,9 @@ Detalle práctico en [`app/Guia_Entrenamiento.md`](../app/Guia_Entrenamiento.md)
 - Izquierda y derecha son las de la persona.
 - `x` e `y` en unidades de la altura de la imagen (x multiplicada por ancho/alto); `z` de la mano relativa a la muñeca.
 - Mano o punto del cuerpo ausente → ceros.
+- **Manos del lado cambiado:** las muestras grabadas antes de ubicar las manos por las muñecas del cuerpo tienen la
+  mano derecha en el lugar de la izquierda. Al abrir la app se respaldan y se intercambian una vez; el archivo
+  `dataset_v2.meta.json` marca que el dataset ya está corregido.
 - **Formato anterior** (135 valores, sin codos): la app lo respalda en `data/backups/` y lo convierte al abrirlo
   (codos en cero); `train_model.py` también lo lee. Conviene regrabar esas señas para que el modelo aprenda los brazos.
 - Las features del modelo se calculan desde estos valores crudos (`app/modules/landmarks.py`), por lo que se pueden cambiar sin regrabar.

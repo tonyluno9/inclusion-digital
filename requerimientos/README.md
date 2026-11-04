@@ -10,7 +10,7 @@ Cada cambio al proyecto debe mantener estos requerimientos o actualizarlos aquí
 | [03_requerimientos_no_funcionales.md](03_requerimientos_no_funcionales.md) | Rendimiento, precisión, privacidad, accesibilidad, robustez (RNF-xx) |
 | [04_vocabulario_y_datos.md](04_vocabulario_y_datos.md) | Señas soportadas, protocolo de grabación y formato del dataset |
 | [05_verificacion.md](05_verificacion.md) | Cómo se verifica cada requerimiento: pruebas automáticas y prueba manual con cámara |
-| [06_avatar.md](06_avatar.md) | Avatar: captura de movimiento, clips por palabra, Blender (RF-17…RF-24, RNF-11) y formato de los clips |
+| [06_avatar.md](06_avatar.md) | Avatar: captura de movimiento, clips por palabra, Blender (RF-17…RF-25, RNF-11) y formato de los clips |
 
 ## Convenciones
 
