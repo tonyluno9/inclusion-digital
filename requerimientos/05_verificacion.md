@@ -9,7 +9,7 @@ cd app
 python -m unittest discover -s tests -t .
 ```
 
-103 pruebas, ~45 s, sin cámara. La prueba de integración con MediaPipe descarga la primera vez los modelos y una foto
+104 pruebas, 30–50 s, sin cámara. La prueba de integración con MediaPipe descarga la primera vez los modelos y una foto
 de muestra oficial (≈ 14 MB); sin internet se omite. Las pruebas de Blender corren si está instalado (variable
 `BLENDER_EXE` o `C:\Program Files\Blender Foundation\Blender *`); el CI no lo tiene y las omite. CI: [`.github/workflows/ci.yml`](../.github/workflows/ci.yml)
 (Windows y Ubuntu, Python 3.10–3.12).
@@ -56,7 +56,8 @@ de muestra oficial (≈ 14 MB); sin internet se omite. Las pruebas de Blender co
 | RF-20 | Formato neutral | `test_motion.WorldFrameTest`, `test_motion.test_make_clip_has_the_documented_format`, `test_blender_script.test_clip_real_de_la_app_en_blender` | ✅ |
 | RF-21 | Blender: en vivo | `blender/tests/test_inclusion_avatar.py` (UDP real, sin el timer modal) | 🟡 falta ver el panel y el timer en Blender abierto |
 | RF-22 | Blender: importar clips | `blender/tests/test_inclusion_avatar.py`, `test_blender_script.test_clip_real_de_la_app_en_blender` | ✅ |
-| RF-23 | Retargeting al rig | — | ⏳ necesita el archivo del personaje |
+| RF-23 | Retargeting al rig | `blender/tests/test_retarget.py` (vía `test_blender_script.test_retargeting_al_personaje`): reposo sin giros, pose conocida (brazos < 1.5°, dedos y palmas 0°), partes perdidas, horneado y en vivo por UDP; revisión visual con fotos de MediaPipe | 🟡 falta probar con la webcam |
+| RF-25 | Contactos exactos | — | ⏳ |
 | RF-24 | Reproducción por palabras | — | ⏳ |
 
 ## Prueba manual con cámara (antes de cada versión)
@@ -98,6 +99,9 @@ Marca cada punto. Lo que falle se registra como requerimiento no cumplido.
 - [ ] Espacio, seña, manos abajo: destello verde y aparece `app/data/avatar/<palabra>.json` (RF-19).
 - [ ] Con "Importar clips automáticamente", el clip queda como acción `seña_<palabra>`; al detener e importarlo, se reproduce (RF-22).
 - [ ] `z` deshace la toma (RF-19).
+- [ ] Con `blender/personaje/avatar_inclusion.blend` abierto y el personaje conectado, el personaje te sigue en vivo:
+      brazos, codos, palmas y dedos; la cabeza gira contigo (RF-23).
+- [ ] Al importar el clip de una palabra, el personaje la reproduce con la acción `seña_<palabra>` (RF-23).
 
 **Precisión** (con el dataset del protocolo de [04](04_vocabulario_y_datos.md))
 - [ ] `python train_model.py` reporta ≥ 90 % en validación por persona y ninguna seña < 80 % (RNF-02).

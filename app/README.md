@@ -64,7 +64,8 @@ El avatar aprende grabando: en modo avatar (`a`) la app manda tu movimiento en v
 `data/avatar/<palabra>.json`, con el movimiento 3D de cuerpo, brazos y dedos a su velocidad real.
 
 En Blender se usa [`../blender/inclusion_avatar.py`](../blender/README.md): crea los puntos, los mueve en vivo e importa
-los clips como animación. Conectar esos puntos al rig del personaje es la siguiente etapa
+los clips como animación, también en el personaje (`../blender/personaje/avatar_inclusion.blend`), que te sigue en vivo y
+guarda una acción por palabra. Encadenar palabras en frases es la siguiente etapa
 ([06_avatar.md](../requerimientos/06_avatar.md)).
 
 ## Cómo funciona

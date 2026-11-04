@@ -90,7 +90,7 @@ def main():
         with open(ruta, "w", encoding="utf-8") as f:
             json.dump(clip_sintetico(), f)
         accion, nk = ia.importar_clip(ruta, esc, inicio=1)
-        comprobar(accion.name == "seña_hola", f"acción '{accion.name}'")
+        comprobar(accion.name == "puntos_hola", f"acción '{accion.name}'")
         comprobar(len(accion.slots) > 0, f"{len(accion.slots)} slots en una sola acción")
         obj = bpy.data.objects["cuerpo.left_shoulder"]  # índice 11
         comprobar(obj.animation_data and obj.animation_data.action == accion, "empty usa la acción")
@@ -118,7 +118,7 @@ def main():
 
         # Reimportar reemplaza, no duplica
         ia.importar_clip(ruta, esc, inicio=1)
-        comprobar(len([a for a in bpy.data.actions if a.name.startswith("seña_hola")]) == 1,
+        comprobar(len([a for a in bpy.data.actions if a.name.startswith("puntos_hola")]) == 1,
                   "reimportar no duplica la acción")
 
         # Versión desconocida
@@ -194,7 +194,7 @@ def main():
         envio.sendto(json.dumps({"type": "clip", "word": "adios", "path": ruta}).encode(), dest)
         time.sleep(0.2)
         ia.procesar_datagramas(esc)
-        comprobar("seña_adios" in bpy.data.actions, "aviso 'clip' importa automáticamente")
+        comprobar("puntos_adios" in bpy.data.actions, "aviso 'clip' importa automáticamente")
 
     envio.close()
     ia.cerrar_socket()

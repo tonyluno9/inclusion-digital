@@ -12,6 +12,7 @@ import unittest
 
 RAIZ = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 PRUEBA = os.path.join(RAIZ, "blender", "tests", "test_inclusion_avatar.py")
+PRUEBA_RIG = os.path.join(RAIZ, "blender", "tests", "test_retarget.py")
 
 
 def _version(ruta):
@@ -41,6 +42,15 @@ class BlenderScriptTest(unittest.TestCase):
             [BLENDER, "-b", "--factory-startup", "--python-exit-code", "1", "--python", PRUEBA],
             capture_output=True, text=True, encoding="utf-8", errors="replace",
             timeout=180, cwd=RAIZ)
+        self.assertEqual(r.returncode, 0, r.stdout[-3000:] + r.stderr[-2000:])
+        self.assertIn("TODO OK", r.stdout)
+
+    def test_retargeting_al_personaje(self):
+        """RF-23: el personaje de blender/personaje/ toma la pose de los puntos, en vivo y horneada."""
+        r = subprocess.run(
+            [BLENDER, "-b", "--factory-startup", "--python-exit-code", "1", "--python", PRUEBA_RIG],
+            capture_output=True, text=True, encoding="utf-8", errors="replace",
+            timeout=300, cwd=RAIZ)
         self.assertEqual(r.returncode, 0, r.stdout[-3000:] + r.stderr[-2000:])
         self.assertIn("TODO OK", r.stdout)
 
@@ -87,7 +97,7 @@ c = bpy.data.objects["cuerpo.right_wrist"].matrix_world.translation
 esperado = ({x!r}, {-z!r}, {y!r})
 ok = all(abs(a - b) < 1e-3 for a, b in zip(e, esperado)) and (e - c).length < 1e-3
 print("POS", tuple(e), esperado, tuple(c))
-print("E2E OK" if ok and accion.name == "seña_prueba_real" else "E2E FALLA")
+print("E2E OK" if ok and accion.name == "puntos_prueba_real" else "E2E FALLA")
 sys.exit(0 if ok else 1)
 """)
             r = subprocess.run([BLENDER, "-b", "--factory-startup", "--python-exit-code", "1", "--python", check],

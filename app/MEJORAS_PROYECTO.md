@@ -25,14 +25,22 @@ orden sugerido para las próximas iteraciones.
 - Add-on de Blender: puntos en vivo e importación de clips como acción `seña_<palabra>`.
 - Prueba de punta a punta: MediaPipe real → clip → Blender. 103 pruebas.
 
+## ✅ Iteración 4 (avatar, etapa A3)
+
+- Personaje de Tripo en `blender/personaje/`, con escena lista (`avatar_inclusion.blend`).
+- Retargeting por direcciones: 42 huesos (columna, cabeza, brazos, manos, 3 falanges por dedo), con el giro del codo,
+  la palma y la pronación repartida al antebrazo. En vivo y horneado como `seña_<palabra>`.
+- Protecciones contra cuerpos mal detectados y límites de giro.
+- Pruebas en Blender: reposo exacto, pose conocida (< 1.5°), en vivo por UDP; revisión con fotos reales de MediaPipe.
+
 ## ⏭️ Siguiente
 
 | Prioridad | Tarea | Requerimiento |
 | :--- | :--- | :--- |
 | **CRÍTICA** | Grabar el dataset del protocolo (3+ personas, 20 muestras por seña) y medir | RNF-02 |
-| **ALTA** | Conectar los puntos al rig del personaje y hornear una acción por palabra | RF-23 |
-| **ALTA** | Probar el modo avatar con la webcam y Blender abiertos ([checklist](../requerimientos/05_verificacion.md)) | RF-17, RF-18, RF-21 |
-| **MEDIA** | Reproducir frases con el avatar (encadenar clips) | RF-24 |
+| **ALTA** | Probar el modo avatar con la webcam y el personaje en Blender ([checklist](../requerimientos/05_verificacion.md)) | RF-17, RF-18, RF-21, RF-23 |
+| **ALTA** | Reproducir frases con el avatar (encadenar clips, desde texto o voz del interlocutor) | RF-24 |
+| **MEDIA** | Contactos exactos con IK (mano en la cara, el pecho o la otra mano) | RF-25 |
 | **ALTA** | Prueba manual con cámara completa ([checklist](../requerimientos/05_verificacion.md)) | RF-01, RF-06, RF-08, RF-14 |
 | **ALTA** | Comparar el Random Forest con un modelo secuencial (GRU o CNN-1D) usando validación por persona | RNF-02 |
 | **MEDIA** | Segmentar también por pausas de movimiento (sin bajar las manos) | nuevo RF |

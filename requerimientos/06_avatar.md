@@ -11,9 +11,9 @@ adelante, la app reproduce los clips palabra por palabra.
 
 | Etapa | Contenido | Estado |
 |---|---|---|
-| **A1** | Captura del brazo completo y coordenadas 3D, modo avatar en la app, envío en vivo, grabación de clips por palabra | Esta iteración |
-| **A2** | En Blender: puntos en vivo y clips importados como animación, sin depender del rig | Esta iteración |
-| **A3** | Conectar los puntos al rig del personaje (retargeting) y hornear una acción por palabra | Siguiente, con el archivo del personaje |
+| **A1** | Captura del brazo completo y coordenadas 3D, modo avatar en la app, envío en vivo, grabación de clips por palabra | Hecha |
+| **A2** | En Blender: puntos en vivo y clips importados como animación, sin depender del rig | Hecha |
+| **A3** | Conectar los puntos al rig del personaje (retargeting) y hornear una acción por palabra | Hecha (falta probar con la webcam) |
 | **A4** | Reproducir palabras u oraciones (texto o voz del interlocutor) con transiciones entre clips | Después de A3 |
 | **A5** | Expresión facial (marcadores no manuales) | Futuro |
 
@@ -56,8 +56,32 @@ que llega por UDP, sin congelar la interfaz de Blender.
 El mismo script importa un clip `.json` como animación de esos puntos, a los fps de la escena, con una acción por palabra.
 
 ### RF-23 · Retargeting al rig — Debe (etapa A3)
-Los huesos del personaje siguen a los puntos (brazos, antebrazos, manos y 3 falanges por dedo, incluido el giro del
-antebrazo según la palma) y se hornea una acción por palabra. Pendiente: necesita el archivo del personaje.
+Los huesos del personaje siguen a los puntos y se hornea una acción por palabra.
+- Personaje: `blender/personaje/` (FBX de Tripo, 78 huesos, pose T con palmas abajo, mirando a −Y). Escena lista en
+  `blender/personaje/avatar_inclusion.blend` (se regenera con `blender/crear_escena.py`).
+- Huesos que se mueven (42): columna (3), cabeza, y por lado clavícula, brazo, antebrazo, mano y 3 falanges por dedo.
+  Piernas y cadera quedan en reposo (la persona seña sentada).
+- **Por dirección, no por posición:** cada hueso apunta como el segmento de la persona (hombro → codo, codo → muñeca,
+  muñeca → nudillo medio, cada falange). No importa la estatura del personaje.
+- **Giro sobre el eje:** el brazo según el plano en que dobla el codo (con el doblez real del rig como referencia); la
+  mano según la línea de nudillos índice → meñique; los dedos según la palma. El antebrazo toma la mitad del giro de la
+  muñeca (pronación), porque los huesos de giro del rig no deforman la malla.
+- **Pecho y cabeza:** la línea de hombros (y caderas → hombros si se ven) inclina la columna, repartida en 3 vértebras;
+  orejas y nariz giran la cabeza.
+- **Protecciones:** hombros a < 15 cm = cuerpo mal detectado, se ignora; caderas → hombros a > 40° de la vertical, se
+  usa la vertical; giro máximo del pecho 35°, de la cabeza 70° y de la clavícula 25°. Una parte que no se detecta
+  conserva su último giro.
+- Al hornear, cada punto se suaviza con un promedio móvil de 5 frames. La acción del personaje es `seña_<palabra>`; la
+  de los puntos, `puntos_<palabra>`.
+- En vivo, el personaje conectado se mueve con cada frame que llega por UDP.
+- Perfiles de rig: hoy `Tripo`. Para otro rig basta agregar sus nombres de huesos en `PERFILES`.
+
+**Limitación conocida:** como se copian direcciones y el personaje tiene otras proporciones, los contactos (mano que
+toca la cara o el pecho) pueden quedar cerca pero no exactos. Se corrige con IK en una etapa posterior (RF-25).
+
+### RF-25 · Contactos exactos — Podría
+Las señas con contacto (mano en la barbilla, el pecho, la otra mano) conservan el contacto en el personaje (IK sobre
+la muñeca con la posición relativa al cuerpo). Pendiente.
 
 ### RF-24 · Reproducción por palabras — Debería (etapa A4)
 Dada una frase, el avatar encadena los clips de sus palabras con transiciones suaves. Pendiente.
