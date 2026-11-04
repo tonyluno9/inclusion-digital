@@ -9,7 +9,7 @@ cd app
 python -m unittest discover -s tests -t .
 ```
 
-104 pruebas, 30–50 s, sin cámara. La prueba de integración con MediaPipe descarga la primera vez los modelos y una foto
+109 pruebas, 30–50 s, sin cámara. La prueba de integración con MediaPipe descarga la primera vez los modelos y una foto
 de muestra oficial (≈ 14 MB); sin internet se omite. Las pruebas de Blender corren si está instalado (variable
 `BLENDER_EXE` o `C:\Program Files\Blender Foundation\Blender *`); el CI no lo tiene y las omite. CI: [`.github/workflows/ci.yml`](../.github/workflows/ci.yml)
 (Windows y Ubuntu, Python 3.10–3.12).
@@ -34,7 +34,7 @@ de muestra oficial (≈ 14 MB); sin internet se omite. Las pruebas de Blender co
 | RF-14 | Control de la ventana | `test_app.test_keys…` (q / Esc) | 🟡 falta probar la X y pantalla completa |
 | RF-15 | Modo sin ventana | `test_integration_mediapipe.test_main_runs_headless_on_video` | ✅ |
 | RF-16 | Exportación móvil | — (requiere TensorFlow) | ⏳ |
-| RNF-01 | Rendimiento | `--benchmark` con video 1280×720 y pose en cada frame (manos y pose en paralelo): **16–20 fps** (detección 43–53 ms; con pose cada 2 frames y sin paralelo era igual o peor el mismo día); avatar (suavizado + UDP) 0.25 ms; entrenar 2 000 muestras: **7 s** | 🟡 cerca del mínimo: medir con la webcam |
+| RNF-01 | Rendimiento | Detección con manos y pose en paralelo, pose en cada frame, 1280×720: modelo `lite` 20–34 ms, **`full` 31 ms (~32 fps)**, `heavy` 76 ms (descartado); app completa con `--benchmark`: 16–20 fps; avatar (suavizado + UDP) 0.25 ms; entrenar 2 000 muestras: **7 s** | 🟡 medir con la webcam |
 | RNF-02 | Precisión ≥ 90 % por persona | `test_pipeline` (sintético). Requiere el dataset de ≥ 3 personas | ⏳ falta grabar el dataset |
 | RNF-03 | Sin internet | `test_tts` (respaldo con voz local), `test_coherence` (sin clave), `test_stt` | ✅ |
 | RNF-04 | Privacidad | `test_pipeline.test_dataset_only_has_coordinates`, `test_coherence` | ✅ |
@@ -50,7 +50,7 @@ de muestra oficial (≈ 14 MB); sin internet se omite. Las pruebas de Blender co
 
 | ID | Requerimiento | Verificación automática | Estado |
 |---|---|---|---|
-| RF-17 | Brazo completo | `test_motion.test_body_sides_are_anatomical`, `test_landmarks.test_arm_features`, `test_landmarks.test_fill_gaps_fills_each_arm_point_alone`, `test_segmenter.test_arms_move_with_the_sign`, `test_integration_mediapipe.test_detector_gives_3d_frame_for_the_avatar`, `test_data_collector.test_migracion_*` | 🟡 falta confirmar lados y codos con la webcam |
+| RF-17 | Brazo completo | `test_motion.test_body_sides_are_anatomical`, `test_landmarks.test_arm_features`, `test_landmarks.test_fill_gaps_fills_each_arm_point_alone`, `test_segmenter.test_arms_move_with_the_sign`, `test_integration_mediapipe.test_detector_gives_3d_frame_for_the_avatar`, `test_data_collector.test_migracion_*`, `test_data_collector.test_manos_grabadas_del_lado_cambiado_*`, `test_motion.HandSideTest` (la mano de cada lado tiene la forma de ese lado, también con MediaPipe real) | 🟡 falta confirmar codos con la webcam |
 | RF-18 | Modo avatar en vivo | `test_app.test_avatar_live_and_record_clip`, `test_motion.LiveSenderTest`, `test_motion.SmoothingTest` | 🟡 falta probar con la webcam y Blender abiertos |
 | RF-19 | Clips por palabra | `test_app.test_avatar_*`, `test_motion.ClipTest`, `test_motion.RecorderTest` | ✅ (con frames simulados) |
 | RF-20 | Formato neutral | `test_motion.WorldFrameTest`, `test_motion.test_make_clip_has_the_documented_format`, `test_blender_script.test_clip_real_de_la_app_en_blender` | ✅ |

@@ -86,6 +86,15 @@ El avatar no se entrena: copia tus movimientos grabados, uno por palabra.
 *   Que se vean tus hombros, codos y manos completos; de frente a la cámara.
 *   Empieza y termina con los brazos abajo, quieto: así la animación arranca y acaba en reposo.
 
+**Si al sistema le cuesta detectar tu cuerpo** (el personaje se queda quieto o los brazos saltan):
+*   Aléjate hasta que se vean **la cabeza, los hombros, los codos y la cintura**. Muy cerca de la cámara, el
+    modelo tiene que adivinar el cuerpo y se equivoca.
+*   Luz de frente y pareja; nada brillante detrás de ti (ventana, lámpara). Una habitación oscura o a contraluz
+    es la causa más común.
+*   Ropa que contraste con el fondo: camisa oscura en pared clara o al revés, y mangas que dejen ver dónde está el codo.
+*   El modelo de cuerpo se elige en `config.py` (`POSE_MODEL`): `full` por defecto; `heavy` detecta un poco mejor
+    pero en este equipo es demasiado lento para el modo en vivo.
+
 ---
 
 ## 7. 🛠️ Ciclo de Mejora Continua

@@ -127,9 +127,10 @@ class DataCollectorTest(unittest.TestCase):
         dc = DataCollector(self.path, self.backup, sequence_length=C.SEQUENCE_LENGTH)
         self.assertEqual(dc.migrated, 2)
         self.assertEqual(dc.count(), 2)
-        backups = os.listdir(self.backup)
-        self.assertEqual(len(backups), 1)
+        backups = sorted(os.listdir(self.backup))
+        self.assertEqual(len(backups), 2)                        # antes de cada corrección
         self.assertIn("formato135", backups[0])
+        self.assertIn("manos_cambiadas", backups[1])
 
         raw, y, groups = load_dataset(self.path)
         self.assertEqual(raw.shape, (2, C.SEQUENCE_LENGTH, RAW_FRAME_SIZE))
@@ -141,6 +142,37 @@ class DataCollectorTest(unittest.TestCase):
         self.assertEqual(dc.count("hola"), 2)
         again = DataCollector(self.path, self.backup, sequence_length=C.SEQUENCE_LENGTH)
         self.assertEqual(again.migrated, 0)                      # no se migra dos veces
+
+    def test_manos_grabadas_del_lado_cambiado_se_corrigen_una_vez(self):
+        """RF-17 / RNF-09: las muestras grabadas con las manos del lado cambiado
+        se intercambian una sola vez (con respaldo); las nuevas no se tocan."""
+        seq = np.zeros((C.SEQUENCE_LENGTH, RAW_FRAME_SIZE), dtype=np.float32)
+        seq[:, :63] = 1.0                                        # mano en el lugar izquierdo
+        seq[:, 63:126] = 2.0
+        seq[:, 126:] = 3.0
+        dc = self.make()
+        dc.save_sequence("hola", seq, person="tony")
+        os.remove(dc.meta_path)                                  # como un dataset de antes de la corrección
+
+        fixed = DataCollector(self.path, self.backup, sequence_length=C.SEQUENCE_LENGTH)
+        self.assertEqual(fixed.hands_fixed, 1)
+        self.assertTrue(any("manos_cambiadas" in n for n in os.listdir(self.backup)))
+        raw, _, _ = load_dataset(self.path)
+        self.assertTrue(np.all(raw[0, :, :63] == 2.0) and np.all(raw[0, :, 63:126] == 1.0))
+        self.assertTrue(np.all(raw[0, :, 126:] == 3.0))         # el cuerpo no cambia
+
+        fixed.save_sequence("hola", seq, person="tony")          # muestra nueva: ya en su lado
+        again = DataCollector(self.path, self.backup, sequence_length=C.SEQUENCE_LENGTH)
+        self.assertEqual(again.hands_fixed, 0)                   # no se corrige dos veces
+        raw, _, _ = load_dataset(self.path)
+        self.assertTrue(np.all(raw[1, :, :63] == 1.0))
+
+    def test_dataset_nuevo_nace_marcado(self):
+        """Un dataset creado por esta versión no se 'corrige' al volver a abrirlo."""
+        dc = DataCollector(self.path, self.backup, sequence_length=C.SEQUENCE_LENGTH)
+        dc.save_sequence("hola", SEQ)
+        self.assertTrue(os.path.isfile(dc.meta_path))
+        self.assertEqual(DataCollector(self.path, self.backup, sequence_length=C.SEQUENCE_LENGTH).hands_fixed, 0)
 
     def test_entrenar_lee_el_formato_anterior_sin_migrar(self):
         """RF-11: train_model.py acepta un dataset viejo que no se ha abierto con la app."""

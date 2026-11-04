@@ -22,10 +22,15 @@ adelante, la app reproduce los clips palabra por palabra.
 ### RF-17 · Brazo completo — Debe
 El detector lee, por cada lado, hombro, codo y muñeca del cuerpo, además de los 21 puntos de cada mano.
 - El lado (izquierdo / derecho) es el **anatómico** de la persona, aunque la imagen esté en espejo.
-  - Las manos usan la etiqueta de MediaPipe, que es correcta con la imagen en espejo.
+  - Cada mano va al lado de la muñeca del cuerpo más cercana. Sin cuerpo, se usa la etiqueta de MediaPipe
+    **invertida**: MediaPipe etiqueta como si la imagen no estuviera en espejo (comprobado con la forma 3D de la
+    mano: los dedos se doblan hacia la palma; ver `motion.hand_side_from_shape`). Con la mano del lado cambiado,
+    el personaje la cierra al revés.
   - El cuerpo se decide por geometría: en espejo, el hombro izquierdo de la persona queda a la izquierda de la imagen.
 - Un punto con visibilidad < 0.5 se guarda como ausente (ceros).
-- La pose se calcula en cada frame (`POSE_EVERY_N_FRAMES = 1`) y se mantiene RNF-01 (≥ 15 fps).
+- La pose se calcula en cada frame (`POSE_EVERY_N_FRAMES = 1`) con el modelo `full` de MediaPipe
+  (`POSE_MODEL`; `lite` es más rápido y detecta peor el cuerpo, `heavy` es demasiado lento), y se mantiene
+  RNF-01 (≥ 15 fps).
 - El reconocedor de señas a subtítulos usa también la posición de codos y muñecas respecto a los hombros (features v4).
 
 ### RF-18 · Modo avatar en vivo — Debe

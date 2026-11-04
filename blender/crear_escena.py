@@ -52,5 +52,14 @@ with open(os.path.join(AQUI, "inclusion_avatar.py"), encoding="utf-8") as f:
     texto.from_string(f.read())
 texto.use_module = True        # se registra al abrir (si Blender permite scripts)
 
+# Al abrir: el script ya visible en Scripting (listo para Run Script) y la barra
+# lateral de la vista 3D abierta (pestaña INCLUSION)
+for pantalla in bpy.data.screens:
+    for area in pantalla.areas:
+        if area.type == 'TEXT_EDITOR':
+            area.spaces.active.text = texto
+        elif area.type == 'VIEW_3D':
+            area.spaces.active.show_region_ui = True
+
 bpy.ops.wm.save_as_mainfile(filepath=SALIDA, compress=True)
 print("ESCENA", SALIDA)

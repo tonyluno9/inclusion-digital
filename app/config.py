@@ -22,6 +22,7 @@ CAMERA_INDEX = 0
 CAMERA_WIDTH = 1280
 CAMERA_HEIGHT = 720
 POSE_EVERY_N_FRAMES = 1     # la pose (hombros, codos, muñecas) se calcula 1 de cada N frames
+POSE_MODEL = "full"         # modelo de pose de MediaPipe: "lite" (rápido), "full" o "heavy" (más preciso)
 
 # Segmentación de señas (en frames, ~30 fps)
 SEGMENT_START_FRAMES = 3    # frames seguidos con manos para empezar una seña

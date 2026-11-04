@@ -7,10 +7,10 @@ import unittest
 
 import numpy as np
 
-from modules.landmark_detector import anatomical_order
+from modules.landmark_detector import anatomical_order, hand_slot_hint
 from modules.motion import (CLIP_FORMAT, CLIP_VERSION, HAND_NAMES, POSE_NAMES, ClipStore, LiveSender, LiveSmoother,
-                            MotionRecorder, OneEuroFilter, empty_world, fill_short_gaps, make_clip, validate_clip,
-                            world_frame)
+                            MotionRecorder, OneEuroFilter, empty_world, fill_short_gaps, hand_side_from_shape,
+                            make_clip, validate_clip, world_frame)
 
 
 def fake_world(seed=0, hands=True):
@@ -59,6 +59,43 @@ class WorldFrameTest(unittest.TestCase):
         self.assertEqual(swapped[11:17], [12, 11, 14, 13, 16, 15])
         self.assertEqual(swapped[0], 0)                       # la nariz no tiene par
         self.assertEqual(sorted(swapped), list(range(33)))
+
+
+def curled_hand(thumb_side=1.0):
+    """Mano con los dedos hacia arriba, el pulgar hacia +x (thumb_side=1) y los
+    dedos algo doblados hacia +z (la palma mira a la cámara)."""
+    p = np.zeros((21, 3))
+    p[1:5] = [(0.02 * thumb_side, 0.02 + 0.015 * k, 0.01) for k in range(4)]
+    for f, (mcp, x) in enumerate(((5, 0.02), (9, 0.0), (13, -0.02), (17, -0.035))):
+        x *= thumb_side
+        p[mcp] = (x, 0.08, 0)
+        p[mcp + 1] = (x, 0.11, 0.005)
+        p[mcp + 2] = (x, 0.13, 0.02)
+        p[mcp + 3] = (x, 0.14, 0.04)
+    return p
+
+
+class HandSideTest(unittest.TestCase):
+    def test_side_from_shape(self):
+        """RF-17: palma a la cámara, dedos arriba y pulgar hacia la izquierda de la
+        persona = mano derecha (como al decir "alto"). En espejo, izquierda."""
+        self.assertEqual(hand_side_from_shape(curled_hand(+1)), "right")
+        self.assertEqual(hand_side_from_shape(curled_hand(-1)), "left")
+        mirrored = curled_hand(+1) * (-1, 1, 1)
+        self.assertEqual(hand_side_from_shape(mirrored), "left")
+
+    def test_slot_by_nearest_body_wrist(self):
+        """RF-17: cada mano va al lado de la muñeca del cuerpo más cercana."""
+        wrists = [(0.6, 0.5), (1.2, 0.5)]                 # izquierda, derecha (en la imagen en espejo)
+        self.assertEqual(hand_slot_hint("Left", (0.62, 0.52), wrists), 0)
+        self.assertEqual(hand_slot_hint("Right", (1.18, 0.49), wrists), 1)
+
+    def test_slot_without_body_uses_inverted_label(self):
+        """Sin cuerpo (o lejos de las muñecas), la etiqueta de MediaPipe invertida:
+        con la imagen en espejo, MediaPipe llama "Left" a la mano derecha."""
+        self.assertEqual(hand_slot_hint("Left", (0.6, 0.5), [None, None]), 1)
+        self.assertEqual(hand_slot_hint("Right", (0.6, 0.5), [None, None]), 0)
+        self.assertEqual(hand_slot_hint("Left", (0.9, 0.1), [(0.6, 0.5), (1.2, 0.5)]), 1)
 
 
 class SmoothingTest(unittest.TestCase):

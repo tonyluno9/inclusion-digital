@@ -40,3 +40,7 @@ app/data/test_assets/
 # Datos grabados por cada persona (puntos del cuerpo): se comparten a propósito, no por defecto
 app/data/dataset_v2.csv
 app/data/avatar/
+app/data/dataset_v2.meta.json
+
+# Copias de respaldo que Blender crea al guardar
+*.blend1

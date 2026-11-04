@@ -45,6 +45,23 @@ LEFT_WRIST, RIGHT_WRIST = 15, 16
 PARTS = ("pose", "left", "right")
 
 
+def hand_side_from_shape(points):
+    """"left" o "right" según la forma 3D de una mano (21 puntos en ejes de la
+    persona). Los dedos siempre se doblan hacia la palma: eso dice hacia dónde
+    mira la palma, y junto con el lado del pulgar, de qué mano se trata.
+    Necesita los dedos algo doblados (una mano totalmente plana es ambigua)."""
+    p = np.asarray(points, dtype=np.float64)
+    toward_fingers = p[9] - p[0]             # muñeca -> nudillo medio
+    toward_thumb = p[5] - p[17]              # nudillo del meñique -> del índice
+    palmar = np.zeros(3)
+    for mcp, pip, tip in ((5, 6, 8), (9, 10, 12), (13, 14, 16), (17, 18, 20)):
+        u = p[pip] - p[mcp]
+        u /= np.linalg.norm(u) + 1e-12
+        v = p[tip] - p[pip]
+        palmar += v - u * v.dot(u)           # hacia dónde se dobla el dedo
+    return "right" if np.cross(toward_fingers, toward_thumb).dot(palmar) < 0 else "left"
+
+
 def empty_world():
     return {"pose": None, "vis": None, "left": None, "right": None}
 
