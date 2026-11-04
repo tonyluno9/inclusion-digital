@@ -80,7 +80,7 @@ if errorlevel 1 (
 )
 
 echo.
-choice /C SN /M "Crear el acceso directo INCLUSION en el Escritorio"
+choice /C SN /M "Crear el acceso directo K'ab T'aan en el Escritorio"
 if not errorlevel 2 call "%~dp0crear_acceso_directo.bat"
 
 :fin

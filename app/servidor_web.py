@@ -1,4 +1,4 @@
-"""INCLUSION como aplicación de escritorio: interfaz web en una ventana propia.
+"""K'ab T'aan como aplicación de escritorio: interfaz web en una ventana propia.
 
     python servidor_web.py                    # cámara 0, abre la ventana
     python servidor_web.py --camera 1
@@ -167,6 +167,11 @@ def _texto(datos, clave):
     return valor[:60]
 
 
+def _segundos(datos, clave):
+    valor = datos.get(clave)
+    return None if valor is None else max(0.0, float(valor))
+
+
 ACCIONES = {
     "modo_deteccion": lambda app, d: app.detection_mode(),
     "entrenar_palabra": lambda app, d: app.train_word(_texto(d, "palabra"), str(d.get("persona", ""))),
@@ -180,11 +185,14 @@ ACCIONES = {
     "borrar_sena": lambda app, d: app.delete_sign(_texto(d, "palabra")),
     "borrar_clip": lambda app, d: app.delete_clip(_texto(d, "palabra")),
     "texto_interlocutor": lambda app, d: app.interlocutor_text(str(d.get("texto", ""))[:300]),
+    "manos": lambda app, d: app.set_hands(str(d.get("modo", ""))),
+    "guardar_toma": lambda app, d: app.save_take(_segundos(d, "inicio"), _segundos(d, "fin")) and True,
+    "descartar_toma": lambda app, d: app.discard_take(),
 }
 
 
 class Manejador(BaseHTTPRequestHandler):
-    server_version = "INCLUSION"
+    server_version = "KabTaan"
 
     def log_message(self, fmt, *args):     # sin una línea por petición en la consola
         pass
@@ -231,6 +239,9 @@ class Manejador(BaseHTTPRequestHandler):
             if ruta.startswith("/api/clip/"):
                 palabra = ruta[len("/api/clip/"):]
                 return self._archivo(self.motor.app.clips.path(palabra), "application/json")
+            if ruta == "/api/toma":
+                toma = self.motor.app.pending_take
+                return self._json(toma) if toma is not None else self._json({"error": "no hay toma"}, 404)
             if ruta == "/api/dataset":
                 senas, personas = self.motor.app.collector.stats()
                 return self._json({"senas": senas, "personas": personas})
@@ -334,7 +345,7 @@ class Servidor(ThreadingHTTPServer):
                 cerrada = (self.cerrar_sin_ventana and self._hubo_ventana and self._sin_ventana_desde is not None
                            and time.monotonic() - self._sin_ventana_desde > CIERRE_SIN_VENTANA)
             if cerrada:
-                print("[INCLUSION] La ventana se cerró: terminando.")
+                print("[APP] La ventana se cerró: terminando.")
                 self.cerrar()
                 return
 
@@ -363,7 +374,7 @@ def abrir_ventana(url):
 
 
 def parse_args(argv=None):
-    p = argparse.ArgumentParser(description="INCLUSION: señas a subtítulos y avatar, en una sola ventana")
+    p = argparse.ArgumentParser(description="K'ab T'aan: señas a subtítulos y avatar, en una sola ventana")
     p.add_argument("--camera", type=int, default=C.CAMERA_INDEX, help="índice de la cámara (0, 1, ...)")
     p.add_argument("--video", help="usar un archivo de video en vez de la cámara (se repite)")
     p.add_argument("--puerto", type=int, default=PUERTO)
@@ -390,7 +401,7 @@ def crear_app():
     detector = LandmarkDetector(C.MODELS_DIR, pose_every=C.POSE_EVERY_N_FRAMES, pose_model=C.POSE_MODEL)
     tts = TTSEngine(lang="es", use_online=C.USE_ONLINE_TTS)
     stt = STTController(model_path=C.VOSK_MODEL_PATH, use_online=C.USE_ONLINE_STT)
-    return InclusionApp(detector, tts, stt)
+    return InclusionApp(detector, tts, stt, review_takes=True)
 
 
 def main(argv=None):
@@ -412,13 +423,13 @@ def main(argv=None):
     try:
         servidor = Servidor(motor, args.puerto, cerrar_sin_ventana=not args.sin_ventana)
     except OSError:
-        print(f"Error: el puerto {args.puerto} está ocupado. ¿INCLUSION ya está abierto? Prueba con --puerto 8766.")
+        print(f"Error: el puerto {args.puerto} está ocupado. ¿K'ab T'aan ya está abierto? Prueba con --puerto 8766.")
         motor.detener()
         return 1
-    print(f"INCLUSION en {servidor.url}")
+    print(f"K'ab T'aan en {servidor.url}")
     threading.Thread(target=servidor.vigilar, daemon=True).start()
     if not args.sin_ventana:
-        print(f"[INCLUSION] Ventana: {abrir_ventana(servidor.url)}")
+        print(f"[APP] Ventana: {abrir_ventana(servidor.url)}")
     try:
         servidor.serve_forever(poll_interval=0.3)
     except KeyboardInterrupt:

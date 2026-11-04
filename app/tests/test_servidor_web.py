@@ -7,6 +7,7 @@ import tempfile
 import threading
 import time
 import unittest
+import urllib.error
 import urllib.request
 
 import numpy as np
@@ -109,7 +110,7 @@ class ServidorWebTest(unittest.TestCase):
         estado, tipo, html = self.get("/")
         self.assertEqual(estado, 200)
         self.assertIn("text/html", tipo)
-        self.assertIn(b"INCLUSION", html)
+        self.assertIn(b"<title>K'ab T'aan</title>", html)
         self.assertIn("javascript", self.get("/js/app.js")[1])
         self.assertEqual(self.get("/assets/modelos/personaje.glb")[1], "model/gltf-binary")
 
@@ -171,6 +172,31 @@ class ServidorWebTest(unittest.TestCase):
         codigo, r = self.accion(accion="borrar_clip", palabra="buenos días")
         self.assertTrue(r["resultado"])
         self.assertEqual(self.clips.words(), [])
+
+    def test_manos_y_toma_pendiente(self):
+        """RF-31, RF-32: elegir las manos de la seña; revisar, recortar y guardar o descartar la toma."""
+        self.accion(accion="avatar_palabra", palabra="hola")
+        codigo, r = self.accion(accion="manos", modo="derecha")
+        self.assertEqual((codigo, r["resultado"]), (200, "derecha"))
+        self.esperar(lambda: self.motor.estado.get("manos") == "derecha")
+        self.assertEqual(self.accion(accion="manos", modo="tres")[0], 400)
+        with self.assertRaises(urllib.error.HTTPError) as err:
+            self.get("/api/toma")
+        self.assertEqual(err.exception.code, 404)
+        self.assertEqual(self.accion(accion="guardar_toma")[0], 400)
+
+        vacio = {"pose": None, "vis": None, "left": None, "right": None}
+        toma = make_clip([(i / 10, vacio) for i in range(21)], "hola", hands="derecha")
+        self.motor.ejecutar(lambda: setattr(self.app, "pending_take", toma))
+        self.assertEqual(json.loads(self.get("/api/toma")[2])["duration"], 2.0)
+        codigo, r = self.accion(accion="guardar_toma", inicio=0.5, fin=1.5)
+        self.assertEqual((codigo, r["ok"]), (200, True))
+        self.assertAlmostEqual(self.clips.load("hola")["duration"], 1.0)
+        self.assertIsNone(self.app.pending_take)
+
+        self.motor.ejecutar(lambda: setattr(self.app, "pending_take", toma))
+        self.assertTrue(self.accion(accion="descartar_toma")[1]["resultado"])
+        self.assertAlmostEqual(self.clips.load("hola")["duration"], 1.0)
 
     def test_sin_camara_la_app_responde(self):
         """RNF-06: sin cámara la interfaz carga y avisa."""

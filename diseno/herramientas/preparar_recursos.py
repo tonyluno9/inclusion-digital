@@ -67,8 +67,26 @@ def recortar(rgba, margen=0.04):
     return lienzo
 
 
+# Logo de K'ab T'aan: el concepto C «Diálogo» (mano de la persona y mano de puntos del sistema)
+LOGO = os.path.join("logo_kab_taan", "concepto_dialogo.png")
+
+
+def rellenar_circulo(rgba, margen):
+    """El logo es un emblema redondo: todo lo de adentro del aro es opaco sobre blanco (el relleno
+    del fondo se puede colar por el aro, que es una línea fina, y dejar el interior transparente)."""
+    lado = rgba.shape[0]
+    radio = lado / 2 / (1 + 2 * margen) - 1
+    yy, xx = np.mgrid[:lado, :lado]
+    dentro = (xx - lado / 2 + .5) ** 2 + (yy - lado / 2 + .5) ** 2 <= radio ** 2
+    a = rgba[..., 3:4].astype(np.float32) / 255
+    blanco = rgba[..., :3].astype(np.float32) * a + 255 * (1 - a)
+    rgba[dentro, :3] = blanco[dentro].astype(np.uint8)
+    rgba[dentro, 3] = 255
+    return rgba
+
+
 def logo():
-    rgba = recortar(quitar_fondo_blanco(leer("logo.png")))
+    rgba = rellenar_circulo(recortar(quitar_fondo_blanco(leer(LOGO)), margen=0.02), margen=0.02)
     cv2.imwrite(os.path.join(DESTINO, "img", "logo.png"), cv2.resize(rgba, (512, 512), interpolation=cv2.INTER_AREA))
     # Ícono de la ventana: varios tamaños dentro de un .ico
     from PIL import Image

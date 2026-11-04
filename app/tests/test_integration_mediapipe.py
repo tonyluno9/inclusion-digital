@@ -89,6 +89,7 @@ class MediaPipeIntegrationTest(unittest.TestCase):
             det = DETECTOR_CLS(C.MODELS_DIR, pose_every=C.POSE_EVERY_N_FRAMES, pose_model=C.POSE_MODEL)
             app = InclusionApp(det, FakeTTS(), FakeSTT(), collector=collector, logic=logic, background=False)
             app.mode, app.label, app.person, app.armed = "TRAINING", "hola", "test", True
+            app.hands = "derecha"                       # la foto es de una sola mano
             blank = np.zeros_like(SIGN_FRAME)
             try:
                 for frame in [blank] * 10 + [SIGN_FRAME] * 25 + [blank] * 12:

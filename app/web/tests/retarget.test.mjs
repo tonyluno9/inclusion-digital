@@ -85,5 +85,18 @@ const cambio = Math.max(...huesos.L_Index1.quaternion.toArray().map((x, i) => Ma
 comprobar(cambio < 1e-6, `un frame vacío conserva la pose (cambio máx. ${cambio.toExponential(1)})`);
 comprobar(Object.values(huesos).every((b) => Number.isFinite(b.quaternion.w)), 'sin NaN');
 
+// Seña de una mano (RF-31): olvidarMano('L') devuelve la mano izquierda y sus dedos al reposo,
+// sin tocar la derecha
+rt.reposo();
+rt.mover(fixture.pose.frame);
+const derechaAntes = huesos.R_Index1.quaternion.clone();
+rt.olvidarMano('L');
+rt.mover({ ...fixture.pose.frame, left: null });
+const relativo = (b) => Math.max(...b.quaternion.toArray().map((x, i) => Math.abs(x - rt.reposoLocal[b.name].toArray()[i])));
+comprobar(relativo(huesos.L_Index1) < 1e-6 && relativo(huesos.L_Hand) < 1e-6,
+  'olvidarMano: la mano izquierda y sus dedos vuelven a su reposo');
+const cambioDer = Math.max(...huesos.R_Index1.quaternion.toArray().map((x, i) => Math.abs(x - derechaAntes.toArray()[i])));
+comprobar(cambioDer < 1e-6, 'olvidarMano: la mano derecha no cambia');
+
 console.log(fallas ? `${fallas} FALLAS` : 'TODO OK');
 process.exit(fallas ? 1 : 0);

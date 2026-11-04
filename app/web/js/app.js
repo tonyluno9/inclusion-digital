@@ -1,4 +1,4 @@
-// INCLUSION · interfaz. Habla con app/servidor_web.py:
+// K'ab T'aan · interfaz. Habla con app/servidor_web.py:
 //   /eventos  (estado + movimiento 3D, ~30 por segundo)   /video  (cámara)   /api/...  (acciones y datos)
 import { Avatar } from './avatar.js';
 import { buscarSenas, norm } from './texto.js';
@@ -6,11 +6,15 @@ import { buscarSenas, norm } from './texto.js';
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
 const TITULOS = { inicio: 'Inicio', traducir: 'Traducir', entrenar: 'Entrenar el traductor', avatar: 'Avatar', ayuda: 'Ayuda' };
+const MODOS_MANOS = ['dos', 'derecha', 'izquierda'];
+const RECORTE_MIN = 0.3;          // s: el recorte más corto que se puede guardar
+const PASO_TECLA = 1 / 30;        // s que mueve una flecha (un frame de la cámara)
 
 const ui = {
   pagina: null,
   estado: {},
   seq: { palabra: null, texto: null, clip: null },
+  revision: null,              // toma del avatar en revisión: { seq, clip, total, inicio, fin, t }
   clips: new Map(),            // palabra normalizada -> nombre del clip
   cacheClips: new Map(),       // nombre -> JSON
   avisoPrevio: '',
@@ -28,7 +32,7 @@ async function accion(nombre, datos = {}) {
     if (!j.ok) avisar(j.error || 'No se pudo hacer la acción', 'error');
     return j;
   } catch {
-    avisar('Se perdió la conexión con INCLUSION', 'error');
+    avisar('Se perdió la conexión con la app', 'error');
     return { ok: false };
   }
 }
@@ -40,7 +44,7 @@ function escuchar() {
   fuente.onmessage = (e) => {
     const { estado, mundo } = JSON.parse(e.data);
     actualizar(estado);
-    if (mundo && estado.modo === 'AVATAR' && ui.pagina === 'avatar') avatar.vivo(mundo);
+    if (mundo && estado.modo === 'AVATAR' && ui.pagina === 'avatar' && !ui.revision) avatar.vivo(mundo, estado.manos);
   };
   fuente.onerror = () => { $('#chip-camara').className = 'chip mal'; };
 }
@@ -100,6 +104,11 @@ function actualizar(e) {
       : 'Listo: levanta las manos y haz la seña';
   });
   $$('[data-accion="grabar"]').forEach((b) => b.classList.toggle('activo', e.armado));
+  $$('[data-manos]').forEach((b) => {
+    const activo = b.dataset.manos === e.manos;
+    b.classList.toggle('activo', activo);
+    b.setAttribute('aria-pressed', String(activo));
+  });
   $$('[data-txt-grabar]').forEach((s) => { s.textContent = e.armado ? 'Pausar (Espacio)' : 'Grabar (Espacio)'; });
 
   // Traducir
@@ -156,9 +165,12 @@ function actualizar(e) {
     $('#palabra-avatar').classList.toggle('tenue', !e.palabra);
   }
   if (e.seq_clip !== ui.seq.clip) {
-    if (ui.seq.clip !== null) { cargarClips(); avisar(`Movimiento guardado: «${e.palabra}»`, 'ok'); }
+    // Un clip nuevo reemplaza al anterior de esa palabra: lo guardado en caché ya no sirve
+    if (ui.seq.clip !== null) { ui.cacheClips.clear(); cargarClips(); }   // el aviso lo da la app (con la duración)
     ui.seq.clip = e.seq_clip;
   }
+  if (e.toma_pendiente && ui.pagina === 'avatar' && (!ui.revision || ui.revision.seq !== e.toma_seq)) abrirRevision(e.toma_seq);
+  if (!e.toma_pendiente && ui.revision) cerrarRevision();
 
   // Avisos de la app (lo que antes salía en la ventana de OpenCV)
   if (e.aviso && e.aviso !== ui.avisoPrevio) avisar(e.aviso, e.destello === 'error' ? 'error' : '');
@@ -219,6 +231,128 @@ async function decirEnSenas(texto) {
   if (faltan.length) avisar(`El avatar no sabe: ${faltan.join(', ')}`);
 }
 
+// ------------------------------------------- revisar y recortar la toma del avatar
+async function abrirRevision(seq) {
+  ui.revision = { seq, clip: null };
+  let toma;
+  try { toma = await obtener('/api/toma'); } catch { ui.revision = null; return; }
+  if (!ui.revision || ui.revision.seq !== seq) return;          // se descartó mientras cargaba
+  const total = toma.duration;
+  Object.assign(ui.revision, { clip: toma, total, inicio: 0, fin: total, t: 0 });
+  $('#rev-palabra').textContent = toma.word;
+  $('#lt-total').textContent = `${segundos(total)} s`;
+  $('#tarjeta-grabar-avatar').classList.add('oculto');
+  $('#tarjeta-revision').classList.remove('oculto');
+  avatar.revisar(toma);
+  avatar.velocidad(ui.velocidad || 1);
+  pintarRevision();
+}
+
+function cerrarRevision() {
+  ui.revision = null;
+  avatar.terminarRevision();
+  $('#tarjeta-revision').classList.add('oculto');
+  $('#tarjeta-grabar-avatar').classList.remove('oculto');
+}
+
+const segundos = (t) => t.toFixed(1).replace('.', ',');
+const revisando = () => Boolean(ui.revision && ui.revision.clip);
+
+function pintarRevision() {
+  const r = ui.revision;
+  if (!revisando()) return;
+  const pct = (t) => `${(100 * t) / r.total}%`;
+  $('#lt-rango').style.left = pct(r.inicio);
+  $('#lt-rango').style.width = pct(r.fin - r.inicio);
+  $('#asa-inicio').style.left = pct(r.inicio);
+  $('#asa-fin').style.left = pct(r.fin);
+  $('#lt-cabezal').style.left = pct(r.t);
+  $('#rev-tiempos').innerHTML = `${segundos(r.inicio)} – ${segundos(r.fin)} s · dura <b>${segundos(r.fin - r.inicio)} s</b>`;
+  const reproduciendo = avatar.rev && avatar.rev.reproduciendo;
+  $('#rev-reproducir span:last-child').textContent = reproduciendo ? 'Pausa' : 'Reproducir';
+  $('#rev-reproducir .icono').style.setProperty('--i', `url(../assets/iconos/${reproduciendo ? 'detener' : 'reproducir'}.png)`);
+  $('#rev-velocidad').textContent = `Velocidad ${(ui.velocidad || 1) === 1 ? '1×' : '½×'}`;
+}
+
+// Mueve un extremo del recorte (o solo el cabezal) y muestra ese instante en el avatar
+function moverRecorte(cual, t) {
+  const r = ui.revision;
+  if (!revisando()) return;
+  if (cual === 'inicio') r.inicio = Math.min(Math.max(0, t), r.fin - RECORTE_MIN);
+  if (cual === 'fin') r.fin = Math.max(Math.min(r.total, t), r.inicio + RECORTE_MIN);
+  r.t = cual === 'inicio' ? r.inicio : cual === 'fin' ? r.fin : Math.min(Math.max(0, t), r.total);
+  avatar.tramo(r.inicio, r.fin);
+  avatar.irA(r.t);
+  pintarRevision();
+}
+
+function conectarLineaDeTiempo() {
+  const linea = $('#linea-tiempo');
+  const tiempo = (ev) => {
+    const caja = linea.getBoundingClientRect();
+    return ((ev.clientX - caja.left) / caja.width) * ui.revision.total;
+  };
+  let arrastre = null;
+  linea.addEventListener('pointerdown', (ev) => {
+    if (!revisando()) return;
+    arrastre = ev.target.id === 'asa-inicio' ? 'inicio' : ev.target.id === 'asa-fin' ? 'fin' : 'cabezal';
+    linea.setPointerCapture(ev.pointerId);
+    moverRecorte(arrastre, tiempo(ev));
+    ev.preventDefault();
+  });
+  linea.addEventListener('pointermove', (ev) => { if (arrastre) moverRecorte(arrastre, tiempo(ev)); });
+  const soltar = () => {
+    if (!arrastre) return;
+    const eraAsa = arrastre !== 'cabezal';
+    arrastre = null;
+    if (eraAsa) { avatar.reproducirTramo(true); pintarRevision(); }   // al soltar un extremo, se ve el recorte
+  };
+  linea.addEventListener('pointerup', soltar);
+  linea.addEventListener('pointercancel', soltar);
+  for (const [id, cual] of [['#asa-inicio', 'inicio'], ['#asa-fin', 'fin']]) {
+    $(id).addEventListener('keydown', (ev) => {
+      if (!revisando() || (ev.key !== 'ArrowLeft' && ev.key !== 'ArrowRight')) return;
+      ev.preventDefault();
+      ev.stopPropagation();
+      const paso = (ev.key === 'ArrowLeft' ? -1 : 1) * PASO_TECLA * (ev.shiftKey ? 10 : 1);
+      moverRecorte(cual, ui.revision[cual] + paso);
+    });
+  }
+  $('#rev-reproducir').addEventListener('click', alternarReproduccion);
+  $('#rev-velocidad').addEventListener('click', () => {
+    ui.velocidad = (ui.velocidad || 1) === 1 ? 0.5 : 1;
+    avatar.velocidad(ui.velocidad);
+    pintarRevision();
+  });
+  $('#rev-guardar').addEventListener('click', guardarToma);
+  $('#rev-descartar').addEventListener('click', descartarToma);
+  avatar.alTiempo = (t) => {
+    if (!revisando()) return;
+    ui.revision.t = t;
+    $('#lt-cabezal').style.left = `${(100 * t) / ui.revision.total}%`;
+  };
+}
+
+function alternarReproduccion() {
+  if (!revisando()) return;
+  avatar.reproducirTramo(!(avatar.rev && avatar.rev.reproduciendo));
+  pintarRevision();
+}
+
+async function guardarToma() {
+  const r = ui.revision;
+  if (!revisando()) return;
+  const recortada = r.inicio > 0.01 || r.fin < r.total - 0.01;
+  const j = await accion('guardar_toma', recortada ? { inicio: r.inicio, fin: r.fin } : {});
+  if (j.ok) cerrarRevision();
+}
+
+async function descartarToma() {
+  if (!revisando()) return;
+  const j = await accion('descartar_toma');
+  if (j.ok) cerrarRevision();
+}
+
 // -------------------------------------------------------------------- avisos
 function avisar(texto, tipo = '') {
   const d = document.createElement('div');
@@ -236,6 +370,8 @@ function conectar() {
   $$('.nav[data-pagina]').forEach((b) => b.addEventListener('click', () => ir(b.dataset.pagina)));
   $$('[data-ir]').forEach((b) => b.addEventListener('click', () => ir(b.dataset.ir)));
   $$('[data-accion]').forEach((b) => b.addEventListener('click', () => accion(b.dataset.accion)));
+  $$('[data-manos]').forEach((b) => b.addEventListener('click', () => accion('manos', { modo: b.dataset.manos })));
+  conectarLineaDeTiempo();
   $('#btn-voz').addEventListener('click', () => accion('voz'));
   $('#btn-escuchar').addEventListener('click', () => accion('escuchar'));
   $('#btn-pantalla').addEventListener('click', pantallaCompleta);
@@ -270,7 +406,22 @@ function conectar() {
   document.addEventListener('keydown', (ev) => {
     if (ev.target.closest('input') || ev.ctrlKey || ev.altKey || ev.metaKey) return;
     const k = ev.key.toLowerCase();
-    if (k === ' ' && (ui.pagina === 'entrenar' || ui.pagina === 'avatar')) { ev.preventDefault(); accion('grabar'); }
+    const grabando = ui.pagina === 'entrenar' || ui.pagina === 'avatar';
+    if (revisando() && ui.pagina === 'avatar') {                  // revisando una toma
+      if (k === 'enter') { ev.preventDefault(); guardarToma(); return; }
+      if (k === 'escape') { ev.preventDefault(); descartarToma(); return; }
+      if (k === ' ') {
+        ev.preventDefault();
+        document.activeElement?.blur();                       // que Espacio no "pulse" el botón enfocado
+        alternarReproduccion();
+        return;
+      }
+    }
+    if (k === ' ' && grabando) { ev.preventDefault(); accion('grabar'); }
+    else if (k === 'm' && grabando) {
+      const i = MODOS_MANOS.indexOf(ui.estado.manos);
+      accion('manos', { modo: MODOS_MANOS[(i + 1) % MODOS_MANOS.length] });
+    }
     else if (k === 'z') accion('deshacer');
     else if (k === 'v') accion('voz');
     else if (k === 's') accion('escuchar');

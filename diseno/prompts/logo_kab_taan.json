@@ -1,0 +1,47 @@
+{
+  "proyecto": "K'ab T'aan - Lengua de Señas Mexicana a texto, voz y avatar (Infomatrix)",
+  "nombre": "K'ab T'aan (maya yucateco: k'ab = mano/brazo, t'aan = palabra/lengua; «lengua de manos»)",
+  "salida": "diseno/generadas/logo_kab_taan",
+  "reglas_generales": [
+    "Modelo: Nano Banana 2.1, calidad 1K como máximo.",
+    "Exactamente UNA generación por imagen (3 en total). Nunca reintentar, aunque el resultado no sea perfecto: se anota y se sigue.",
+    "Los tres son SOLO el símbolo, sin texto: el nombre «K'ab T'aan» se escribe después con una fuente real, para que la ortografía (con apóstrofos) salga exacta y todas las versiones usen el mismo símbolo.",
+    "La persona elige uno de los tres conceptos; con ese se arman las versiones horizontal, vertical, fondo oscuro e ícono.",
+    "Guardar en PNG con el nombre de 'archivo'."
+  ],
+  "estilo_comun": "Professional logo symbol design for K'ab T'aan, a student science-fair project (Infomatrix) that translates Mexican Sign Language into text and voice and answers back with a 3D signing avatar. The name means 'language of the hands' in Yucatec Maya. Modern flat vector logo, subtly inspired by the geometry of ancient Maya glyph blocks (rounded square cartouches, stepped fret 'greca' details, bold rounded strokes), but clean, contemporary and minimal, not a historical illustration. Color palette only: jade teal #2EC4B6, Maya blue #3A86C8, deep navy #0F1724 and one small warm amber #FFC857 accent. Solid flat colors with at most one subtle gradient, crisp clean edges, strong silhouette that is recognizable in one color and at small sizes (favicon) and also looks great printed large on a poster. Perfectly centered, the symbol fills about 70% of the canvas with generous even padding, on a plain solid pure white background, no shadow, no mockup, no frame, no background scene.",
+  "negativo_comun": "text, letters, words, numbers, typography, watermark, signature, pyramids, temples, feathered headdress, skulls, tribal tattoo style, clip art, 3D render, photorealistic, gradients everywhere, busy details, thin hairlines, extra fingers, missing fingers, distorted hand",
+  "imagenes": [
+    {
+      "id": "concepto_glifo",
+      "archivo": "concepto_glifo.png",
+      "para_que": "Concepto A «Glifo»: la mano dentro de un bloque de glifo maya. Es el más «maya» y el más fácil de reconocer como ícono.",
+      "ancho": 1024,
+      "alto": 1024,
+      "aspecto": "1:1",
+      "prompt": "Concept: a modern Maya glyph block. A rounded-square cartouche in deep navy #0F1724, like the frame of an ancient Maya hieroglyph, containing a bold stylized open human hand in jade teal #2EC4B6 raised in a friendly signing gesture, palm facing the viewer, exactly five clearly separated fingers (four fingers and one thumb). Two or three short curved 'speech scroll' marks in Maya blue #3A86C8 come out from the fingertips, like the speech scrolls used in Maya and Mesoamerican art to show someone speaking. One small amber #FFC857 dot accent. The cartouche border has a subtle stepped fret detail in one corner only. Symmetric, bold, iconic, no text.",
+      "revision": "Mano con 5 dedos bien separados dentro de un cuadro redondeado tipo glifo; volutas de habla saliendo de los dedos; sin texto; legible en pequeño."
+    },
+    {
+      "id": "concepto_voluta",
+      "archivo": "concepto_voluta.png",
+      "para_que": "Concepto B «Mano que habla»: una sola forma; la mano y la voluta de la palabra son la misma figura. El más limpio y moderno.",
+      "ancho": 1024,
+      "alto": 1024,
+      "aspecto": "1:1",
+      "prompt": "Concept: the hand that speaks. A single bold continuous shape: a stylized open human hand in a gentle signing gesture, palm facing the viewer, exactly five fingers (four fingers and one thumb), whose palm and wrist curl smoothly into a Mesoamerican speech scroll (a spiral 'voluta' like the ones that mean speech in Maya art). The hand is jade teal #2EC4B6 blending softly into Maya blue #3A86C8 along the spiral, and the negative space inside the palm forms a small rounded speech bubble shape. One small warm amber #FFC857 dot at the center of the spiral. Minimal, elegant, friendly, balanced, very simple geometry, no outline, no text.",
+      "revision": "Una sola figura: mano de 5 dedos que se enrolla en una voluta; burbuja de diálogo en el hueco de la palma; sin texto; se entiende en pequeño."
+    },
+    {
+      "id": "concepto_dialogo",
+      "archivo": "concepto_dialogo.png",
+      "para_que": "Concepto C «Diálogo»: la mano humana y la mano del avatar (hecha de puntos de seguimiento) se encuentran. Cuenta toda la idea del proyecto: persona ↔ sistema ↔ avatar.",
+      "ancho": 1024,
+      "alto": 1024,
+      "aspecto": "1:1",
+      "prompt": "Concept: dialogue between a person and an avatar. Two stylized open hands facing each other at the same height, fingertips almost touching in the center, together forming a circular emblem. The left hand is a solid flat shape in jade teal #2EC4B6, representing the person. The right hand is drawn only as connected dots and straight lines in Maya blue #3A86C8, like computer-vision hand-tracking landmarks (21 dots: wrist, knuckles and finger joints), representing the digital avatar. Each hand has exactly five fingers. A thin circular ring in deep navy #0F1724 around both hands with a small stepped Maya fret motif at the top and bottom of the ring, and one small amber #FFC857 spark between the fingertips. Symmetric, clean, iconic, no text.",
+      "revision": "Dos manos de 5 dedos frente a frente: una sólida, otra de puntos y líneas; aro con greca escalonada; chispa ámbar al centro; sin texto."
+    }
+  ],
+  "modelo": "Nano Banana 2.1 (WaveSpeedAI), texto a imagen, resolución 1K como máximo"
+}

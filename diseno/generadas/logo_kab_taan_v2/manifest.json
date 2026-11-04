@@ -1,0 +1,49 @@
+{
+  "modelo": "google/nano-banana-2.1/edit",
+  "resolucion": "1k",
+  "imagenes": {
+    "dialogo_maya_relieve": {
+      "archivo": "dialogo_maya_relieve.png",
+      "modelo": "google/nano-banana-2.1/edit",
+      "prompt_final": "Edit the reference logo. KEEP its composition exactly: a solid jade teal human hand on the left and a hand drawn only as connected blue dots and lines (hand-tracking landmarks) on the right, fingertips almost touching, a small four-pointed amber star between them, all inside a circular emblem, centered on a plain solid pure white background outside the circle. Keep the flat vector logo style, crisp edges and the palette: jade teal #2EC4B6, Maya blue #3A86C8, deep navy #0F1724, warm amber #FFC857, plus a soft warm cream #F4ECDD. Add authentic ancient Maya design details so the emblem feels rich and complete instead of empty, in the style of carved Maya stone reliefs and codices, but clean, modern and legible as a logo. Both hands must stay clearly the main subject, each with exactly five fingers. No text, no letters, no numbers in Latin script, no pyramids, no feathered headdress, no skulls, no Aztec sun stone, no photorealism, no 3D render. Changes: (1) Turn the thin outer ring into a bold circular border band in deep navy #0F1724, decorated all around with a continuous Maya stepped-fret (greca escalonada) pattern, and at the top, bottom, left and right four small square glyph cartouches containing Maya bar-and-dot numerals (dots and bars only). (2) Fill the inside of the circle with a soft warm cream #F4ECDD background with a very subtle, low-contrast carved-stone texture of tiny Maya geometric motifs, so the white is no longer empty but the hands still stand out strongly. (3) From the fingertips of each hand, add one curling Mesoamerican speech scroll (voluta) in Maya blue and jade that flow toward the center, meaning communication. (4) Make the central star a four-petal shape inspired by the Maya k'in (sun) glyph, amber #FFC857, with a small jade center and a soft glow. (5) Give the solid hand a jade bead bracelet at the wrist and a few fine carved-relief inner lines like a Maya stone carving; make the dots of the digital hand look like small polished jade beads connected by thin lines. Symmetric, balanced, iconic.",
+      "tamano_pedido": {
+        "aspecto": "1:1",
+        "resolucion": "1k",
+        "referencia": "1024x1024"
+      },
+      "id_tarea": "4fd8dd71a6284a1b97acdff7682acf07",
+      "fecha": "2026-11-04T19:17:19+00:00",
+      "tamano_real": "1024x1024",
+      "formato_entregado": "PNG",
+      "coincide_aspecto": true,
+      "tiempo_inferencia_ms": 68311,
+      "costo_usd": null,
+      "costo_documentado_usd": 0.042,
+      "revision_estado": "cumple, con detalles",
+      "revision_notas": "Conserva la composición (mano sólida, mano de puntos, estrella, aro) y las manos siguen siendo lo principal, cada una con 5 dedos. Sí trae: banda azul marino ancha, 4 cartuchos con numerales de puntos y barra (3 puntos + 1 barra = 8, el mismo en los 4), fondo crema con textura de glifos, una voluta jade desde el índice de la mano sólida y una azul desde el pulgar de la mano de puntos, estrella de 4 pétalos tipo k'in con centro jade y brillo, pulsera de cuentas de jade, líneas de relieve en la mano y puntos como cuentas de jade. Sin texto. Detalles: la greca de la banda es un meandro tipo «griego» en espiral, no la greca escalonada maya; la textura de glifos en la mitad de abajo se nota más de lo «sutil» pedido; el emblema llena casi todo el lienzo y casi no deja margen. En pequeño la banda se vuelve una textura gris y los numerales se pierden: es para tamaño grande (póster, portada)."
+    },
+    "dialogo_maya_limpio": {
+      "archivo": "dialogo_maya_limpio.png",
+      "modelo": "google/nano-banana-2.1/edit",
+      "prompt_final": "Edit the reference logo. KEEP its composition exactly: a solid jade teal human hand on the left and a hand drawn only as connected blue dots and lines (hand-tracking landmarks) on the right, fingertips almost touching, a small four-pointed amber star between them, all inside a circular emblem, centered on a plain solid pure white background outside the circle. Keep the flat vector logo style, crisp edges and the palette: jade teal #2EC4B6, Maya blue #3A86C8, deep navy #0F1724, warm amber #FFC857, plus a soft warm cream #F4ECDD. Add authentic ancient Maya design details so the emblem feels rich and complete instead of empty, in the style of carved Maya stone reliefs and codices, but clean, modern and legible as a logo. Both hands must stay clearly the main subject, each with exactly five fingers. No text, no letters, no numbers in Latin script, no pyramids, no feathered headdress, no skulls, no Aztec sun stone, no photorealism, no 3D render. Changes, keeping it simpler and bold so it still reads at small sizes: (1) Make the outer ring thicker, deep navy #0F1724, with a clean Maya stepped-fret (greca escalonada) pattern repeated around the whole ring in jade teal #2EC4B6 negative space. (2) Fill the inside of the circle with a flat soft warm cream #F4ECDD. (3) Add two simple curling Mesoamerican speech scrolls (volutas), one rising from each hand toward the center. (4) Make the central star a bold four-petal shape inspired by the Maya k'in (sun) glyph, amber #FFC857. (5) Add a simple jade bead bracelet on the wrist of the solid hand. Large simple shapes, no fine texture, very clear silhouette.",
+      "tamano_pedido": {
+        "aspecto": "1:1",
+        "resolucion": "1k",
+        "referencia": "1024x1024"
+      },
+      "id_tarea": "d6cd763cd4824188a559e58ca69a9e14",
+      "fecha": "2026-11-04T19:18:32+00:00",
+      "tamano_real": "1024x1024",
+      "formato_entregado": "PNG",
+      "coincide_aspecto": true,
+      "tiempo_inferencia_ms": 49587,
+      "costo_usd": null,
+      "costo_documentado_usd": 0.042,
+      "revision_estado": "cumple a medias",
+      "revision_notas": "Conserva la composición, 5 dedos en cada mano, sin texto. Aro grueso azul marino con greca en jade, interior crema plano, estrella de 4 pétalos tipo k'in en ámbar (con centro azul marino) y pulsera de cuentas. Es el que mejor se lee a 64 y 32 px y sobre azul marino. Detalles: la greca vuelve a ser meandro tipo «griego», no escalonada; las 2 volutas flotan sueltas (una arriba entre las manos y otra abajo, bajo el pulgar) en vez de salir de cada mano; el aro toca el borde del lienzo (se recorta un poco arriba y a los lados), así que para usarlo como ícono hay que agregarle margen."
+    }
+  },
+  "referencia": "diseno/generadas/logo_kab_taan/concepto_dialogo.png",
+  "acepta_prompt_negativo": false,
+  "referencia_url": "https://d2h7xmz5gqybh9.cloudfront.net/media/images/e04ac7f3-b949-4c10-9b76-a59ee681aaf0.png"
+}

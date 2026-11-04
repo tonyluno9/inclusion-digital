@@ -263,6 +263,14 @@ export class Retarget {
     this.aplicar(this.resolver(frame));
   }
 
+  // Olvida el último giro de la mano y los dedos de un lado ('L' / 'R'): vuelven a su reposo.
+  // Para señas de una mano, la otra no conserva la forma de un momento anterior.
+  olvidarMano(s) {
+    const lado = this.perfil.lados[s];
+    delete this.ultimo[lado.mano];
+    for (const cadena of Object.values(lado.dedos)) cadena.forEach((n) => { delete this.ultimo[n]; });
+  }
+
   reposo() {
     this.ultimo = {};
     for (const [n, b] of Object.entries(this.huesos)) b.quaternion.copy(this.reposoLocal[n]);

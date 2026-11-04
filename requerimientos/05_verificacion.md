@@ -9,7 +9,7 @@ cd app
 python -m unittest discover -s tests -t .
 ```
 
-123 pruebas de Python (incluyen las de JavaScript con Node y las de Blender, si están instalados), 30–60 s, sin cámara. La prueba de integración con MediaPipe descarga la primera vez los modelos y una foto
+137 pruebas de Python (incluyen las de JavaScript con Node y las de Blender, si están instalados), 30–60 s, sin cámara. La prueba de integración con MediaPipe descarga la primera vez los modelos y una foto
 de muestra oficial (≈ 14 MB); sin internet se omite. Las pruebas de Blender corren si está instalado (variable
 `BLENDER_EXE` o `C:\Program Files\Blender Foundation\Blender *`); el CI no lo tiene y las omite. CI: [`.github/workflows/ci.yml`](../.github/workflows/ci.yml)
 (Windows y Ubuntu, Python 3.10–3.12).
@@ -68,6 +68,8 @@ de muestra oficial (≈ 14 MB); sin internet se omite. Las pruebas de Blender co
 | RF-28 | Pantallas | `test_servidor_web.test_estado_y_acciones`, `test_app` (mismas acciones); revisión de las 5 pantallas en el navegador | 🟡 falta con la webcam |
 | RF-29 | Texto a señas | `web/tests/texto.test.mjs`; revisión en el navegador («Hola, prueba» → seña «prueba» y aviso de «hola») | ✅ |
 | RF-30 | Verificación de señas | `python verificar_senas.py` con el dataset real: 89.4 % por la cámara simulada (ver [MEJORAS](../app/MEJORAS_PROYECTO.md)) | ✅ |
+| RF-31 | Una o dos manos | `test_manos_y_tomas` (máscara de la otra mano, rechazo de muestras sin una mano, brazo en reposo del avatar, memoria por palabra, tecla M), `retarget.test.mjs` (olvidarMano); probado en la app con video | 🟡 |
+| RF-32 | Recortar la toma del avatar | `test_manos_y_tomas.TomasTest`, `test_servidor_web.test_manos_y_toma_pendiente`; probado en la app con video (arrastrar extremos, ½×, Enter guarda 2.6 s de 4.8 s) | 🟡 |
 | RNF-12 | Seguridad local | `test_servidor_web.test_no_sale_de_la_carpeta_web`; servidor en `127.0.0.1` | ✅ |
 | RF-24 | Reproducción por palabras | Cubierto por RF-29 (app unificada) | 🟡 falta probar con frases reales |
 

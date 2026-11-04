@@ -131,6 +131,9 @@ class AppTest(unittest.TestCase):
         self.type_answer(label)
         self.type_answer(person)
         self.assertEqual(self.app.mode, "TRAINING")
+        while self.app.hands != "derecha":                       # las señas sintéticas son de la mano derecha
+            self.keys("m")
+        self.assertEqual(self.app.hands, "derecha")
         self.keys(" ")
         self.assertTrue(self.app.armed)
         for _ in range(n):

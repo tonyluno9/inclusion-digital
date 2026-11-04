@@ -5,6 +5,8 @@ el frame con la interfaz dibujada; `handle_key(key)` procesa una tecla y
 devuelve False cuando hay que salir. Así la app completa se puede probar con
 frames y teclas simuladas (ver tests/test_app.py).
 """
+import json
+import os
 import threading
 import time
 from collections import deque
@@ -16,8 +18,9 @@ from modules.beep import beep_error, beep_start, beep_stop
 from modules.coherence import make_coherent
 from modules.data_collector import DataCollector
 from modules.gesture_logic import GestureLogic
-from modules.landmarks import elbows_visible, hands_present, pose_valid
-from modules.motion import ClipStore, LiveSender, LiveSmoother, MotionRecorder, make_clip
+from modules.landmarks import elbows_visible, hands_present, keep_hands, missing_hands, pose_valid
+from modules.motion import (ClipStore, LiveSender, LiveSmoother, MotionRecorder, make_clip, rest_arm,
+                            resting_side, trim_clip)
 from modules.segmenter import SignSegmenter
 from train_model import train
 from ui.display import DisplayUI, View
@@ -28,6 +31,7 @@ HELP_LINES = [
     "a\tAvatar: grabar el movimiento de una palabra",
     "Espacio\t(entrenamiento / avatar) activar / pausar la grabación",
     "z\t(entrenamiento / avatar) deshacer la última toma",
+    "m\t(entrenamiento / avatar) seña de dos manos / mano derecha / mano izquierda",
     "d\tModo detección",
     "e\tEntrenar el modelo",
     "r\tRecargar el modelo",
@@ -46,7 +50,8 @@ RED = (40, 40, 230)
 
 class InclusionApp:
     def __init__(self, detector, tts, stt, collector=None, logic=None, coherence=make_coherent,
-                 trainer=train, clock=time.monotonic, background=True, clips=None, sender=None):
+                 trainer=train, clock=time.monotonic, background=True, clips=None, sender=None,
+                 review_takes=False):
         self.detector = detector
         self.tts = tts
         self.stt = stt
@@ -58,6 +63,16 @@ class InclusionApp:
         self.recorder = MotionRecorder(C.AVATAR_PREROLL_FRAMES + C.SEGMENT_START_FRAMES)
         self.smoother = LiveSmoother()
         self.last_clip = None        # ruta del último clip guardado
+        # Con review_takes (la app web), la toma del avatar no se guarda sola: queda
+        # pendiente para revisarla y recortarla (save_take / discard_take)
+        self.review_takes = review_takes
+        self.pending_take = None
+        self.take_seq = 0
+        # Manos de cada seña ("dos", "derecha", "izquierda"), recordadas por palabra
+        self.hands = "dos"
+        self.hands_path = os.path.join(os.path.dirname(os.path.abspath(self.collector.file_path)),
+                                       "manos_por_sena.json")
+        self.hands_by_word = self._load_hands()
         self.live_world = None       # frame 3D suavizado (modo avatar), para el avatar de la app web
         self.word_seq = 0            # sube con cada seña reconocida
         self.text_seq = 0            # sube con cada texto nuevo del interlocutor
@@ -126,6 +141,7 @@ class InclusionApp:
 
     def _set_mode(self, mode):
         self.mode = mode
+        self.pending_take = None
         self._elbows_seen.clear()
         self.armed = False
         self.prediction = ""
@@ -168,14 +184,60 @@ class InclusionApp:
         question = "Seña a BORRAR: " + (", ".join(sorted(labels)) if labels else "(dataset vacío)")
         self._open_prompt(TextPrompt(question[:70], on_word))
 
+    def _load_hands(self):
+        try:
+            with open(self.hands_path, encoding="utf-8") as f:
+                data = json.load(f)
+            return {str(k): v for k, v in data.items() if v in C.HANDS_MODES}
+        except (OSError, ValueError, AttributeError):
+            return {}
+
+    def _remember_hands(self):
+        if not self.label:
+            return
+        self.hands_by_word[self.label] = self.hands
+        try:
+            os.makedirs(os.path.dirname(self.hands_path), exist_ok=True)
+            tmp = self.hands_path + ".tmp"
+            with open(tmp, "w", encoding="utf-8") as f:
+                json.dump(self.hands_by_word, f, ensure_ascii=False, indent=1, sort_keys=True)
+            os.replace(tmp, self.hands_path)
+        except OSError as e:
+            print(f"[MANOS] No se pudo guardar {self.hands_path}: {e}")
+
+    def set_hands(self, mode):
+        """La seña se hace con las dos manos o con una sola ("derecha" / "izquierda")."""
+        if mode not in C.HANDS_MODES:
+            raise ValueError(f"modo de manos desconocido: {mode}")
+        self.hands = mode
+        self.segmenter.reset()
+        self.recorder.cancel()
+        self._remember_hands()
+        self.notify({"dos": "Seña de dos manos",
+                     "derecha": "Seña de una mano: la derecha (la izquierda no se graba)",
+                     "izquierda": "Seña de una mano: la izquierda (la derecha no se graba)"}[mode])
+        return mode
+
+    def cycle_hands(self):
+        modes = C.HANDS_MODES
+        return self.set_hands(modes[(modes.index(self.hands) + 1) % len(modes)])
+
+    def _word_hands(self):
+        """Al elegir una palabra se recupera con qué manos se hace (si ya se eligió antes)."""
+        self.hands = self.hands_by_word.get(self.label, self.hands)
+
+    def _hands_label(self):
+        return {"dos": "dos manos", "derecha": "mano derecha", "izquierda": "mano izquierda"}[self.hands]
+
     def train_word(self, word, person=""):
         """Modo entrenamiento para grabar muestras de `word`."""
         self.label = word.strip().lower()
         if person and person.strip():
             self.person = person.strip().lower()
         self._set_mode("TRAINING")
+        self._word_hands()
         n = self.collector.count(self.label)
-        self.notify(f"'{self.label}' por {self.person} ({n} muestras). Espacio para empezar.")
+        self.notify(f"'{self.label}' por {self.person} ({n} muestras, {self._hands_label()}). Espacio para empezar.")
 
     def avatar_word(self, word):
         """Modo avatar para grabar el movimiento de `word`. Sin palabra, el avatar
@@ -185,8 +247,9 @@ class InclusionApp:
         if not self.label:
             self.notify("Avatar en vivo. Escribe una palabra para grabar su movimiento.")
             return
+        self._word_hands()
         exists = self.label in self.clips.words()
-        self.notify(f"Avatar: '{self.label}'{' (ya tiene clip: se reemplaza)' if exists else ''}. "
+        self.notify(f"Avatar: '{self.label}' ({self._hands_label()}){' (ya tiene clip: se reemplaza)' if exists else ''}. "
                     f"Espacio para grabar.")
 
     def detection_mode(self):
@@ -199,6 +262,9 @@ class InclusionApp:
             return False
         if not self.label:
             self.notify("Primero escribe la palabra que vas a grabar.")
+            return False
+        if self.pending_take is not None:
+            self.notify("Primero guarda o descarta la toma que estás revisando.")
             return False
         self.armed = not self.armed
         self.segmenter.reset()
@@ -213,6 +279,9 @@ class InclusionApp:
             self._flash(RED if removed else GRAY_FLASH)
             self.notify(f"Se deshizo la última muestra ('{removed}')" if removed else "No hay muestras.")
         elif self.mode == "AVATAR":
+            if self.pending_take is not None:
+                self.discard_take()
+                return
             result = self.clips.undo(self.label)
             self._flash(RED if result else GRAY_FLASH)
             self.notify({"restaurado": f"Se deshizo la toma: '{self.label}' vuelve a la anterior",
@@ -253,6 +322,33 @@ class InclusionApp:
             removed += 1
         self.notify(f"Se borró el movimiento de '{word}'." if removed else f"'{word}' no tiene movimiento.")
         return bool(removed)
+
+    def save_take(self, start=None, end=None):
+        """Guarda la toma pendiente del avatar, recortada entre `start` y `end` (s)."""
+        if self.pending_take is None:
+            raise ValueError("no hay ninguna toma por guardar")
+        clip = self.pending_take
+        if start is not None or end is not None:
+            clip = trim_clip(clip, 0.0 if start is None else start,
+                             clip["duration"] if end is None else end)
+        self.pending_take = None
+        self._store_clip(clip)
+        return self.last_clip
+
+    def discard_take(self):
+        if self.pending_take is None:
+            return False
+        self.pending_take = None
+        self._flash(GRAY_FLASH)
+        self.notify("Toma descartada. Espacio para grabar otra.")
+        return True
+
+    def _store_clip(self, clip):
+        self.last_clip = self.clips.save(clip)
+        self.clip_seq += 1
+        self.sender.send_clip(clip["word"], self.last_clip)
+        self._flash(GREEN)
+        self.notify(f"Movimiento guardado: '{clip['word']}' ({clip['duration']:.1f} s)")
 
     def interlocutor_text(self, text):
         """Texto del interlocutor escrito a mano (en vez de dictado)."""
@@ -318,6 +414,13 @@ class InclusionApp:
         frame, raw = self.detector.process(frame)
         world = getattr(self.detector, "world", None)
         t1 = time.perf_counter()
+
+        recording_modes = ("TRAINING", "AVATAR")
+        if self.mode in recording_modes and self.hands != "dos":
+            # Seña de una mano: la otra no cuenta (ni para cortar la seña ni en el avatar)
+            raw = keep_hands(raw, self.hands)
+            if world is not None:
+                world = rest_arm(world, resting_side(self.hands))
 
         self.live_world = None
         if self.mode == "AVATAR" and world is not None:
@@ -415,13 +518,16 @@ class InclusionApp:
         if was_active and not self.segmenter.active:
             frames = self.recorder.finish()
             if sequence is not None and len(frames) > 1:
-                clip = make_clip(frames, self.label, self.person)
-                self.last_clip = self.clips.save(clip)
-                self.clip_seq += 1
-                self.sender.send_clip(self.label, self.last_clip)
+                clip = make_clip(frames, self.label, self.person, self.hands)
                 beep_stop()
-                self._flash(GREEN)
-                self.notify(f"Movimiento guardado: '{self.label}' ({clip['duration']:.1f} s)")
+                if self.review_takes:
+                    # Se revisa y recorta en la app antes de guardarla; mientras, no se graba otra
+                    self.pending_take = clip
+                    self.take_seq += 1
+                    self.armed = False
+                    self.notify("Revisa la toma: recórtala si hace falta y guárdala.")
+                else:
+                    self._store_clip(clip)
             else:
                 beep_error()
                 self._flash(RED)
@@ -429,6 +535,8 @@ class InclusionApp:
 
         if self.segmenter.active:
             return f"GRABANDO movimiento de '{self.label}'... baja las manos al terminar"
+        if self.pending_take is not None:
+            return f"Revisando la toma de '{self.label}'"
         target = f"en vivo a {C.AVATAR_UDP_HOST}:{C.AVATAR_UDP_PORT}"
         if self.armed:
             return f"Avatar '{self.label}' ({target}): levanta las manos y haz la seña"
@@ -445,7 +553,17 @@ class InclusionApp:
         if self.mode == "TRAINING":
             if not was_active and self.segmenter.active:
                 beep_start()
-            if finished:
+            missing = missing_hands(sequence, self.hands, C.MIN_HAND_COVERAGE) if finished and sequence is not None else []
+            if missing:
+                beep_error()
+                self._flash(RED)
+                if self.hands == "dos" and len(missing) == 1:
+                    self.notify(f"No vi tu mano {missing[0]} en casi toda la seña: no se guardó. "
+                                f"Si la seña es de una mano, elige «una mano».", seconds=5)
+                else:
+                    self.notify(f"No vi tu mano {' ni la '.join(missing)} en casi toda la seña: no se guardó. "
+                                "Repítela.", seconds=5)
+            elif finished:
                 if sequence is not None:
                     self.collector.save_sequence(self.label, sequence, person=self.person)
                     self.last_saved = (self.label, self.person)
@@ -526,6 +644,8 @@ class InclusionApp:
             self.toggle_recording()
         elif ch == "z":
             self.undo()
+        elif ch == "m" and self.mode in ("TRAINING", "AVATAR"):
+            self.cycle_hands()
         elif ch == "d":
             self.detection_mode()
         elif ch == "r":
@@ -575,6 +695,9 @@ class InclusionApp:
             "seq_palabra": self.word_seq,
             "seq_texto": self.text_seq,
             "seq_clip": self.clip_seq,
+            "manos": self.hands,
+            "toma_seq": self.take_seq,
+            "toma_pendiente": self.pending_take is not None,
         }
 
     def benchmark_summary(self):

@@ -46,6 +46,15 @@ orden sugerido para las próximas iteraciones.
   versión actual** (que también guarda codos y muñecas del cuerpo) debería subir el acierto.
 - 123 pruebas.
 
+## ✅ Iteración 6 (una o dos manos, recortar tomas)
+
+- Al grabar se elige si la seña es de dos manos o de una (derecha / izquierda); se recuerda por palabra. Con una
+  mano, la otra no se graba y el avatar la deja quieta abajo.
+- Las muestras a las que les falta una de sus manos ya no se guardan: la app dice cuál no vio.
+- La toma del avatar se revisa antes de guardarla: línea de tiempo para recortar inicio y fin, cámara lenta.
+- Al reemplazar el movimiento de una palabra, «Ver» ya muestra el nuevo (antes quedaba el anterior en caché).
+- 137 pruebas.
+
 ## ⏭️ Siguiente
 
 | Prioridad | Tarea | Requerimiento |

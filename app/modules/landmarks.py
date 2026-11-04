@@ -98,6 +98,37 @@ def hands_present(frame) -> bool:
     return bool(np.any(np.asarray(frame)[:HANDS_SIZE] != 0))
 
 
+HAND_SLOTS = {"izquierda": 0, "derecha": 1}
+
+
+def keep_hands(frame, mode):
+    """Con una sola mano ("derecha" o "izquierda"), borra la otra del frame
+    crudo. Con "dos" lo deja igual."""
+    if mode not in HAND_SLOTS:
+        return frame
+    frame = np.array(frame, dtype=np.float32)
+    other = 1 - HAND_SLOTS[mode]
+    frame[other * HAND_SIZE:(other + 1) * HAND_SIZE] = 0
+    return frame
+
+
+def hand_coverage(frames):
+    """Fracción de los frames en que se ve cada mano: {"izquierda": f, "derecha": f}."""
+    frames = np.asarray(frames)
+    if len(frames) == 0:
+        return {side: 0.0 for side in HAND_SLOTS}
+    return {side: float(np.mean(np.any(frames[:, s * HAND_SIZE:(s + 1) * HAND_SIZE] != 0, axis=1)))
+            for side, s in HAND_SLOTS.items()}
+
+
+def missing_hands(frames, mode, min_coverage):
+    """Manos que la seña necesita (las dos, o solo la elegida) y que se vieron
+    en menos de `min_coverage` de los frames."""
+    needed = tuple(HAND_SLOTS) if mode == "dos" else (mode,)
+    coverage = hand_coverage(frames)
+    return [side for side in needed if coverage[side] < min_coverage]
+
+
 def upgrade_raw(frames):
     """Completa frames del formato anterior (135 valores) con ceros en codos y
     muñecas del cuerpo. Los frames que ya tienen el formato actual no cambian."""

@@ -38,6 +38,11 @@ AVATAR_UDP_HOST = "127.0.0.1"   # a dónde se envía el movimiento en vivo (Blen
 AVATAR_UDP_PORT = 5005
 AVATAR_PREROLL_FRAMES = 15      # frames antes de levantar las manos que entran al clip (~0.5 s)
 
+# Manos de cada seña: "dos", o solo "derecha" / "izquierda". Con una mano, la otra no se
+# graba (no estorba si se mueve o sale de cuadro) y el avatar la deja quieta, abajo.
+HANDS_MODES = ("dos", "derecha", "izquierda")
+MIN_HAND_COVERAGE = 0.5        # al grabar, cada mano de la seña debe verse en la mitad de los frames
+
 # Aviso de encuadre: si en el último segundo los codos se vieron en menos del 30 %
 # de los frames, la app pide alejarse de la cámara
 FRAMING_WINDOW = 30

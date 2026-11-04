@@ -196,7 +196,7 @@ class ClipTest(unittest.TestCase):
     def test_clip_contains_only_coordinates(self):
         """RNF-11: el clip solo tiene números, nombres y metadatos (nunca imagen)."""
         clip = make_clip(self.timed(5), "hola")
-        allowed = {"format", "version", "word", "person", "created", "fps", "duration", "coords",
+        allowed = {"format", "version", "word", "person", "hands", "created", "fps", "duration", "coords",
                    "pose_names", "hand_names", "frames"}
         self.assertEqual(set(clip), allowed)
         self.assertEqual(set(clip["frames"][0]), {"t", "pose", "vis", "left", "right"})

@@ -2,7 +2,13 @@
 
 Uso (desde la raiz del repo):
     $env:WAVESPEED_API_KEY = "..."     # nunca se guarda en ningun archivo
-    python diseno/herramientas/generar_imagenes.py
+    python diseno/herramientas/generar_imagenes.py                                   # imagenes.json
+    python diseno/herramientas/generar_imagenes.py diseno/prompts/logo_kab_taan.json # otro lote
+
+Cada lote guarda sus imagenes y su manifest.json en la carpeta "salida" de su JSON.
+Si el JSON trae "modo": "edicion" y "referencia" (una imagen del repo), se usa el modelo de
+edicion con esa imagen como referencia (MODELO_EDICION; revisar en la documentacion de
+WaveSpeedAI el identificador y el campo de imagenes antes de correrlo).
 
 Reglas:
 - Una sola generacion por imagen. Si diseno/generadas/<archivo> ya existe, se salta.
@@ -30,10 +36,13 @@ SALIDA = RAIZ / "diseno" / "generadas"
 MANIFIESTO = SALIDA / "manifest.json"
 
 MODELO = "google/nano-banana-2.1/text-to-image"
-URL_ENVIO = f"https://api.wavespeed.ai/api/v3/{MODELO}"
+MODELO_EDICION = "google/nano-banana-2.1/edit"   # imagen(es) de referencia + instrucciones
+URL_BASE = "https://api.wavespeed.ai/api/v3/"
+URL_ENVIO = f"{URL_BASE}{MODELO}"
 URL_RESULTADO = "https://api.wavespeed.ai/api/v3/predictions/{id}/result"
 RESOLUCION = "1k"  # maximo permitido por la persona; nunca 2k ni 4k
 COSTO_DOCUMENTADO_USD = 0.04  # precio publicado por imagen a 1k
+COSTO_POR_REFERENCIA_USD = 0.002  # edicion: se suma por cada imagen de referencia
 ACEPTA_NEGATIVO = False  # el modelo no documenta prompt negativo
 
 INTERVALO_S = 3
@@ -54,7 +63,30 @@ def encabezados(clave: str) -> dict:
     return {"Authorization": f"Bearer {clave}", "Content-Type": "application/json"}
 
 
-def enviar(clave: str, prompt: str, aspecto: str) -> str:
+def subir_referencia(clave: str, ruta: Path) -> str:
+    """Sube la imagen con la carga directa de WaveSpeedAI y devuelve su download_url.
+
+    El modo de edicion pide URLs en "images" (no base64). Documentacion:
+    https://wavespeed.ai/docs/docs-common-api/media-upload  (los archivos duran 7 dias).
+    La clave solo va a la API de WaveSpeedAI, nunca a la URL firmada de subida.
+    """
+    r = requests.post(URL_BASE + "media/uploads", headers=encabezados(clave),
+                      json={"filename": ruta.name, "size": ruta.stat().st_size,
+                            "content_type": "image/png"}, timeout=30)
+    if r.status_code != 200:
+        raise RuntimeError(f"subida (ticket) HTTP {r.status_code}: {r.text[:300]}")
+    ticket = r.json().get("data") or {}
+    subida = ticket.get("upload") or {}
+    if not subida.get("url") or not ticket.get("download_url"):
+        raise RuntimeError(f"subida sin url: {r.text[:300]}")
+    with ruta.open("rb") as f:
+        p = requests.put(subida["url"], headers=subida.get("headers") or {}, data=f, timeout=300)
+    if p.status_code not in (200, 201):
+        raise RuntimeError(f"subida (PUT) HTTP {p.status_code}: {p.text[:300]}")
+    return ticket["download_url"]
+
+
+def enviar(clave: str, prompt: str, aspecto: str, referencia_url: str | None = None) -> str:
     cuerpo = {
         "prompt": prompt,
         "aspect_ratio": aspecto,
@@ -63,7 +95,11 @@ def enviar(clave: str, prompt: str, aspecto: str) -> str:
         "enable_web_search": False,
         "enable_image_search": False,
     }
-    r = requests.post(URL_ENVIO, headers=encabezados(clave), json=cuerpo, timeout=60)
+    url = URL_ENVIO
+    if referencia_url is not None:
+        url = URL_BASE + MODELO_EDICION
+        cuerpo["images"] = [referencia_url]
+    r = requests.post(url, headers=encabezados(clave), json=cuerpo, timeout=120)
     if r.status_code != 200:
         raise RuntimeError(f"envio HTTP {r.status_code}: {r.text[:500]}")
     datos = r.json().get("data") or {}
@@ -116,10 +152,23 @@ def main() -> int:
         print("Falta WAVESPEED_API_KEY. Definela en la terminal: $env:WAVESPEED_API_KEY = \"...\"")
         return 1
 
-    spec = json.loads(JSON_PROMPTS.read_text(encoding="utf-8"))
+    global SALIDA, MANIFIESTO
+    ruta_prompts = Path(sys.argv[1]).resolve() if len(sys.argv) > 1 else JSON_PROMPTS
+    spec = json.loads(ruta_prompts.read_text(encoding="utf-8"))
+    SALIDA = RAIZ / spec.get("salida", "diseno/generadas")
+    MANIFIESTO = SALIDA / "manifest.json"
     SALIDA.mkdir(parents=True, exist_ok=True)
     m = cargar_manifiesto()
-    m["modelo"], m["resolucion"] = MODELO, RESOLUCION
+    referencia = None
+    if spec.get("modo") == "edicion":
+        referencia = (RAIZ / spec["referencia"]).resolve()
+        if not referencia.is_file():
+            print(f"No existe la imagen de referencia {referencia}")
+            return 1
+    modelo = MODELO_EDICION if referencia else MODELO
+    m["modelo"], m["resolucion"] = modelo, RESOLUCION
+    if referencia:
+        m["referencia"] = spec["referencia"]
     m["acepta_prompt_negativo"] = ACEPTA_NEGATIVO
 
     errores = 0
@@ -140,7 +189,7 @@ def main() -> int:
             pass  # el modelo no lo admite; nunca se agrega al texto
         entrada.update({
             "archivo": archivo,
-            "modelo": MODELO,
+            "modelo": modelo,
             "prompt_final": prompt,
             "tamano_pedido": {"aspecto": item["aspecto"], "resolucion": RESOLUCION,
                               "referencia": f"{item['ancho']}x{item['alto']}"},
@@ -153,7 +202,14 @@ def main() -> int:
         else:
             print(f"[{item['id']}] enviando...")
             try:
-                tarea_id = enviar(clave, prompt, item["aspecto"])
+                referencia_url = None
+                if referencia:
+                    if not m.get("referencia_url"):  # se sube una sola vez por lote
+                        print("    subiendo la imagen de referencia...")
+                        m["referencia_url"] = subir_referencia(clave, referencia)
+                        guardar_manifiesto(m)
+                    referencia_url = m["referencia_url"]
+                tarea_id = enviar(clave, prompt, item["aspecto"], referencia_url)
             except Exception as e:  # noqa: BLE001
                 entrada["error_envio"] = str(e)
                 guardar_manifiesto(m)
@@ -187,7 +243,7 @@ def main() -> int:
             "coincide_aspecto": abs(aspecto_real - a / b) < 0.02,
             "tiempo_inferencia_ms": (datos.get("timings") or {}).get("inference"),
             "costo_usd": datos.get("cost") or datos.get("price"),
-            "costo_documentado_usd": COSTO_DOCUMENTADO_USD,
+            "costo_documentado_usd": round(COSTO_DOCUMENTADO_USD + (COSTO_POR_REFERENCIA_USD if referencia else 0), 3),
         })
         if not entrada["coincide_aspecto"]:
             entrada["nota_tamano"] = f"Pedido {item['aspecto']}, entregado {ancho}x{alto}."

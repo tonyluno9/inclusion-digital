@@ -49,6 +49,22 @@ disponible (`iniciar_clasico.bat`) y comparte la misma lógica.
 `python verificar_senas.py` reproduce cada muestra del dataset a varias velocidades por el segmentador real, la
 clasifica con un modelo que no la vio (validación cruzada) y lista las muestras que fallan, para regrabarlas.
 
+### RF-31 · Señas de una o dos manos — Debe
+- Al grabar (Entrenar y Avatar) se elige si la seña es de **dos manos**, de la **mano derecha** o de la **mano
+  izquierda** (botones o tecla `M`). La elección se recuerda por palabra (`data/manos_por_sena.json`, fuera de git).
+- Con una mano, la otra no cuenta: no se guarda en la muestra, no alarga ni corta la seña, y el avatar deja ese
+  brazo colgando junto al cuerpo con la mano en reposo (en vivo y en el clip, campo `hands`).
+- Una muestra a la que le falta una de sus manos en más de la mitad de los frames no se guarda y se explica
+  por qué («No vi tu mano izquierda… Si la seña es de una mano, elige «una mano»»). Evita muestras como las de
+  «buenas tardes» sin la mano izquierda que hoy confunden al traductor con «hola».
+
+### RF-32 · Revisar y recortar la toma del avatar — Debe
+- En la app, la toma no se guarda sola: el avatar la repite en bucle y aparece una línea de tiempo con dos
+  extremos. Al arrastrar un extremo el avatar muestra ese instante; al soltarlo repite solo el recorte.
+- Pausa, velocidad 1× / ½×, flechas para ajustar un frame (Shift: 10), `Enter` guarda el recorte y `Esc` lo
+  descarta. Mientras se revisa no se graba otra toma; deshacer o cambiar de palabra la descarta.
+- La versión clásica (OpenCV) sigue guardando cada toma al momento.
+
 ### RNF-12 · Seguridad local — Debe
 - El servidor solo escucha en `127.0.0.1` (no se ve desde la red).
 - Solo sirve archivos de `app/web` (no se puede pedir nada fuera de esa carpeta).

@@ -8,6 +8,9 @@ import { Retarget, perfilTripo } from './retarget.js';
 const TRANSICION = 0.3;          // s para pasar de una pose a otra
 const SIN_DATOS_VIVO = 0.6;      // s sin frames en vivo para volver al reposo
 const DISTANCIA = 1.25;          // cámara: de la cintura para arriba (el personaje mide 1 m)
+const PAUSA_BUCLE = 0.5;         // s quieto al final del recorte antes de repetirlo
+// Señas de una mano: el lado del rig que se queda quieto ('L' = izquierda de la persona)
+const LADO_QUIETO = { derecha: 'L', izquierda: 'R' };
 
 export class Avatar {
   constructor() {
@@ -31,6 +34,8 @@ export class Avatar {
     this.modo = 'cargando';
     this.cola = [];               // clips por reproducir
     this.alPalabra = null;        // (palabra | null) al empezar cada clip y al terminar
+    this.alTiempo = null;         // (t) en cada cuadro mientras se revisa una toma
+    this.rev = null;              // toma en revisión: { frames, inicio, fin, t, reproduciendo, velocidad }
     this.ultimoVivo = 0;
     this._transicion = null;
     this.contenedor = null;
@@ -79,11 +84,56 @@ export class Avatar {
   }
 
   // ------------------------------------------------------------------ estados
-  vivo(frame) {
-    if (!this.rt) return;
+  // manos: 'dos', 'derecha' o 'izquierda' (con una, la otra mano vuelve a su reposo)
+  vivo(frame, manos = 'dos') {
+    if (!this.rt || this.modo === 'revision') return;
     if (this.modo !== 'vivo') { this.cola = []; this._empezarTransicion(); this.modo = 'vivo'; }
     this.ultimoVivo = performance.now();
+    this._soltarMano(manos);
     this.rt.mover(frame);
+  }
+
+  _soltarMano(manos) {
+    if (LADO_QUIETO[manos]) this.rt.olvidarMano(LADO_QUIETO[manos]);
+  }
+
+  // ------------------------------------------------- revisar y recortar una toma
+  revisar(clip) {
+    if (!this.rt) return;
+    const frames = clip.frames;
+    this.cola = [];
+    this.rev = { frames, inicio: 0, fin: frames[frames.length - 1].t, t: 0, reproduciendo: true, velocidad: 1,
+      previo: performance.now(), pausaHasta: null };
+    this._soltarMano(clip.hands);
+    this._empezarTransicion();
+    this.modo = 'revision';
+  }
+
+  tramo(inicio, fin) {
+    if (!this.rev) return;
+    Object.assign(this.rev, { inicio, fin, pausaHasta: null });
+  }
+
+  // Muestra el instante `t` y deja la reproducción en pausa (al arrastrar la línea de tiempo)
+  irA(t) {
+    if (!this.rev) return;
+    Object.assign(this.rev, { t, reproduciendo: false, pausaHasta: null });
+  }
+
+  reproducirTramo(si = true) {
+    const r = this.rev;
+    if (!r) return;
+    if (si && (r.t >= r.fin - 1e-3 || r.t < r.inicio)) r.t = r.inicio;
+    r.reproduciendo = si;
+    r.pausaHasta = null;
+    r.previo = performance.now();
+  }
+
+  velocidad(v) { if (this.rev) this.rev.velocidad = v; }
+
+  terminarRevision() {
+    this.rev = null;
+    if (this.modo === 'revision') this._aReposo();
   }
 
   // clips: [{ palabra, clip }] (clip = JSON del formato inclusion-movimiento, o null si no hay)
@@ -102,6 +152,7 @@ export class Avatar {
     const c = this.cola.shift();
     if (!c) { this._aReposo(); return; }
     this.actual = { palabra: c.palabra, frames: c.clip.frames, inicio: performance.now(), i: 0 };
+    this._soltarMano(c.clip.hands);
     this._empezarTransicion();
     this.modo = 'clip';
     if (this.alPalabra) this.alPalabra(c.palabra);
@@ -129,6 +180,7 @@ export class Avatar {
       const ahora = performance.now();
       if (this.modo === 'vivo' && ahora - this.ultimoVivo > SIN_DATOS_VIVO * 1000) this._aReposo();
       if (this.modo === 'clip') this._avanzarClip(ahora);
+      if (this.modo === 'revision') this._avanzarRevision(ahora);
       if (this.modo === 'reposo') this._respirar(ahora);
       this._mezclar(ahora);
     }
@@ -143,6 +195,22 @@ export class Avatar {
     const f0 = fr[a.i]; const f1 = fr[Math.min(a.i + 1, fr.length - 1)];
     const k = f1.t > f0.t ? Math.min(1, Math.max(0, (t - f0.t) / (f1.t - f0.t))) : 0;
     this.rt.mover(interpolar(f0, f1, k));
+  }
+
+  _avanzarRevision(ahora) {
+    const r = this.rev;
+    const dt = Math.min(0.1, (ahora - r.previo) / 1000);
+    r.previo = ahora;
+    if (r.reproduciendo) {
+      if (r.pausaHasta !== null) {
+        if (ahora >= r.pausaHasta) { r.pausaHasta = null; r.t = r.inicio; }
+      } else {
+        r.t += dt * r.velocidad;
+        if (r.t >= r.fin) { r.t = r.fin; r.pausaHasta = ahora + PAUSA_BUCLE * 1000; }
+      }
+    }
+    this.rt.mover(poseEn(r.frames, r.t));
+    if (this.alTiempo) this.alTiempo(r.t);
   }
 
   _respirar(ahora) {
@@ -160,6 +228,16 @@ export class Avatar {
     const e = k * k * (3 - 2 * k);
     for (const [n, b] of Object.entries(this.huesos)) b.quaternion.copy(tr.desde[n].clone().slerp(b.quaternion, e));
   }
+}
+
+// Pose del clip en el instante t (s), interpolando entre los dos frames vecinos
+export function poseEn(frames, t) {
+  let a = 0; let b = frames.length - 1;
+  if (t <= frames[0].t) return interpolar(frames[0], frames[0], 0);
+  if (t >= frames[b].t) return interpolar(frames[b], frames[b], 0);
+  while (b - a > 1) { const m = (a + b) >> 1; if (frames[m].t <= t) a = m; else b = m; }
+  const f0 = frames[a]; const f1 = frames[b];
+  return interpolar(f0, f1, f1.t > f0.t ? (t - f0.t) / (f1.t - f0.t) : 0);
 }
 
 // Interpolación lineal entre dos frames del clip (solo las partes que tienen ambos)

@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>INCLUSION</title>
+  <title>K'ab T'aan</title>
   <link rel="icon" href="assets/img/logo.ico">
   <link rel="stylesheet" href="css/app.css">
   <script type="importmap">
@@ -12,7 +12,7 @@
 </head>
 <body>
   <aside class="lateral">
-    <img class="lateral-logo" src="assets/img/logo.png" alt="INCLUSION">
+    <img class="lateral-logo" src="assets/img/logo.png" alt="K'ab T'aan">
     <nav>
       <button class="nav" data-pagina="inicio"><span class="icono" style="--i:url(../assets/iconos/inicio.png)"></span>Inicio</button>
       <button class="nav" data-pagina="traducir"><span class="icono" style="--i:url(../assets/iconos/subtitulos.png)"></span>Traducir</button>
@@ -42,7 +42,8 @@
       <div class="inicio">
         <div class="inicio-texto">
           <img class="inicio-logo" src="assets/img/logo.png" alt="">
-          <h2>INCLUSION</h2>
+          <h2>K'ab T'aan</h2>
+          <p class="significado">En maya: <b>«lengua de manos»</b></p>
           <p class="lema">Lengua de Señas Mexicana a texto, voz y avatar.<br>Para conversaciones cortas entre una persona Sorda y una oyente.</p>
           <div class="tarjetas-inicio">
             <button class="tarjeta-accion" data-ir="traducir">
@@ -112,11 +113,17 @@
             </form>
             <div class="estado-grabacion" id="estado-entrenar">
               <div class="contador"><b id="muestras">0</b><span>muestras de <i id="palabra-entrenar"></i></span></div>
+              <div class="manos-fila">
+                <span class="etiqueta">La seña se hace con</span>
+                <div class="segmentado" role="group" aria-label="Manos de la seña">
+                  <button type="button" data-manos="dos">Dos manos</button><button type="button" data-manos="derecha">Mano derecha</button><button type="button" data-manos="izquierda">Mano izquierda</button>
+                </div>
+              </div>
               <div class="botones">
                 <button class="boton grabar" data-accion="grabar"><span class="icono" style="--i:url(../assets/iconos/grabar.png)"></span><span data-txt-grabar>Grabar (Espacio)</span></button>
                 <button class="boton" data-accion="deshacer"><span class="icono" style="--i:url(../assets/iconos/deshacer.png)"></span>Deshacer (Z)</button>
               </div>
-              <p class="ayuda-corta">Con la grabación activa, cada seña (manos arriba → manos abajo) se guarda sola.</p>
+              <p class="ayuda-corta">Con la grabación activa, cada seña (manos arriba → manos abajo) se guarda sola. Si la seña es de una mano, la otra puede quedarse abajo: no se graba.</p>
             </div>
           </div>
           <div class="tarjeta">
@@ -143,7 +150,7 @@
         </div>
       </div>
       <div class="rejilla dos abajo">
-        <div class="tarjeta">
+        <div class="tarjeta" id="tarjeta-grabar-avatar">
           <h3>Grabar el movimiento de una seña</h3>
           <form class="campos" id="form-avatar">
             <label>Palabra<input id="avatar-palabra" placeholder="ej. gracias" autocomplete="off" required></label>
@@ -151,11 +158,35 @@
           </form>
           <div class="estado-grabacion">
             <div class="contador"><b id="palabra-avatar" class="tenue">Sin palabra</b><span id="estado-avatar">Escribe la palabra y pulsa Elegir</span></div>
+            <div class="manos-fila">
+              <span class="etiqueta">La seña se hace con</span>
+              <div class="segmentado" role="group" aria-label="Manos de la seña">
+                <button type="button" data-manos="dos">Dos manos</button><button type="button" data-manos="derecha">Mano derecha</button><button type="button" data-manos="izquierda">Mano izquierda</button>
+              </div>
+            </div>
             <div class="botones">
               <button class="boton grabar" data-accion="grabar"><span class="icono" style="--i:url(../assets/iconos/grabar.png)"></span><span data-txt-grabar>Grabar (Espacio)</span></button>
               <button class="boton" data-accion="deshacer"><span class="icono" style="--i:url(../assets/iconos/deshacer.png)"></span>Deshacer (Z)</button>
             </div>
-            <p class="ayuda-corta">Empieza y termina con los brazos abajo. Una toma limpia por palabra basta.</p>
+            <p class="ayuda-corta">Empieza y termina con los brazos abajo. Al terminar, revisas la toma y la recortas antes de guardarla.</p>
+          </div>
+        </div>
+        <div class="tarjeta oculto" id="tarjeta-revision">
+          <div class="titulo-fila"><h3>Revisa la toma de «<span id="rev-palabra"></span>»</h3><span class="rev-tiempos" id="rev-tiempos"></span></div>
+          <p class="ayuda-corta sin-margen">Arrastra los extremos para dejar solo la seña. Mientras arrastras, el avatar muestra ese instante.</p>
+          <div class="linea-tiempo" id="linea-tiempo">
+            <div class="lt-pista"></div>
+            <div class="lt-rango" id="lt-rango"></div>
+            <div class="lt-cabezal" id="lt-cabezal"></div>
+            <button type="button" class="lt-asa" id="asa-inicio" aria-label="Inicio del recorte" title="Inicio (← → para ajustar)"></button>
+            <button type="button" class="lt-asa" id="asa-fin" aria-label="Fin del recorte" title="Fin (← → para ajustar)"></button>
+          </div>
+          <div class="lt-marcas"><span>0 s</span><span id="lt-total"></span></div>
+          <div class="botones">
+            <button type="button" class="boton" id="rev-reproducir"><span class="icono" style="--i:url(../assets/iconos/reproducir.png)"></span><span>Pausa</span></button>
+            <button type="button" class="boton" id="rev-velocidad">Velocidad 1×</button>
+            <button type="button" class="boton primario" id="rev-guardar"><span class="icono" style="--i:url(../assets/iconos/datos.png)"></span>Guardar (Enter)</button>
+            <button type="button" class="boton peligro" id="rev-descartar"><span class="icono" style="--i:url(../assets/iconos/borrar.png)"></span>Descartar (Esc)</button>
           </div>
         </div>
         <div class="tarjeta">
@@ -183,12 +214,14 @@
           <ol>
             <li>En <b>Entrenar</b>, escribe la palabra y tu nombre, y pulsa Empezar.</li>
             <li>Activa la grabación y haz la seña unas 20 veces (normal, lenta y rápida).</li>
+            <li>Elige si la seña es de <b>dos manos</b> o de <b>una</b>. Con una mano, la otra puede quedarse abajo: no se graba y el avatar la deja quieta. La app lo recuerda para cada palabra.</li>
             <li>Pulsa <b>Entrenar el traductor</b>. Con más personas grabando, el traductor acierta más.</li>
-            <li>En <b>Avatar</b>, graba una vez el movimiento de la palabra para que el avatar también la sepa hacer.</li>
+            <li>En <b>Avatar</b>, graba una vez el movimiento de la palabra para que el avatar también la sepa hacer. Antes de guardarla, recorta la toma para dejar solo la seña.</li>
           </ol>
           <h3>Teclas</h3>
           <div class="teclas">
-            <span><kbd>Espacio</kbd> grabar / pausar</span><span><kbd>Z</kbd> deshacer</span>
+            <span><kbd>Espacio</kbd> grabar / pausar</span><span><kbd>Z</kbd> deshacer</span><span><kbd>M</kbd> una / dos manos</span>
+            <span><kbd>Enter</kbd> guardar la toma</span><span><kbd>Esc</kbd> descartarla</span>
             <span><kbd>V</kbd> voz</span><span><kbd>S</kbd> micrófono</span><span><kbd>F</kbd> pantalla completa</span>
           </div>
         </div>

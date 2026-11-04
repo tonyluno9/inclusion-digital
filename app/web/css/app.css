@@ -1,4 +1,4 @@
-/* INCLUSION · interfaz. Paleta y tipografía: diseno/README.md */
+/* K'ab T'aan · interfaz. Paleta y tipografía: diseno/README.md */
 @font-face {
   font-family: "Lexend";
   src: url("../assets/fuentes/Lexend.ttf") format("truetype");
@@ -57,7 +57,7 @@ h3 { font-size: 18px; margin-bottom: 14px; }
   background: #0B111C;
   border-right: 1px solid var(--borde);
 }
-.lateral-logo { width: 56px; height: 56px; margin-bottom: 22px; }
+.lateral-logo { width: 60px; height: 60px; margin-bottom: 22px; }
 .lateral nav { display: flex; flex-direction: column; gap: 6px; width: 100%; }
 .lateral-pie { margin-top: auto; display: flex; flex-direction: column; gap: 4px; width: 100%; }
 .nav {
@@ -134,8 +134,10 @@ main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
   border-radius: 0; padding: 40px 56px;
 }
 .inicio-texto { max-width: 720px; }
-.inicio-logo { width: 96px; height: 96px; }
-.inicio h2 { font-size: 64px; font-weight: 700; letter-spacing: .02em; margin: 6px 0 8px; }
+.inicio-logo { width: 132px; height: 132px; filter: drop-shadow(0 10px 24px rgba(0, 0, 0, .35)); }
+.inicio h2 { font-size: 64px; font-weight: 700; letter-spacing: .01em; margin: 10px 0 2px; }
+.significado { margin: 0 0 14px; font-size: 18px; color: var(--texto-2); }
+.significado b { color: var(--ambar); font-weight: 600; }
 .lema { font-size: 20px; color: #C9D1DE; margin: 0 0 30px; }
 .tarjetas-inicio { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
 .tarjeta-accion {
@@ -236,6 +238,42 @@ main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
 .fila.vacia { grid-template-columns: 1fr; color: var(--texto-2); }
 .lista-clips { display: flex; flex-direction: column; gap: 6px; max-height: 260px; overflow: auto; }
 .lista-clips .fila { grid-template-columns: 1fr auto auto; }
+
+/* ------------------------------------------------- una o dos manos */
+.manos-fila { display: flex; flex-direction: column; gap: 8px; margin-bottom: 14px; }
+.segmentado {
+  display: inline-flex; flex-wrap: wrap; gap: 4px; align-self: flex-start; max-width: 100%;
+  padding: 4px; border-radius: 12px; background: var(--fondo); border: 1px solid var(--borde);
+}
+.segmentado button {
+  border: 0; background: transparent; padding: 9px 14px; border-radius: 9px;
+  font-weight: 600; color: var(--texto-2); cursor: pointer;
+}
+.segmentado button:hover { color: var(--texto); }
+.segmentado button.activo { background: var(--violeta); color: #fff; }
+.segmentado button:focus-visible { outline: 2px solid var(--ambar); outline-offset: 1px; }
+
+/* ------------------------------------------- revisar y recortar la toma */
+.ayuda-corta.sin-margen { margin: 0 0 4px; }
+.rev-tiempos { color: var(--texto-2); font-size: 14px; white-space: nowrap; }
+.rev-tiempos b { color: var(--turquesa); }
+.linea-tiempo { position: relative; height: 56px; margin: 14px 10px 2px; touch-action: none; cursor: pointer; }
+.lt-pista {
+  position: absolute; left: 0; right: 0; top: 22px; height: 12px; border-radius: 6px;
+  background: var(--superficie-2); border: 1px solid var(--borde);
+}
+.lt-rango { position: absolute; top: 22px; height: 12px; border-radius: 6px; background: rgba(46, 196, 182, .55); pointer-events: none; }
+.lt-cabezal {
+  position: absolute; top: 8px; width: 3px; height: 40px; margin-left: -1.5px; border-radius: 2px;
+  background: var(--ambar); pointer-events: none;
+}
+.lt-asa {
+  position: absolute; top: 12px; width: 18px; height: 32px; margin-left: -9px; padding: 0;
+  border-radius: 6px; border: 2px solid var(--fondo); background: var(--turquesa);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, .45); cursor: ew-resize;
+}
+.lt-asa:focus-visible { outline: 3px solid var(--ambar); outline-offset: 2px; }
+.lt-marcas { display: flex; justify-content: space-between; margin: 0 10px 16px; color: var(--texto-2); font-size: 13px; }
 
 /* ----------------------------------------------------------------- ayuda */
 .ayuda-ilustrada img { width: 220px; display: block; margin: 0 auto 10px; background: #E9EEF6; border-radius: 50%; padding: 18px; }

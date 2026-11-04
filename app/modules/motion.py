@@ -43,6 +43,9 @@ POSE_LR_PAIRS = [(1, 4), (2, 5), (3, 6), (7, 8), (9, 10), (11, 12), (13, 14), (1
                  (19, 20), (21, 22), (23, 24), (25, 26), (27, 28), (29, 30), (31, 32)]
 LEFT_WRIST, RIGHT_WRIST = 15, 16
 PARTS = ("pose", "left", "right")
+# Hombro, codo, muñeca, meñique, índice y pulgar del cuerpo, por lado
+ARM_POINTS = {"left": (11, 13, 15, 17, 19, 21), "right": (12, 14, 16, 18, 20, 22)}
+HANDS_TO_SIDE = {"derecha": "right", "izquierda": "left"}
 
 
 def hand_side_from_shape(points):
@@ -85,6 +88,35 @@ def world_frame(pose, vis, hands):
             continue
         hand = -np.asarray(hand, dtype=np.float32)
         out[side] = hand - hand[0] + out["pose"][wrist]
+    return out
+
+
+def resting_side(hands):
+    """Lado del cuerpo ("left"/"right") que no participa en una seña de una
+    mano; None si la seña es de dos manos."""
+    side = HANDS_TO_SIDE.get(hands)
+    return None if side is None else ("left" if side == "right" else "right")
+
+
+def rest_arm(world, side):
+    """Deja el brazo `side` colgando junto al cuerpo, con el codo apenas
+    doblado, y sin mano: en una seña de una mano la otra no se mueve aunque la
+    persona la baje fuera de cuadro. Las proporciones son las de la pose de
+    reposo del avatar (web/js/avatar.js)."""
+    out = dict(world)
+    out[side] = None
+    if world["pose"] is None:
+        return out
+    pose = np.array(world["pose"], dtype=np.float32)
+    vis = np.array(world["vis"], dtype=np.float32) if world["vis"] is not None else np.ones(len(pose), np.float32)
+    shoulder, elbow, wrist, pinky, index, thumb = ARM_POINTS[side]
+    outward = 1.0 if side == "left" else -1.0          # x apunta a la izquierda de la persona
+    pose[elbow] = pose[shoulder] + (0.06 * outward, -0.28, -0.01)
+    pose[wrist] = pose[elbow] + (0.015 * outward, -0.245, 0.07)
+    for i, dx in ((pinky, 0.02), (index, -0.01), (thumb, -0.02)):
+        pose[i] = pose[wrist] + (dx * outward, -0.07, 0.02)
+    vis[[elbow, wrist, pinky, index, thumb]] = 1.0
+    out["pose"], out["vis"] = pose, vis
     return out
 
 
@@ -196,7 +228,7 @@ def frame_to_json(world, t):
             "left": _rounded(world["left"]), "right": _rounded(world["right"])}
 
 
-def make_clip(timed_frames, word, person="anonimo"):
+def make_clip(timed_frames, word, person="anonimo", hands="dos"):
     """Clip listo para guardar a partir de [(t, frame)]. Rellena huecos cortos."""
     if not timed_frames:
         raise ValueError("el clip no tiene frames")
@@ -210,6 +242,7 @@ def make_clip(timed_frames, word, person="anonimo"):
         "version": CLIP_VERSION,
         "word": word,
         "person": person,
+        "hands": hands,
         "created": time.strftime("%Y-%m-%dT%H:%M:%S"),
         "fps": round(fps, 2),
         "duration": round(duration, 3),
@@ -218,6 +251,23 @@ def make_clip(timed_frames, word, person="anonimo"):
         "hand_names": HAND_NAMES,
         "frames": [frame_to_json(f, t) for t, f in zip(times, frames)],
     }
+
+
+def trim_clip(clip, start, end):
+    """Copia del clip con solo los frames entre `start` y `end` (segundos del
+    clip original); el tiempo vuelve a empezar en 0."""
+    start, end = float(start), float(end)
+    frames = [f for f in clip["frames"] if start - 1e-6 <= f["t"] <= end + 1e-6]
+    if len(frames) < 2:
+        raise ValueError("el recorte es demasiado corto")
+    t0 = frames[0]["t"]
+    out = dict(clip)
+    out["frames"] = [{**f, "t": round(f["t"] - t0, 4)} for f in frames]
+    duration = out["frames"][-1]["t"]
+    out["duration"] = round(duration, 3)
+    out["fps"] = round((len(frames) - 1) / duration, 2) if duration > 0 else clip.get("fps", 30.0)
+    out["trimmed_from"] = [round(start, 3), round(end, 3)]
+    return out
 
 
 def validate_clip(clip):

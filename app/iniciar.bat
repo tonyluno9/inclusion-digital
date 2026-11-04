@@ -1,5 +1,5 @@
 @echo off
-rem INCLUSION en su ventana (interfaz nueva). La version anterior, con la ventana de OpenCV: iniciar_clasico.bat
+rem K'ab T'aan en su ventana (interfaz nueva). La version anterior, con la ventana de OpenCV: iniciar_clasico.bat
 chcp 65001 >nul
 pushd "%~dp0"
 
