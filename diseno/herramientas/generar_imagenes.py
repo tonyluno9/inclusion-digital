@@ -6,9 +6,12 @@ Uso (desde la raiz del repo):
     python diseno/herramientas/generar_imagenes.py diseno/prompts/logo_kab_taan.json # otro lote
 
 Cada lote guarda sus imagenes y su manifest.json en la carpeta "salida" de su JSON.
-Si el JSON trae "modo": "edicion" y "referencia" (una imagen del repo), se usa el modelo de
-edicion con esa imagen como referencia (MODELO_EDICION; revisar en la documentacion de
-WaveSpeedAI el identificador y el campo de imagenes antes de correrlo).
+Imagenes de referencia (modelo de edicion, MODELO_EDICION):
+- todo el lote: "modo": "edicion" + "referencia": "<ruta>" (o "referencias": [...]);
+- una sola imagen: "referencias": ["<ruta>", ...] dentro de esa imagen (manda sobre el lote;
+  [] la genera de texto a imagen).
+Las rutas son relativas a la raiz del repo. Cada archivo se sube una sola vez (su URL queda en
+el manifiesto, en "subidas").
 
 Reglas:
 - Una sola generacion por imagen. Si diseno/generadas/<archivo> ya existe, se salta.
@@ -86,7 +89,7 @@ def subir_referencia(clave: str, ruta: Path) -> str:
     return ticket["download_url"]
 
 
-def enviar(clave: str, prompt: str, aspecto: str, referencia_url: str | None = None) -> str:
+def enviar(clave: str, prompt: str, aspecto: str, referencias_urls: list[str] | None = None) -> str:
     cuerpo = {
         "prompt": prompt,
         "aspect_ratio": aspecto,
@@ -96,9 +99,9 @@ def enviar(clave: str, prompt: str, aspecto: str, referencia_url: str | None = N
         "enable_image_search": False,
     }
     url = URL_ENVIO
-    if referencia_url is not None:
+    if referencias_urls:
         url = URL_BASE + MODELO_EDICION
-        cuerpo["images"] = [referencia_url]
+        cuerpo["images"] = list(referencias_urls)
     r = requests.post(url, headers=encabezados(clave), json=cuerpo, timeout=120)
     if r.status_code != 200:
         raise RuntimeError(f"envio HTTP {r.status_code}: {r.text[:500]}")
@@ -159,16 +162,33 @@ def main() -> int:
     MANIFIESTO = SALIDA / "manifest.json"
     SALIDA.mkdir(parents=True, exist_ok=True)
     m = cargar_manifiesto()
-    referencia = None
-    if spec.get("modo") == "edicion":
-        referencia = (RAIZ / spec["referencia"]).resolve()
-        if not referencia.is_file():
-            print(f"No existe la imagen de referencia {referencia}")
-            return 1
-    modelo = MODELO_EDICION if referencia else MODELO
-    m["modelo"], m["resolucion"] = modelo, RESOLUCION
-    if referencia:
-        m["referencia"] = spec["referencia"]
+    lote = list(spec.get("referencias") or [])
+    if spec.get("modo") == "edicion" and spec.get("referencia"):
+        lote = [spec["referencia"]] + [r for r in lote if r != spec["referencia"]]
+
+    def referencias_de(item):
+        return list(item["referencias"]) if "referencias" in item else lote
+
+    # Todas las referencias tienen que existir antes de gastar en ninguna imagen
+    faltan = sorted({r for item in spec["imagenes"] for r in referencias_de(item) if not (RAIZ / r).is_file()})
+    if faltan:
+        print("No existen estas imagenes de referencia: " + ", ".join(faltan))
+        return 1
+    subidas = m.setdefault("subidas", {})
+    if m.get("referencia_url") and m.get("referencia"):      # manifiestos anteriores (una referencia)
+        subidas.setdefault(m["referencia"], m["referencia_url"])
+
+    def url_de(ruta_rel):
+        if ruta_rel not in subidas:                             # se sube una sola vez
+            print(f"    subiendo la referencia {ruta_rel}...")
+            subidas[ruta_rel] = subir_referencia(clave, RAIZ / ruta_rel)
+            guardar_manifiesto(m)
+        return subidas[ruta_rel]
+
+    m["modelo"] = MODELO_EDICION if lote else MODELO
+    m["resolucion"] = RESOLUCION
+    if lote:
+        m["referencias_lote"] = lote
     m["acepta_prompt_negativo"] = ACEPTA_NEGATIVO
 
     errores = 0
@@ -185,11 +205,14 @@ def main() -> int:
             continue
 
         prompt = f"{spec['estilo_comun']} {item['prompt']}"
+        referencias = referencias_de(item)
+        modelo = MODELO_EDICION if referencias else MODELO
         if ACEPTA_NEGATIVO:
             pass  # el modelo no lo admite; nunca se agrega al texto
         entrada.update({
             "archivo": archivo,
             "modelo": modelo,
+            "referencias": referencias,
             "prompt_final": prompt,
             "tamano_pedido": {"aspecto": item["aspecto"], "resolucion": RESOLUCION,
                               "referencia": f"{item['ancho']}x{item['alto']}"},
@@ -202,14 +225,7 @@ def main() -> int:
         else:
             print(f"[{item['id']}] enviando...")
             try:
-                referencia_url = None
-                if referencia:
-                    if not m.get("referencia_url"):  # se sube una sola vez por lote
-                        print("    subiendo la imagen de referencia...")
-                        m["referencia_url"] = subir_referencia(clave, referencia)
-                        guardar_manifiesto(m)
-                    referencia_url = m["referencia_url"]
-                tarea_id = enviar(clave, prompt, item["aspecto"], referencia_url)
+                tarea_id = enviar(clave, prompt, item["aspecto"], [url_de(r) for r in referencias])
             except Exception as e:  # noqa: BLE001
                 entrada["error_envio"] = str(e)
                 guardar_manifiesto(m)
@@ -243,7 +259,7 @@ def main() -> int:
             "coincide_aspecto": abs(aspecto_real - a / b) < 0.02,
             "tiempo_inferencia_ms": (datos.get("timings") or {}).get("inference"),
             "costo_usd": datos.get("cost") or datos.get("price"),
-            "costo_documentado_usd": round(COSTO_DOCUMENTADO_USD + (COSTO_POR_REFERENCIA_USD if referencia else 0), 3),
+            "costo_documentado_usd": round(COSTO_DOCUMENTADO_USD + COSTO_POR_REFERENCIA_USD * len(referencias), 3),
         })
         if not entrada["coincide_aspecto"]:
             entrada["nota_tamano"] = f"Pedido {item['aspecto']}, entregado {ancho}x{alto}."
