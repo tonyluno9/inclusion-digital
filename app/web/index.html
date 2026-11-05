@@ -16,6 +16,8 @@
     <nav>
       <button class="nav" data-pagina="inicio"><span class="icono" style="--i:url(../assets/iconos/inicio.png)"></span>Inicio</button>
       <button class="nav" data-pagina="traducir"><span class="icono" style="--i:url(../assets/iconos/subtitulos.png)"></span>Traducir</button>
+      <button class="nav" data-pagina="aprender"><span class="icono" style="--i:url(../assets/iconos/aprender.png)"></span>Aprender</button>
+      <button class="nav" data-pagina="diccionario"><span class="icono" style="--i:url(../assets/iconos/diccionario.png)"></span>Diccionario</button>
       <button class="nav" data-pagina="entrenar"><span class="icono" style="--i:url(../assets/iconos/senas.png)"></span>Entrenar</button>
       <button class="nav" data-pagina="avatar"><span class="icono" style="--i:url(../assets/iconos/avatar.png)"></span>Avatar</button>
       <button class="nav" data-pagina="ayuda"><span class="icono" style="--i:url(../assets/iconos/ayuda.png)"></span>Ayuda</button>
@@ -49,6 +51,14 @@
             <button class="tarjeta-accion" data-ir="traducir">
               <span class="icono grande" style="--i:url(../assets/iconos/subtitulos.png)"></span>
               <b>Traducir</b><small>Tus señas se vuelven subtítulos y voz. El avatar responde con señas.</small>
+            </button>
+            <button class="tarjeta-accion" data-ir="aprender">
+              <span class="icono grande" style="--i:url(../assets/iconos/aprender.png)"></span>
+              <b>Aprender</b><small>El avatar te enseña una seña y el traductor te califica. Gana estrellas e insignias.</small>
+            </button>
+            <button class="tarjeta-accion" data-ir="diccionario">
+              <span class="icono grande" style="--i:url(../assets/iconos/diccionario.png)"></span>
+              <b>Diccionario</b><small>Todas las señas por categoría. Toca una y el avatar te la muestra.</small>
             </button>
             <button class="tarjeta-accion" data-ir="entrenar">
               <span class="icono grande" style="--i:url(../assets/iconos/senas.png)"></span>
@@ -116,7 +126,7 @@
               <div class="manos-fila">
                 <span class="etiqueta">La seña se hace con</span>
                 <div class="segmentado" role="group" aria-label="Manos de la seña">
-                  <button type="button" data-manos="dos">Dos manos</button><button type="button" data-manos="derecha">Mano derecha</button><button type="button" data-manos="izquierda">Mano izquierda</button>
+                  <button type="button" data-manos="dos"><span class="icono" style="--i:url(../assets/iconos/dos_manos.png)"></span>Dos manos</button><button type="button" data-manos="derecha"><span class="icono" style="--i:url(../assets/iconos/una_mano.png)"></span>Mano derecha</button><button type="button" data-manos="izquierda"><span class="icono espejo" style="--i:url(../assets/iconos/una_mano.png)"></span>Mano izquierda</button>
                 </div>
               </div>
               <div class="botones">
@@ -161,7 +171,7 @@
             <div class="manos-fila">
               <span class="etiqueta">La seña se hace con</span>
               <div class="segmentado" role="group" aria-label="Manos de la seña">
-                <button type="button" data-manos="dos">Dos manos</button><button type="button" data-manos="derecha">Mano derecha</button><button type="button" data-manos="izquierda">Mano izquierda</button>
+                <button type="button" data-manos="dos"><span class="icono" style="--i:url(../assets/iconos/dos_manos.png)"></span>Dos manos</button><button type="button" data-manos="derecha"><span class="icono" style="--i:url(../assets/iconos/una_mano.png)"></span>Mano derecha</button><button type="button" data-manos="izquierda"><span class="icono espejo" style="--i:url(../assets/iconos/una_mano.png)"></span>Mano izquierda</button>
               </div>
             </div>
             <div class="botones">
@@ -172,7 +182,7 @@
           </div>
         </div>
         <div class="tarjeta oculto" id="tarjeta-revision">
-          <div class="titulo-fila"><h3>Revisa la toma de «<span id="rev-palabra"></span>»</h3><span class="rev-tiempos" id="rev-tiempos"></span></div>
+          <div class="titulo-fila"><h3 class="con-icono"><span class="icono" style="--i:url(../assets/iconos/recortar.png)"></span>Revisa la toma de «<span id="rev-palabra"></span>»</h3><span class="rev-tiempos" id="rev-tiempos"></span></div>
           <p class="ayuda-corta sin-margen">Arrastra los extremos para dejar solo la seña. Mientras arrastras, el avatar muestra ese instante.</p>
           <div class="linea-tiempo" id="linea-tiempo">
             <div class="lt-pista"></div>
@@ -184,7 +194,7 @@
           <div class="lt-marcas"><span>0 s</span><span id="lt-total"></span></div>
           <div class="botones">
             <button type="button" class="boton" id="rev-reproducir"><span class="icono" style="--i:url(../assets/iconos/reproducir.png)"></span><span>Pausa</span></button>
-            <button type="button" class="boton" id="rev-velocidad">Velocidad 1×</button>
+            <button type="button" class="boton" id="rev-velocidad"><span class="icono" style="--i:url(../assets/iconos/lento.png)"></span><span>Velocidad 1×</span></button>
             <button type="button" class="boton primario" id="rev-guardar"><span class="icono" style="--i:url(../assets/iconos/datos.png)"></span>Guardar (Enter)</button>
             <button type="button" class="boton peligro" id="rev-descartar"><span class="icono" style="--i:url(../assets/iconos/borrar.png)"></span>Descartar (Esc)</button>
           </div>
@@ -192,6 +202,61 @@
         <div class="tarjeta">
           <h3>Movimientos grabados</h3>
           <div class="lista-clips" id="lista-clips"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================ APRENDER ============================ -->
+    <section class="pagina" id="pagina-aprender">
+      <div class="tarjeta apr-barra">
+        <div class="apr-dato"><span class="icono grande estrella-icono" style="--i:url(../assets/iconos/estrella.png)"></span><div><b id="apr-estrellas">0</b><small>estrellas</small></div></div>
+        <div class="apr-dato" id="apr-racha-caja"><span class="icono grande racha-icono" style="--i:url(../assets/iconos/racha.png)"></span><div><b id="apr-racha">0 días</b><small>de racha</small></div></div>
+        <div class="apr-dato"><span class="icono grande" style="--i:url(../assets/iconos/correcto.png)"></span><div><b id="apr-aprendidas">0</b><small>señas aprendidas</small></div></div>
+        <button type="button" class="boton apr-logros" id="apr-abrir-logros"><span class="icono" style="--i:url(../assets/iconos/trofeo.png)"></span><span>Logros <b id="apr-logros">0 / 9</b></span></button>
+      </div>
+      <div class="rejilla dos apr-vista">
+        <div class="tarjeta camara-tarjeta">
+          <div class="camara" data-camara><img alt="Cámara" data-video><div class="camara-vacia"><img src="assets/img/sin_camara.png" alt=""><p>Buscando la cámara…</p></div></div>
+        </div>
+        <div class="tarjeta escenario-tarjeta">
+          <div class="escenario" id="escenario-aprender"></div>
+          <div class="escenario-pie" id="pie-aprender">El avatar te enseña la seña.</div>
+        </div>
+      </div>
+      <div class="tarjeta apr-reto" id="apr-reto">
+        <div class="apr-cabeza">
+          <div><div class="etiqueta">Haz la seña</div><div class="apr-palabra" id="apr-palabra">…</div></div>
+          <div class="apr-mejor" title="Tu mejor resultado en esta seña"><span class="etiqueta">Tu mejor</span><div class="estrellas" id="apr-mejor"></div></div>
+        </div>
+        <div class="apr-estado" id="apr-estado"></div>
+        <div class="botones">
+          <button type="button" class="boton" id="apr-ver"><span class="icono" style="--i:url(../assets/iconos/repetir.png)"></span>Ver otra vez</button>
+          <button type="button" class="boton" id="apr-lento"><span class="icono" style="--i:url(../assets/iconos/lento.png)"></span><span>Velocidad 1×</span></button>
+          <button type="button" class="boton" id="apr-saltar"><span class="icono" style="--i:url(../assets/iconos/reproducir.png)"></span>Otra seña</button>
+          <button type="button" class="boton primario oculto" id="apr-siguiente"><span class="icono" style="--i:url(../assets/iconos/estrella.png)"></span>Siguiente (Enter)</button>
+        </div>
+      </div>
+      <div class="tarjeta vacio-grande oculto" id="apr-vacio">
+        <img src="assets/img/entrenando.png" alt="">
+        <h3>Primero, enséñale señas al traductor</h3>
+        <p>Para practicar, el traductor tiene que reconocer al menos una seña. Grábala en <b>Entrenar</b> y, si quieres que el avatar te la enseñe, graba también su movimiento en <b>Avatar</b>.</p>
+        <button type="button" class="boton primario" data-ir="entrenar"><span class="icono" style="--i:url(../assets/iconos/senas.png)"></span>Ir a Entrenar</button>
+      </div>
+    </section>
+
+    <!-- ============================ DICCIONARIO ============================ -->
+    <section class="pagina" id="pagina-diccionario">
+      <div class="dic-rejilla">
+        <div class="columna">
+          <div class="tarjeta dic-busqueda">
+            <label class="buscador"><span class="icono" style="--i:url(../assets/iconos/buscar.png)"></span><input id="dic-buscar" type="search" placeholder="Buscar una seña…" autocomplete="off"></label>
+            <div class="filtros" id="dic-filtros"></div>
+          </div>
+          <div class="dic-secciones" id="dic-secciones"></div>
+        </div>
+        <div class="tarjeta escenario-tarjeta dic-lateral">
+          <div class="escenario" id="escenario-diccionario"></div>
+          <div class="dic-detalle" id="dic-detalle"></div>
         </div>
       </div>
     </section>
@@ -218,7 +283,8 @@
             <li>Pulsa <b>Entrenar el traductor</b>. Con más personas grabando, el traductor acierta más.</li>
             <li>En <b>Avatar</b>, graba una vez el movimiento de la palabra para que el avatar también la sepa hacer. Antes de guardarla, recorta la toma para dejar solo la seña.</li>
           </ol>
-          <h3>Teclas</h3>
+          <button type="button" class="boton" id="btn-tutorial"><span class="icono" style="--i:url(../assets/iconos/consejo.png)"></span>Ver el tutorial de bienvenida</button>
+          <h3 class="separado">Teclas</h3>
           <div class="teclas">
             <span><kbd>Espacio</kbd> grabar / pausar</span><span><kbd>Z</kbd> deshacer</span><span><kbd>M</kbd> una / dos manos</span>
             <span><kbd>Enter</kbd> guardar la toma</span><span><kbd>Esc</kbd> descartarla</span>
@@ -230,6 +296,64 @@
   </main>
 
   <div class="avisos" id="avisos"></div>
+
+  <!-- Pantalla de carga (RF-33) -->
+  <div class="carga" id="carga">
+    <div class="carga-texto">
+      <img src="assets/img/logo.png" alt="">
+      <h2>K'ab T'aan</h2>
+      <p>«Lengua de manos» · Lengua de Señas Mexicana a texto, voz y avatar</p>
+      <div class="carga-barra"><i></i></div>
+    </div>
+  </div>
+
+  <!-- Tutorial de bienvenida (RF-33) -->
+  <div class="capa oculto" id="tutorial" role="dialog" aria-modal="true" aria-labelledby="tut-titulo">
+    <div class="dialogo tutorial">
+      <img id="tut-img" alt="">
+      <div class="tutorial-texto">
+        <span class="etiqueta" id="tut-numero"></span>
+        <h2 id="tut-titulo"></h2>
+        <p id="tut-texto"></p>
+        <div class="puntos" id="tut-puntos"></div>
+        <div class="botones">
+          <button type="button" class="boton" id="tut-anterior">Anterior</button>
+          <button type="button" class="boton primario" id="tut-siguiente"><span>Siguiente</span></button>
+          <button type="button" class="boton enlace" id="tut-saltar">Saltar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Celebraciones: insignias nuevas y traductor entrenado (RF-35, RF-36) -->
+  <div class="capa oculto" id="celebracion" role="dialog" aria-modal="true" aria-labelledby="cel-titulo">
+    <div class="dialogo celebracion">
+      <div class="confeti" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+      <img id="cel-img" alt="">
+      <h2 id="cel-titulo"></h2>
+      <p id="cel-texto"></p>
+      <button type="button" class="boton primario" id="cel-ok">¡Genial!</button>
+    </div>
+  </div>
+
+  <!-- Logros (RF-35) -->
+  <div class="capa oculto" id="logros" role="dialog" aria-modal="true" aria-labelledby="logros-titulo">
+    <div class="dialogo logros">
+      <div class="titulo-fila"><h2 id="logros-titulo" class="con-icono"><span class="icono" style="--i:url(../assets/iconos/trofeo.png)"></span>Logros</h2>
+        <button type="button" class="boton mini" id="logros-cerrar" aria-label="Cerrar"><span class="icono" style="--i:url(../assets/iconos/incorrecto.png)"></span></button></div>
+      <p class="ayuda-corta sin-margen" id="logros-resumen"></p>
+      <div class="logros-rejilla" id="logros-rejilla"></div>
+    </div>
+  </div>
+
+  <!-- Sin conexión con el motor (RF-36) -->
+  <div class="capa oculto" id="sin-conexion" role="alertdialog" aria-labelledby="sc-titulo">
+    <div class="dialogo celebracion">
+      <img src="assets/img/estados/sin_conexion.png" alt="">
+      <h2 id="sc-titulo">Se perdió la conexión</h2>
+      <p>La ventana no recibe nada de K'ab T'aan. Si cerraste la consola, vuelve a abrir la app. Esta ventana se recupera sola cuando vuelva la conexión.</p>
+    </div>
+  </div>
   <script type="module" src="js/app.js"></script>
 </body>
 </html>

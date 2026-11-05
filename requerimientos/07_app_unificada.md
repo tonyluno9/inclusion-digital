@@ -65,6 +65,37 @@ clasifica con un modelo que no la vio (validación cruzada) y lista las muestras
   descarta. Mientras se revisa no se graba otra toma; deshacer o cambiar de palabra la descarta.
 - La versión clásica (OpenCV) sigue guardando cada toma al momento.
 
+### RF-33 · Pantalla de carga y tutorial — Debería
+- Al abrir, una portada con el logo y el nombre mientras arrancan la cámara, el traductor y el avatar (al menos
+  1.2 s, como máximo 8 s aunque algo no responda).
+- La primera vez, un tutorial de 4 pasos con ilustraciones: colocarse, hacer la seña, la traducción y el avatar.
+  Se puede volver a ver desde Ayuda. Flechas para avanzar, `Esc` para cerrarlo.
+
+### RF-34 · Diccionario de señas — Debería
+- Todas las palabras que la app conoce (muestras del dataset, señas del traductor y movimientos del avatar), una
+  sola vez cada una, agrupadas en saludos, cortesía, preguntas, familia, emociones, números y otras
+  (`web/datos/categorias.json`, editable).
+- Buscador sin acentos ni mayúsculas y filtros por categoría. Cada seña dice si el traductor la reconoce, si el
+  avatar la sabe hacer, cuántas muestras tiene y con qué manos se hace.
+- Al tocarla, el avatar la hace (también a ½×). Botones para practicarla, grabar muestras o grabar su movimiento
+  con la palabra ya puesta, y «Por grabar» con las palabras de la categoría que aún faltan.
+
+### RF-35 · Aprender: práctica con estrellas e insignias — Debería
+- La app elige una seña que el traductor reconoce (primero las que el avatar sabe hacer, y más seguido las que menos
+  se han acertado); el avatar la enseña (repetir, ½×) y la persona la hace frente a la cámara.
+- Si el traductor reconoce esa seña: «¡Bien hecho!» y de 1 a 3 estrellas según la confianza (≥ 75 %: 2; ≥ 90 %: 3).
+  Si reconoce otra: «Inténtalo otra vez» con lo que entendió; tras dos fallos el avatar la repite más despacio.
+- En práctica las señas no forman oraciones (no se llama a Claude).
+- Estrellas, racha de días, señas aprendidas y 9 insignias (primera seña, 10 señas, racha de 3 y de 7 días, saludos,
+  primer movimiento del avatar, traductor entrenado, primera oración, 3 categorías). Se guardan en
+  `data/progreso.json` (junto al dataset, fuera de git); las reglas están en `modules/progreso.py`.
+
+### RF-36 · Escenarios del avatar y pantallas de estado — Debería
+- El avatar se puede ver en 4 escenarios (Estudio, Jade, Aula y Plaza); la elección se recuerda.
+- Celebraciones con ilustración al ganar una insignia y al terminar de entrenar el traductor.
+- Si la ventana deja de recibir datos del motor por más de 3 s, aviso «Se perdió la conexión», que se quita solo
+  cuando vuelve.
+
 ### RNF-12 · Seguridad local — Debe
 - El servidor solo escucha en `127.0.0.1` (no se ve desde la red).
 - Solo sirve archivos de `app/web` (no se puede pedir nada fuera de esa carpeta).

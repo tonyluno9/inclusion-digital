@@ -2,6 +2,7 @@
 
 - retarget.test.mjs: el retargeting del avatar en la app da lo mismo que el de Blender (RF-23, RF-27).
 - texto.test.mjs: texto del interlocutor -> señas del avatar (RF-24).
+- diccionario.test.mjs: Diccionario por categorías y qué seña practicar en Aprender (RF-34, RF-35).
 
 Se omiten si Node no está instalado.
 """

@@ -9,7 +9,7 @@ cd app
 python -m unittest discover -s tests -t .
 ```
 
-137 pruebas de Python (incluyen las de JavaScript con Node y las de Blender, si están instalados), 30–60 s, sin cámara. La prueba de integración con MediaPipe descarga la primera vez los modelos y una foto
+150 pruebas de Python (incluyen las de JavaScript con Node y las de Blender, si están instalados), 30–60 s, sin cámara. La prueba de integración con MediaPipe descarga la primera vez los modelos y una foto
 de muestra oficial (≈ 14 MB); sin internet se omite. Las pruebas de Blender corren si está instalado (variable
 `BLENDER_EXE` o `C:\Program Files\Blender Foundation\Blender *`); el CI no lo tiene y las omite. CI: [`.github/workflows/ci.yml`](../.github/workflows/ci.yml)
 (Windows y Ubuntu, Python 3.10–3.12).
@@ -70,6 +70,10 @@ de muestra oficial (≈ 14 MB); sin internet se omite. Las pruebas de Blender co
 | RF-30 | Verificación de señas | `python verificar_senas.py` con el dataset real: 89.4 % por la cámara simulada (ver [MEJORAS](../app/MEJORAS_PROYECTO.md)) | ✅ |
 | RF-31 | Una o dos manos | `test_manos_y_tomas` (máscara de la otra mano, rechazo de muestras sin una mano, brazo en reposo del avatar, memoria por palabra, tecla M), `retarget.test.mjs` (olvidarMano); probado en la app con video | 🟡 |
 | RF-32 | Recortar la toma del avatar | `test_manos_y_tomas.TomasTest`, `test_servidor_web.test_manos_y_toma_pendiente`; probado en la app con video (arrastrar extremos, ½×, Enter guarda 2.6 s de 4.8 s) | 🟡 |
+| RF-33 | Carga y tutorial | Revisado en la app con video (portada, tutorial la primera vez y desde Ayuda) | 🟡 |
+| RF-34 | Diccionario | `test_progreso.test_vocabulario_une_dataset_traductor_y_avatar`, `test_categorias_validas`, `test_servidor_web.test_diccionario_progreso_y_practica`, `diccionario.test.mjs`; revisado en la app con video | 🟡 |
+| RF-35 | Aprender | `test_progreso` (estrellas, racha, insignias, guardado, práctica sin oraciones), `diccionario.test.mjs` (qué seña practicar); en la app con video el traductor reconoció «buenas tardes» y dio estrella, racha e insignia | 🟡 |
+| RF-36 | Escenarios y estados | Revisado en la app con video (escenario recordado, celebraciones, «Se perdió la conexión» al detener el motor) | 🟡 |
 | RNF-12 | Seguridad local | `test_servidor_web.test_no_sale_de_la_carpeta_web`; servidor en `127.0.0.1` | ✅ |
 | RF-24 | Reproducción por palabras | Cubierto por RF-29 (app unificada) | 🟡 falta probar con frases reales |
 

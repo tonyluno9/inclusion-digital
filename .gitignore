@@ -42,6 +42,7 @@ app/data/dataset_v2.csv
 app/data/avatar/
 app/data/dataset_v2.meta.json
 app/data/manos_por_sena.json
+app/data/progreso.json
 
 # Copias de respaldo que Blender crea al guardar
 *.blend1

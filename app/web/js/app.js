@@ -1,11 +1,22 @@
 // K'ab T'aan · interfaz. Habla con app/servidor_web.py:
 //   /eventos  (estado + movimiento 3D, ~30 por segundo)   /video  (cámara)   /api/...  (acciones y datos)
 import { Avatar } from './avatar.js';
+import { crearEscenas } from './escenas.js';
 import { buscarSenas, norm } from './texto.js';
+import { crearAprender } from './vista_aprender.js';
+import { crearDiccionario } from './vista_diccionario.js';
 
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
-const TITULOS = { inicio: 'Inicio', traducir: 'Traducir', entrenar: 'Entrenar el traductor', avatar: 'Avatar', ayuda: 'Ayuda' };
+const TITULOS = {
+  inicio: 'Inicio', traducir: 'Traducir', aprender: 'Aprender', diccionario: 'Diccionario de señas',
+  entrenar: 'Entrenar el traductor', avatar: 'Avatar', ayuda: 'Ayuda',
+};
+const PIES = {
+  traducir: 'El avatar repite cada seña reconocida y dice en señas lo que escribe el interlocutor.',
+  avatar: 'El avatar te imita en vivo.',
+  aprender: 'El avatar te enseña la seña.',
+};
 const MODOS_MANOS = ['dos', 'derecha', 'izquierda'];
 const RECORTE_MIN = 0.3;          // s: el recorte más corto que se puede guardar
 const PASO_TECLA = 1 / 30;        // s que mueve una flecha (un frame de la cámara)
@@ -19,6 +30,8 @@ const ui = {
   cacheClips: new Map(),       // nombre -> JSON
   avisoPrevio: '',
   entrenando: false,
+  palabraAvatar: null,         // palabra que llega del Diccionario a la pantalla Avatar
+  conectado: false,
 };
 
 // ------------------------------------------------------------------- servidor
@@ -43,15 +56,18 @@ function escuchar() {
   const fuente = new EventSource('/eventos');
   fuente.onmessage = (e) => {
     const { estado, mundo } = JSON.parse(e.data);
+    if (!ui.conectado) { ui.conectado = true; escenas.marcar('estado'); }
+    escenas.conexion(true);
     actualizar(estado);
     if (mundo && estado.modo === 'AVATAR' && ui.pagina === 'avatar' && !ui.revision) avatar.vivo(mundo, estado.manos);
   };
-  fuente.onerror = () => { $('#chip-camara').className = 'chip mal'; };
+  fuente.onerror = () => { $('#chip-camara').className = 'chip mal'; escenas.conexion(false); };
 }
 
 // ----------------------------------------------------------------- navegación
-function ir(pagina) {
+function ir(pagina, dato = null) {
   if (ui.pagina === pagina) return;
+  if (ui.pagina === 'aprender') aprender.alSalir();
   ui.pagina = pagina;
   $$('.pagina').forEach((p) => p.classList.toggle('visible', p.id === `pagina-${pagina}`));
   $$('.nav[data-pagina]').forEach((b) => b.classList.toggle('activa', b.dataset.pagina === pagina));
@@ -63,9 +79,51 @@ function ir(pagina) {
     if (!visible && img.getAttribute('src')) img.removeAttribute('src');
   });
   if (pagina === 'traducir') { avatar.montar($('#escenario-traducir')); avatar.detener(); accion('modo_deteccion'); }
-  if (pagina === 'avatar') { avatar.montar($('#escenario-avatar')); avatar.detener(); accion('avatar_palabra', { palabra: ui.estado.modo === 'AVATAR' ? ui.estado.palabra : '' }); cargarClips(); }
-  if (pagina === 'entrenar') { cargarDataset(); if (ui.estado.modo === 'AVATAR') accion('modo_deteccion'); }
-  if (pagina === 'inicio' || pagina === 'ayuda') { if (ui.estado.modo === 'AVATAR') accion('modo_deteccion'); }
+  if (pagina === 'avatar') {
+    avatar.montar($('#escenario-avatar')); avatar.detener();
+    const palabra = ui.palabraAvatar !== null ? ui.palabraAvatar : (ui.estado.modo === 'AVATAR' ? ui.estado.palabra : '');
+    ui.palabraAvatar = null;
+    if (palabra) $('#avatar-palabra').value = palabra;
+    accion('avatar_palabra', { palabra }); cargarClips();
+  }
+  if (pagina === 'aprender') { avatar.montar($('#escenario-aprender')); avatar.detener(); accion('modo_deteccion', { practica: true }); aprender.alEntrar(dato); }
+  if (pagina === 'diccionario') { avatar.montar($('#escenario-diccionario')); avatar.detener(); diccionario.alEntrar(); }
+  if (pagina === 'entrenar') { cargarDataset(); }
+  // Fuera de Avatar no se imita, y fuera de Aprender se vuelven a armar oraciones
+  const sinDeteccion = pagina !== 'traducir' && pagina !== 'aprender' && pagina !== 'avatar';
+  if (sinDeteccion && pagina !== 'entrenar' && (ui.estado.modo === 'AVATAR' || ui.estado.practica)) accion('modo_deteccion');
+  if (pagina === 'entrenar' && ui.estado.modo === 'AVATAR') accion('modo_deteccion');
+}
+
+// Abre otra pantalla con una palabra ya puesta (desde el Diccionario)
+function irConPalabra(pagina, palabra) {
+  if (pagina === 'entrenar') {
+    ir('entrenar');
+    $('#entrenar-palabra').value = palabra;
+    accion('entrenar_palabra', { palabra, persona: $('#entrenar-persona').value });
+  } else if (pagina === 'avatar') {
+    ui.palabraAvatar = palabra;
+    ir('avatar');
+  } else {
+    ir(pagina, palabra);
+  }
+}
+
+let categoriasCache = null;
+function categorias() {
+  if (!categoriasCache) {
+    categoriasCache = obtener('/datos/categorias.json').then((j) => j.categorias)
+      .catch(() => { categoriasCache = null; return []; });
+  }
+  return categoriasCache;
+}
+
+// Insignias que se ganan fuera de Aprender (entrenar, grabar un movimiento, una oración)
+async function revisarLogros() {
+  try {
+    const p = await obtener('/api/progreso');
+    if (p.nuevas && p.nuevas.length) aprender.aplicarProgreso(p);
+  } catch { /* se revisa la próxima vez */ }
 }
 
 // ---------------------------------------------------------- estado -> pantalla
@@ -151,7 +209,14 @@ function actualizar(e) {
   const btnEntrenar = $('#btn-entrenar');
   btnEntrenar.disabled = e.entrenando;
   btnEntrenar.querySelector('span:last-child').textContent = e.entrenando ? 'Entrenando…' : 'Entrenar el traductor';
-  if (ui.entrenando && !e.entrenando) cargarDataset();
+  if (ui.entrenando && !e.entrenando) {
+    cargarDataset();
+    if (e.modelo_senas.length) {
+      escenas.celebrar({ img: 'assets/img/estados/entrenado.png', titulo: '¡Traductor entrenado!',
+        texto: `Ya reconoce ${e.modelo_senas.length} señas: ${e.modelo_senas.join(', ')}. Pruébalo en Traducir o practica en Aprender.` });
+      revisarLogros();
+    }
+  }
   ui.entrenando = e.entrenando;
   $('#info-modelo').textContent = e.modelo_senas.length
     ? `El traductor conoce: ${e.modelo_senas.join(', ')}.` : 'El traductor todavía no está entrenado.';
@@ -166,11 +231,14 @@ function actualizar(e) {
   }
   if (e.seq_clip !== ui.seq.clip) {
     // Un clip nuevo reemplaza al anterior de esa palabra: lo guardado en caché ya no sirve
-    if (ui.seq.clip !== null) { ui.cacheClips.clear(); cargarClips(); }   // el aviso lo da la app (con la duración)
+    if (ui.seq.clip !== null) { ui.cacheClips.clear(); cargarClips(); revisarLogros(); }   // el aviso lo da la app
     ui.seq.clip = e.seq_clip;
   }
   if (e.toma_pendiente && ui.pagina === 'avatar' && (!ui.revision || ui.revision.seq !== e.toma_seq)) abrirRevision(e.toma_seq);
   if (!e.toma_pendiente && ui.revision) cerrarRevision();
+
+  if (e.oracion && e.oracion !== antes.oracion && !e.oracion_cargando) revisarLogros();
+  aprender.alEstado(e);
 
   // Avisos de la app (lo que antes salía en la ventana de OpenCV)
   if (e.aviso && e.aviso !== ui.avisoPrevio) avisar(e.aviso, e.destello === 'error' ? 'error' : '');
@@ -375,6 +443,7 @@ function conectar() {
   $('#btn-voz').addEventListener('click', () => accion('voz'));
   $('#btn-escuchar').addEventListener('click', () => accion('escuchar'));
   $('#btn-pantalla').addEventListener('click', pantallaCompleta);
+  $('#btn-tutorial').addEventListener('click', () => escenas.abrirTutorial());
   $('#form-entrenar').addEventListener('submit', (ev) => {
     ev.preventDefault();
     accion('entrenar_palabra', { palabra: $('#entrenar-palabra').value, persona: $('#entrenar-persona').value });
@@ -417,6 +486,9 @@ function conectar() {
         return;
       }
     }
+    if (ui.pagina === 'aprender' && k === 'enter' && !$('#apr-siguiente').classList.contains('oculto')) {
+      ev.preventDefault(); aprender.siguiente(); return;
+    }
     if (k === ' ' && grabando) { ev.preventDefault(); accion('grabar'); }
     else if (k === 'm' && grabando) {
       const i = MODOS_MANOS.indexOf(ui.estado.manos);
@@ -429,9 +501,8 @@ function conectar() {
     else if (k === 'h') ir('ayuda');
   });
   avatar.alPalabra = (palabra) => {
-    const pie = ui.pagina === 'avatar' ? $('#pie-avatar') : $('#pie-traducir');
-    pie.innerHTML = palabra ? `Seña: <b>${esc(palabra)}</b>`
-      : (ui.pagina === 'avatar' ? 'El avatar te imita en vivo.' : 'El avatar repite cada seña reconocida y dice en señas lo que escribe el interlocutor.');
+    const pie = $(`#pie-${ui.pagina}`);
+    if (pie) pie.innerHTML = palabra ? `Seña: <b>${esc(palabra)}</b>` : PIES[ui.pagina];
   };
 }
 
@@ -442,13 +513,18 @@ function pantallaCompleta() {
 
 // ------------------------------------------------------------------- inicio
 const avatar = new Avatar();
-window.inclusion = { ui, avatar, buscarSenas, norm };      // para depurar y para las pruebas
+const escenas = crearEscenas($, $$);
+const ctx = { ui, $, $$, esc, accion, obtener, avatar, clip, avisar, categorias, irConPalabra };
+const aprender = crearAprender(ctx, escenas);
+const diccionario = crearDiccionario(ctx);
+window.inclusion = { ui, avatar, buscarSenas, norm, escenas, aprender, diccionario };   // para depurar y probar
 conectar();
 ir('inicio');
 cargarClips();
 escuchar();
 avatar.montar($('#escenario-traducir'));
-avatar.cargar().catch((err) => {
+avatar.cargar().then(() => escenas.marcar('avatar')).catch((err) => {
   console.error(err);
+  escenas.marcar('avatar');
   $$('.escenario').forEach((s) => { s.innerHTML = '<div class="cargando">No se pudo cargar el avatar.</div>'; });
 });

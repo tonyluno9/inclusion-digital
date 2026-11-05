@@ -55,6 +55,16 @@ orden sugerido para las próximas iteraciones.
 - Al reemplazar el movimiento de una palabra, «Ver» ya muestra el nuevo (antes quedaba el anterior en caché).
 - 137 pruebas.
 
+## ✅ Iteración 7 (app completa)
+
+- Pantalla de carga con la portada y tutorial de bienvenida de 4 pasos.
+- **Aprender:** el avatar enseña una seña, la persona la hace y el traductor la califica; estrellas, racha diaria y
+  9 insignias mayas (los conteos con numerales de puntos y barras).
+- **Diccionario:** todas las señas por categoría, con buscador; el avatar hace la que se toque.
+- 4 escenarios para el avatar, celebraciones y aviso de «sin conexión».
+- 9 imágenes nuevas (Nano Banana 2.1, 1K) con las anteriores como referencia de estilo.
+- 150 pruebas.
+
 ## ⏭️ Siguiente
 
 | Prioridad | Tarea | Requerimiento |

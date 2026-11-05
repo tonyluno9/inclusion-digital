@@ -19,6 +19,7 @@ from modules.coherence import make_coherent
 from modules.data_collector import DataCollector
 from modules.gesture_logic import GestureLogic
 from modules.landmarks import elbows_visible, hands_present, keep_hands, missing_hands, pose_valid
+from modules.progreso import Progreso, normalizar
 from modules.motion import (ClipStore, LiveSender, LiveSmoother, MotionRecorder, make_clip, rest_arm,
                             resting_side, trim_clip)
 from modules.segmenter import SignSegmenter
@@ -73,6 +74,9 @@ class InclusionApp:
         self.hands_path = os.path.join(os.path.dirname(os.path.abspath(self.collector.file_path)),
                                        "manos_por_sena.json")
         self.hands_by_word = self._load_hands()
+        # Modo Aprender: progreso junto al dataset; en práctica no se arman oraciones
+        self.progreso = Progreso(os.path.join(os.path.dirname(self.hands_path), "progreso.json"))
+        self.practice = False
         self.live_world = None       # frame 3D suavizado (modo avatar), para el avatar de la app web
         self.word_seq = 0            # sube con cada seña reconocida
         self.text_seq = 0            # sube con cada texto nuevo del interlocutor
@@ -142,6 +146,7 @@ class InclusionApp:
     def _set_mode(self, mode):
         self.mode = mode
         self.pending_take = None
+        self.practice = False
         self._elbows_seen.clear()
         self.armed = False
         self.prediction = ""
@@ -252,10 +257,14 @@ class InclusionApp:
         self.notify(f"Avatar: '{self.label}' ({self._hands_label()}){' (ya tiene clip: se reemplaza)' if exists else ''}. "
                     f"Espacio para grabar.")
 
-    def detection_mode(self):
+    def detection_mode(self, practice=False):
+        """Detección; con `practice` (pantalla Aprender) las señas no forman oraciones."""
         self._set_mode("DETECTION")
+        self.practice = bool(practice)
+        if practice:
+            self.pending_words, self.history = [], []
         self.logic.load_model()
-        self.notify("Modo detección")
+        self.notify("Modo práctica" if practice else "Modo detección")
 
     def toggle_recording(self):
         if self.mode not in ("TRAINING", "AVATAR"):
@@ -350,6 +359,52 @@ class InclusionApp:
         self._flash(GREEN)
         self.notify(f"Movimiento guardado: '{clip['word']}' ({clip['duration']:.1f} s)")
 
+    # -------------------------------------------------------- aprender y diccionario
+    @staticmethod
+    def _categorias():
+        try:
+            with open(C.CATEGORIAS_PATH, encoding="utf-8") as f:
+                return {c["id"]: c["palabras"] for c in json.load(f)["categorias"]}
+        except (OSError, ValueError, KeyError, TypeError):
+            return {}
+
+    def _evaluar_insignias(self):
+        return self.progreso.evaluar(self._categorias(), self.logic.classes if self.logic.model is not None else [],
+                                     len(self.clips.words()), self.logic.model is not None)
+
+    def practice_result(self, word, correct, confidence=0.0):
+        """Resultado de un intento en Aprender: estrellas, insignias nuevas y el resumen."""
+        stars = self.progreso.registrar_intento(word, correct, confidence)
+        nuevas = self._evaluar_insignias()
+        self.progreso.guardar()
+        return {"estrellas": stars, "nuevas": nuevas, "resumen": self.progreso.resumen()}
+
+    def progress_summary(self):
+        nuevas = self._evaluar_insignias()
+        if nuevas:
+            self.progreso.guardar()
+        return {**self.progreso.resumen(), "nuevas": nuevas}
+
+    def vocabulary(self):
+        """Todas las palabras que la app conoce (dataset, traductor y avatar), una por palabra."""
+        labels, _ = self.collector.stats()
+        model = self.logic.classes if self.logic.model is not None else []
+        out = {}
+
+        def entry(label):
+            key = normalizar(label)
+            return key, out.setdefault(key, {"palabra": label, "clave": key, "nombre": C.display_name(label),
+                                             "muestras": 0, "traductor": False, "movimiento": None,
+                                             "manos": self.hands_by_word.get(label)})
+
+        for label, n in labels.items():
+            entry(label)[1]["muestras"] += n
+        for label in model:
+            entry(label)[1]["traductor"] = True
+        for word in self.clips.words():
+            entry(word)[1]["movimiento"] = word
+        return sorted(out.values(), key=lambda e: e["clave"])
+
     def interlocutor_text(self, text):
         """Texto del interlocutor escrito a mano (en vez de dictado)."""
         self.stt_text = text.strip()
@@ -389,6 +444,11 @@ class InclusionApp:
             self.sentence = result
             self.tts.speak(result)
             self.sentence_loading = False
+            try:
+                self.progreso.registrar_oracion()
+                self.progreso.guardar()
+            except OSError as e:
+                print(f"[PROGRESO] No se pudo guardar: {e}")
 
         self._run(run)
 
@@ -589,8 +649,9 @@ class InclusionApp:
                 self.word_seq += 1          # la app web reproduce la seña con el avatar
                 shown = C.display_name(pred)
                 self.tts.speak(shown)
-                self.pending_words.append(shown)
-                self.history = (self.history + [shown])[-C.SUBTITLE_HISTORY:]
+                if not self.practice:            # en Aprender no se arman oraciones
+                    self.pending_words.append(shown)
+                    self.history = (self.history + [shown])[-C.SUBTITLE_HISTORY:]
             elif self.logic.model is not None:
                 self.prediction = ""
                 self.notify(f"Seña no reconocida ({conf:.0%})", seconds=1.5)
@@ -696,6 +757,7 @@ class InclusionApp:
             "seq_texto": self.text_seq,
             "seq_clip": self.clip_seq,
             "manos": self.hands,
+            "practica": self.practice,
             "toma_seq": self.take_seq,
             "toma_pendiente": self.pending_take is not None,
         }

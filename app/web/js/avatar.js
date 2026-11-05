@@ -136,9 +136,11 @@ export class Avatar {
     if (this.modo === 'revision') this._aReposo();
   }
 
-  // clips: [{ palabra, clip }] (clip = JSON del formato inclusion-movimiento, o null si no hay)
-  reproducir(clips) {
+  // clips: [{ palabra, clip }] (clip = JSON del formato inclusion-movimiento, o null si no hay).
+  // velocidad: 1 normal, 0.5 en cámara lenta (Diccionario y Aprender).
+  reproducir(clips, { velocidad = 1 } = {}) {
     if (!this.rt) return;
+    this.velocidadClip = velocidad;
     this.cola = clips.filter((c) => c.clip && c.clip.frames && c.clip.frames.length);
     this._siguiente();
   }
@@ -189,7 +191,7 @@ export class Avatar {
 
   _avanzarClip(ahora) {
     const a = this.actual; const fr = a.frames;
-    const t = (ahora - a.inicio) / 1000;
+    const t = ((ahora - a.inicio) / 1000) * (this.velocidadClip || 1);
     if (t > fr[fr.length - 1].t) { this._siguiente(); return; }
     while (a.i < fr.length - 2 && fr[a.i + 1].t <= t) a.i += 1;
     const f0 = fr[a.i]; const f1 = fr[Math.min(a.i + 1, fr.length - 1)];

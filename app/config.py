@@ -41,6 +41,7 @@ AVATAR_PREROLL_FRAMES = 15      # frames antes de levantar las manos que entran 
 # Manos de cada seña: "dos", o solo "derecha" / "izquierda". Con una mano, la otra no se
 # graba (no estorba si se mueve o sale de cuadro) y el avatar la deja quieta, abajo.
 HANDS_MODES = ("dos", "derecha", "izquierda")
+CATEGORIAS_PATH = os.path.join(BASE_DIR, "web", "datos", "categorias.json")   # Diccionario e insignias
 MIN_HAND_COVERAGE = 0.5        # al grabar, cada mano de la seña debe verse en la mitad de los frames
 
 # Aviso de encuadre: si en el último segundo los codos se vieron en menos del 30 %

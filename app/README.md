@@ -27,6 +27,8 @@ o `crear_acceso_directo.bat`). Se abre INCLUSION en su propia ventana, con cinco
 | Pantalla | Para qué |
 |---|---|
 | **Inicio** | Qué hace la app y el estado de la cámara, el traductor y el avatar |
+| **Aprender** | El avatar te enseña una seña y el traductor te califica: estrellas, racha e insignias |
+| **Diccionario** | Todas las señas por categoría, con buscador; el avatar hace la que toques |
 | **Traducir** | Tus señas se vuelven subtítulos y voz; el avatar repite cada seña. Lo que el interlocutor dicta o escribe, el avatar lo dice en señas |
 | **Entrenar** | Grabar ejemplos de una seña y entrenar el traductor |
 | **Avatar** | El avatar te imita en vivo; grabar el movimiento de cada palabra |

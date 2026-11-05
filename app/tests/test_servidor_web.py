@@ -198,6 +198,21 @@ class ServidorWebTest(unittest.TestCase):
         self.assertTrue(self.accion(accion="descartar_toma")[1]["resultado"])
         self.assertAlmostEqual(self.clips.load("hola")["duration"], 1.0)
 
+    def test_diccionario_progreso_y_practica(self):
+        """RF-34, RF-35: datos del Diccionario, progreso de Aprender y modo práctica."""
+        self.assertEqual(json.loads(self.get("/api/diccionario")[2]), {"palabras": []})
+        self.assertEqual(self.get("/datos/categorias.json")[1].split(";")[0], "application/json")
+        progreso = json.loads(self.get("/api/progreso")[2])
+        self.assertEqual((progreso["estrellas"], len(progreso["insignias"])), (0, 9))
+        codigo, r = self.accion(accion="practica", palabra="Hola", acierto=True, confianza=0.8)
+        self.assertEqual((codigo, r["resultado"]["estrellas"]), (200, 2))
+        self.assertIn("primera_sena", r["resultado"]["nuevas"])
+        self.assertEqual(self.accion(accion="practica", palabra=" ")[0], 400)
+        self.accion(accion="modo_deteccion", practica=True)
+        self.esperar(lambda: self.motor.estado.get("practica") is True)
+        self.accion(accion="modo_deteccion")
+        self.esperar(lambda: self.motor.estado.get("practica") is False)
+
     def test_sin_camara_la_app_responde(self):
         """RNF-06: sin cámara la interfaz carga y avisa."""
         self.servidor.cerrar()

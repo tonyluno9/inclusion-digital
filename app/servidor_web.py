@@ -173,7 +173,7 @@ def _segundos(datos, clave):
 
 
 ACCIONES = {
-    "modo_deteccion": lambda app, d: app.detection_mode(),
+    "modo_deteccion": lambda app, d: app.detection_mode(bool(d.get("practica"))),
     "entrenar_palabra": lambda app, d: app.train_word(_texto(d, "palabra"), str(d.get("persona", ""))),
     "avatar_palabra": lambda app, d: app.avatar_word(str(d.get("palabra", ""))[:60]),
     "grabar": lambda app, d: app.toggle_recording(),
@@ -188,6 +188,8 @@ ACCIONES = {
     "manos": lambda app, d: app.set_hands(str(d.get("modo", ""))),
     "guardar_toma": lambda app, d: app.save_take(_segundos(d, "inicio"), _segundos(d, "fin")) and True,
     "descartar_toma": lambda app, d: app.discard_take(),
+    "practica": lambda app, d: app.practice_result(_texto(d, "palabra"), bool(d.get("acierto")),
+                                                   float(d.get("confianza") or 0.0)),
 }
 
 
@@ -242,6 +244,10 @@ class Manejador(BaseHTTPRequestHandler):
             if ruta == "/api/toma":
                 toma = self.motor.app.pending_take
                 return self._json(toma) if toma is not None else self._json({"error": "no hay toma"}, 404)
+            if ruta == "/api/diccionario":
+                return self._json({"palabras": self.motor.ejecutar(self.motor.app.vocabulary)})
+            if ruta == "/api/progreso":
+                return self._json(self.motor.ejecutar(self.motor.app.progress_summary))
             if ruta == "/api/dataset":
                 senas, personas = self.motor.app.collector.stats()
                 return self._json({"senas": senas, "personas": personas})
