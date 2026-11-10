@@ -1,0 +1,965 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>K'ab T'aan · Lengua de manos</title>
+  <meta name="description" content="K'ab T'aan es una herramienta de apoyo para conversaciones cortas entre una persona Sorda que seña en Lengua de Señas Mexicana y una persona oyente: de señas a texto y voz, y de texto o voz a señas con un avatar 3D.">
+  <meta name="author" content="Angel Antonio Pérez Reyes">
+  <meta name="theme-color" content="#0F1724">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="K'ab T'aan · Lengua de manos">
+  <meta property="og:description" content="De señas a texto y voz. De texto y voz a señas, con un avatar 3D. Un proyecto para Infomatrix.">
+  <!-- Si el sitio se publica en otra dirección, cambia estas dos URL -->
+  <meta property="og:url" content="https://tonyluno9.github.io/inclusion-digital/">
+  <meta property="og:image" content="https://tonyluno9.github.io/inclusion-digital/assets/img/compartir.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="K'ab T'aan, lengua de manos: una mano jade frente a una mano de puntos azul, con una estrella ámbar en medio.">
+  <meta property="og:site_name" content="K'ab T'aan">
+  <meta property="og:locale" content="es_MX">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="assets/img/icono-32.png" sizes="32x32" type="image/png">
+  <link rel="icon" href="assets/img/icono-192.png" sizes="192x192" type="image/png">
+  <link rel="apple-touch-icon" href="assets/img/icono-180.png">
+  <link rel="preload" href="assets/fuentes/Lexend-latin.woff" as="font" type="font/woff" crossorigin>
+  <link rel="preload" href="assets/img/portada.webp" as="image" type="image/webp">
+  <link rel="stylesheet" href="css/estilos.css">
+  <script>
+    // Las animaciones de entrada solo se activan si el JavaScript del sitio carga; si no, todo se ve igual.
+    document.documentElement.classList.add('js');
+    setTimeout(function () { if (!window.kabtaanListo) document.documentElement.classList.remove('js'); }, 4000);
+  </script>
+  <script type="importmap">
+    { "imports": { "three": "./vendor/three/three.module.js", "three/addons/": "./vendor/three/addons/" } }
+  </script>
+  <script type="module" src="js/main.js"></script>
+</head>
+<body>
+  <a class="saltar" href="#contenido">Saltar al contenido</a>
+
+  <!-- ============================================================ BARRA DE NAVEGACIÓN -->
+  <header class="barra" id="barra">
+    <div class="barra-dentro">
+      <a class="marca" href="#inicio" aria-label="K'ab T'aan, ir al inicio">
+        <img src="assets/img/logo.webp" width="40" height="40" alt="">
+        <span class="marca-nombre">K<i>'</i>ab T<i>'</i>aan</span>
+      </a>
+      <nav class="menu" id="menu" aria-label="Secciones">
+        <ul>
+          <li><a href="#problema">El problema</a></li>
+          <li><a href="#solucion">La solución</a></li>
+          <li><a href="#como-funciona">Cómo funciona</a></li>
+          <li><a href="#avatar">Avatar</a></li>
+          <li><a href="#funciones">Funciones</a></li>
+          <li><a href="#resultados">Resultados</a></li>
+          <li><a href="#privacidad">Privacidad</a></li>
+          <li><a href="#equipo">Equipo</a></li>
+        </ul>
+      </nav>
+      <a class="boton boton-chico boton-borde barra-github" href="https://github.com/tonyluno9/inclusion-digital" target="_blank" rel="noopener">
+        <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+        <span>Código</span>
+      </a>
+      <button class="menu-boton" id="menu-boton" aria-expanded="false" aria-controls="menu">
+        <span class="menu-raya"></span><span class="menu-raya"></span>
+        <span class="solo-lector">Abrir el menú</span>
+      </button>
+    </div>
+    <div class="progreso" aria-hidden="true"><i id="progreso"></i></div>
+  </header>
+
+  <main id="contenido">
+
+    <!-- ============================================================ 0 · PORTADA -->
+    <section class="heroe" id="inicio" aria-labelledby="titulo-heroe">
+      <div class="heroe-fondo" aria-hidden="true">
+        <img src="assets/img/portada.webp" width="1376" height="768" alt="" fetchpriority="high">
+        <canvas id="heroe-puntos"></canvas>
+      </div>
+      <div class="contenedor heroe-dentro">
+        <p class="sobretitulo revelar">Lengua de Señas Mexicana · Infomatrix 2026 · Desarrollo de Software</p>
+        <h1 id="titulo-heroe" class="heroe-titulo revelar">
+          <span class="linea">K<i>'</i>ab</span>
+          <span class="linea">T<i>'</i>aan</span>
+        </h1>
+        <p class="heroe-traduccion revelar">
+          <span lang="yua">k'ab</span> <em>mano</em> <span class="punto-medio">·</span>
+          <span lang="yua">t'aan</span> <em>palabra, lengua</em>
+          <span class="flecha-larga" aria-hidden="true"></span>
+          <strong>lengua de manos</strong>
+        </p>
+        <p class="heroe-texto revelar">
+          Una herramienta para las conversaciones cortas, cara a cara, entre una persona Sorda que seña en LSM y una
+          persona oyente. Las señas se vuelven texto y voz; lo que se escribe o se dice, un avatar 3D lo responde en señas.
+        </p>
+        <div class="heroe-acciones revelar">
+          <a class="boton boton-principal" href="#como-funciona">
+            Ver cómo funciona
+            <svg viewBox="0 0 20 20" width="18" height="18" aria-hidden="true"><path d="M10 4v12m0 0l-5-5m5 5l5-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </a>
+          <a class="boton boton-borde" href="https://github.com/tonyluno9/inclusion-digital" target="_blank" rel="noopener">
+            Ver el código en GitHub
+          </a>
+        </div>
+      </div>
+
+      <!-- Subtítulo como el de la app: cambia entre señas del vocabulario -->
+      <div class="heroe-subtitulo revelar" aria-hidden="true">
+        <div class="subt-cabeza">
+          <span class="subt-punto"></span>
+          <span>Seña reconocida</span>
+          <span class="subt-conf"><b id="subt-conf">94</b> %</span>
+        </div>
+        <p class="subt-palabra" id="subt-palabra">Hola</p>
+        <div class="subt-barra"><i id="subt-barra"></i></div>
+      </div>
+
+      <a class="bajar" href="#datos-rapidos" aria-label="Bajar a la siguiente sección">
+        <span></span>
+      </a>
+    </section>
+
+    <!-- Franja de números rápidos -->
+    <section class="franja" id="datos-rapidos" aria-label="El proyecto en números">
+      <div class="contenedor franja-dentro">
+        <div class="dato revelar">
+          <p class="dato-num"><span data-contar="147">147</span></p>
+          <p class="dato-txt">valores por cuadro: manos, brazos y cuerpo</p>
+        </div>
+        <div class="dato revelar">
+          <p class="dato-num"><span>28–29</span><small> cps</small></p>
+          <p class="dato-txt">cuadros por segundo en una laptop sin GPU dedicada</p>
+        </div>
+        <div class="dato revelar">
+          <p class="dato-num"><span data-contar="0.003" data-decimales="3">0.003</span><small>°</small></p>
+          <p class="dato-txt">de diferencia entre el avatar en Blender y en la app</p>
+        </div>
+        <div class="dato revelar">
+          <p class="dato-num"><span data-contar="150">150</span></p>
+          <p class="dato-txt">pruebas automáticas que corren sin cámara</p>
+        </div>
+      </div>
+      <div class="greca" aria-hidden="true"></div>
+    </section>
+
+    <!-- ============================================================ 1 · EL PROBLEMA -->
+    <section class="seccion" id="problema" aria-labelledby="titulo-problema">
+      <div class="contenedor">
+        <header class="seccion-cabeza">
+          <div class="seccion-num" data-maya="1"><span aria-hidden="true">01</span></div>
+          <p class="sobretitulo">El problema</p>
+          <h2 id="titulo-problema" class="seccion-titulo revelar">Una conversación corta puede atorarse en la primera frase.</h2>
+        </header>
+
+        <div class="problema-intro">
+          <p class="texto-grande revelar">
+            En una ventanilla, en el consultorio o en la tiendita de la esquina, una persona Sorda que se comunica en
+            Lengua de Señas Mexicana suele encontrarse con alguien que no la conoce. Lo que debería tomar un minuto
+            —saludar, dar las gracias, pedir algo— se vuelve gestos, papelitos y paciencia de los dos lados.
+          </p>
+          <div class="cifras">
+            <figure class="cifra revelar">
+              <p class="cifra-num"><span data-contar="8.8" data-decimales="1">8.8</span> <small>millones</small></p>
+              <figcaption>
+                de personas de 5 años y más tienen alguna discapacidad en México.
+                <a class="fuente" href="https://www.inegi.org.mx/contenidos/saladeprensa/aproposito/2024/EAP_PCD24.pdf" target="_blank" rel="noopener">INEGI, ENADID 2023 · comunicado 684/24</a>
+              </figcaption>
+            </figure>
+            <figure class="cifra revelar">
+              <p class="cifra-num"><span data-contar="19.5" data-decimales="1">19.5</span> <small>%</small></p>
+              <figcaption>
+                de ellas tiene mucha dificultad para oír, o no puede oír, aun usando aparato auditivo: cerca de
+                1.7 millones de personas <span class="nota">(cálculo nuestro a partir de las dos cifras de INEGI)</span>.
+                <a class="fuente" href="https://www.inegi.org.mx/contenidos/saladeprensa/aproposito/2024/EAP_PCD24.pdf" target="_blank" rel="noopener">INEGI, ENADID 2023 · gráfica 3</a>
+              </figcaption>
+            </figure>
+            <figure class="cifra revelar">
+              <p class="cifra-num cifra-ley">Art. 14</p>
+              <figcaption>
+                La LSM «es reconocida oficialmente como una lengua nacional» y forma parte del patrimonio lingüístico
+                de México.
+                <a class="fuente" href="https://www.diputados.gob.mx/LeyesBiblio/pdf/LGIPD.pdf" target="_blank" rel="noopener">Ley General para la Inclusión de las Personas con Discapacidad</a>
+              </figcaption>
+            </figure>
+          </div>
+        </div>
+
+        <ul class="escenas" aria-label="Situaciones cotidianas">
+          <li class="escena revelar">
+            <figure>
+              <div class="escena-img"><img src="assets/img/sitio/problema_ventanilla.webp" width="1024" height="765" loading="lazy" alt="Ilustración: una mujer Sorda seña frente a una ventanilla; detrás del vidrio, el empleado no entiende. Entre los dos flota un globo de diálogo vacío."></div>
+              <figcaption><b>Un trámite</b> El turno llega, y con él la primera barrera: explicar a qué viniste.</figcaption>
+            </figure>
+          </li>
+          <li class="escena revelar">
+            <figure>
+              <div class="escena-img"><img src="assets/img/sitio/problema_consultorio.webp" width="1024" height="765" loading="lazy" alt="Ilustración: un joven Sordo seña en un consultorio; el médico, con su tabla de notas, se inclina para entender."></div>
+              <figcaption><b>Una consulta</b> Con buena voluntad no alcanza: hace falta un puente para las frases más simples.</figcaption>
+            </figure>
+          </li>
+          <li class="escena revelar">
+            <figure>
+              <div class="escena-img"><img src="assets/img/sitio/problema_tienda.webp" width="1024" height="765" loading="lazy" alt="Ilustración: un señor Sordo seña y señala un estante en una tiendita; el tendero sonríe, pero no entiende."></div>
+              <figcaption><b>Una compra</b> Saludar, pedir, dar las gracias. Lo cotidiano también cuenta.</figcaption>
+            </figure>
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ============================================================ 2 · LA SOLUCIÓN -->
+    <section class="seccion seccion-alterna" id="solucion" aria-labelledby="titulo-solucion">
+      <div class="contenedor">
+        <header class="seccion-cabeza">
+          <div class="seccion-num" data-maya="2"><span aria-hidden="true">02</span></div>
+          <p class="sobretitulo">La solución</p>
+          <h2 id="titulo-solucion" class="seccion-titulo revelar">Un puente que funciona en las dos direcciones.</h2>
+          <p class="seccion-intro revelar">
+            K'ab T'aan corre en una laptop con webcam. No necesita guantes, sensores ni internet para lo esencial.
+          </p>
+        </header>
+
+        <!-- Diagrama de las dos direcciones -->
+        <div class="puente revelar" aria-label="Diagrama: la persona Sorda seña y la persona oyente lee y escucha; la persona oyente escribe o habla y el avatar responde en señas.">
+          <div class="puente-lado">
+            <img src="assets/img/tutorial/paso_2.webp" width="420" height="420" loading="lazy" alt="">
+            <p class="puente-quien">Persona Sorda</p>
+            <p class="puente-que">seña frente a la cámara</p>
+          </div>
+          <svg class="puente-flechas" viewBox="0 0 520 260" aria-hidden="true">
+            <defs>
+              <linearGradient id="g-ida" x1="0" x2="1"><stop offset="0" stop-color="#2EC4B6"/><stop offset="1" stop-color="#3A86C8"/></linearGradient>
+              <linearGradient id="g-vuelta" x1="1" x2="0"><stop offset="0" stop-color="#FFC857"/><stop offset="1" stop-color="#7C5CFF"/></linearGradient>
+            </defs>
+            <path class="ruta ruta-ida" d="M20 80 C 160 10, 360 10, 500 80" stroke="url(#g-ida)"/>
+            <path class="ruta ruta-vuelta" d="M500 180 C 360 250, 160 250, 20 180" stroke="url(#g-vuelta)"/>
+            <path d="M488 70 l14 10 -16 6" fill="none" stroke="#3A86C8" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M32 190 l-14 -10 16 -6" fill="none" stroke="#7C5CFF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+            <text x="260" y="62" text-anchor="middle" class="ruta-texto">seña → subtítulo y voz</text>
+            <text x="260" y="208" text-anchor="middle" class="ruta-texto">texto o voz → señas del avatar</text>
+            <circle cx="260" cy="130" r="54" class="puente-centro"/>
+            <image href="assets/img/logo.webp" x="214" y="84" width="92" height="92"/>
+          </svg>
+          <div class="puente-lado">
+            <img src="assets/img/tutorial/paso_3.webp" width="420" height="420" loading="lazy" alt="">
+            <p class="puente-quien">Persona oyente</p>
+            <p class="puente-que">lee, escucha y responde</p>
+          </div>
+        </div>
+
+        <div class="direcciones">
+          <article class="direccion revelar">
+            <p class="direccion-etiqueta"><span class="chip chip-jade">Ida</span> De señas a texto y voz</p>
+            <h3>La persona Sorda seña; la app la traduce.</h3>
+            <p>
+              La cámara detecta manos, brazos y cuerpo. Cuando la persona baja las manos, la seña termina: el
+              traductor la reconoce, la muestra como un subtítulo grande y la dice en voz alta. Varias señas seguidas
+              se pueden unir en una oración natural <span class="nota">(opcional, con la API de Claude)</span>.
+            </p>
+            <ol class="mini-pasos">
+              <li><img src="assets/img/tutorial/paso_1.webp" width="420" height="420" loading="lazy" alt="Una persona sentada frente a la laptop, encuadrada de la cabeza a los codos."><span>Colócate a un metro</span></li>
+              <li><img src="assets/img/tutorial/paso_2.webp" width="420" height="420" loading="lazy" alt="La persona levanta las manos y hace una seña frente a la webcam."><span>Haz la seña y baja las manos</span></li>
+              <li><img src="assets/img/tutorial/paso_3.webp" width="420" height="420" loading="lazy" alt="En la pantalla de la laptop aparece un subtítulo con un ícono de voz."><span>Aparece el subtítulo y se oye</span></li>
+            </ol>
+          </article>
+          <article class="direccion revelar">
+            <p class="direccion-etiqueta"><span class="chip chip-violeta">Vuelta</span> De texto o voz a señas</p>
+            <h3>La persona oyente escribe o dicta; el avatar responde.</h3>
+            <p>
+              Lo que se escribe o se dicta se divide en las palabras y frases que el avatar conoce —primero las más
+              largas, como «buenos días»— y un personaje 3D las hace en señas, una tras otra. El avatar copia
+              movimientos grabados de una persona real.
+            </p>
+            <ol class="mini-pasos">
+              <li><img src="assets/img/tutorial/paso_4.webp" width="420" height="420" loading="lazy" alt="Dos personas conversan en señas con un pequeño avatar a su lado."><span>El avatar dice en señas la respuesta</span></li>
+              <li><img src="assets/img/entrenando.webp" width="480" height="480" loading="lazy" alt="Una mano hecha de puntos conectados sobre una barra de progreso."><span>Cada movimiento se graba de una persona</span></li>
+              <li><img src="assets/img/bienvenida.webp" width="480" height="480" loading="lazy" alt="Una persona saluda frente a la laptop."><span>Y se puede entrenar con tus señas</span></li>
+            </ol>
+          </article>
+        </div>
+
+        <aside class="aviso revelar" role="note">
+          <span class="aviso-icono" aria-hidden="true"></span>
+          <p><b>K'ab T'aan no sustituye a un intérprete de LSM.</b> Es un apoyo para frases cortas y de cortesía, con un
+          vocabulario pequeño que se puede ampliar. Para trámites importantes, salud o asuntos legales, una persona
+          intérprete sigue siendo indispensable.</p>
+        </aside>
+      </div>
+    </section>
+
+    <!-- ============================================================ 3 · CÓMO FUNCIONA -->
+    <section class="seccion" id="como-funciona" aria-labelledby="titulo-como">
+      <div class="contenedor">
+        <header class="seccion-cabeza">
+          <div class="seccion-num" data-maya="3"><span aria-hidden="true">03</span></div>
+          <p class="sobretitulo">Cómo funciona</p>
+          <h2 id="titulo-como" class="seccion-titulo revelar">De un movimiento de manos a una palabra, en menos de un segundo.</h2>
+          <p class="seccion-intro revelar">Baja despacio: cada paso se dibuja con los mismos datos que usa la app.</p>
+        </header>
+      </div>
+
+      <div class="proceso" id="proceso">
+        <div class="contenedor proceso-dentro">
+          <div class="proceso-lienzo" aria-hidden="true">
+            <div class="lienzo-marco">
+              <canvas id="proceso-canvas"></canvas>
+              <div class="lienzo-etiqueta"><span id="lienzo-paso">01</span><span id="lienzo-nombre">Cámara</span></div>
+              <div class="lienzo-pista" id="lienzo-pista">
+                <span class="pista-ida">Ida · seña → texto</span>
+                <span class="pista-vuelta">Vuelta · texto → seña</span>
+              </div>
+            </div>
+          </div>
+
+          <ol class="pasos" id="pasos">
+            <li class="paso" data-paso="camara">
+              <p class="paso-num">01 <span>Ida</span></p>
+              <h3>La cámara</h3>
+              <p>Una webcam común a unos 80–120 cm. El video se procesa cuadro por cuadro <b>en la computadora</b>, a
+                28–29 cuadros por segundo en una laptop sin GPU dedicada, y <b>nunca se guarda</b>.</p>
+              <p class="paso-tec">OpenCV · Python 3.10 · Windows</p>
+            </li>
+            <li class="paso" data-paso="puntos">
+              <p class="paso-num">02 <span>Ida</span></p>
+              <h3>Los puntos</h3>
+              <p>MediaPipe encuentra <b>21 puntos en cada mano</b> y, del cuerpo, nariz, hombros, codos y muñecas:
+                <b>147 valores por cuadro</b>. Como la imagen va en espejo, cada mano se asigna a su lado real con la
+                muñeca del cuerpo más cercana.</p>
+              <p class="paso-tec">MediaPipe Tasks 0.10 · HandLandmarker + PoseLandmarker «full»</p>
+            </li>
+            <li class="paso" data-paso="corte">
+              <p class="paso-num">03 <span>Ida</span></p>
+              <h3>El corte de la seña</h3>
+              <p>Una seña empieza al <b>levantar las manos</b> y termina al <b>bajarlas</b>. Se recorta, se rellenan los
+                huecos cortos y se remuestrea a 30 cuadros. Es el <b>mismo camino al grabar y al detectar</b>: el modelo
+                siempre ve las señas preparadas igual.</p>
+              <p class="paso-tec">segmenter.py · 30 cuadros por seña</p>
+            </li>
+            <li class="paso" data-paso="rasgos">
+              <p class="paso-num">04 <span>Ida</span></p>
+              <h3>Los rasgos</h3>
+              <p>De cada cuadro salen <b>260 rasgos</b>: la posición de cada punto respecto a los hombros (sin depender
+                de la distancia a la cámara), la forma de la mano respecto a su muñeca y la postura de los brazos.</p>
+              <p class="paso-tec">landmarks.py · 260 rasgos × 30 cuadros</p>
+            </li>
+            <li class="paso" data-paso="bosque">
+              <p class="paso-num">05 <span>Ida</span></p>
+              <h3>El traductor</h3>
+              <p>Un bosque aleatorio de <b>200 árboles</b> vota por la seña. Si la confianza no alcanza el umbral, la
+                app prefiere no decir nada antes que equivocarse. El modelo se entrena con un botón, con las muestras de
+                quien lo usa.</p>
+              <p class="paso-tec">scikit-learn · StandardScaler + RandomForestClassifier</p>
+            </li>
+            <li class="paso" data-paso="subtitulo">
+              <p class="paso-num">06 <span>Ida</span></p>
+              <h3>Subtítulo y voz</h3>
+              <p>La palabra aparece en grande, se dice en voz alta y entra al historial. Tras una pausa, las palabras
+                se pueden unir en una oración natural.</p>
+              <p class="paso-tec">Voz del sistema sin internet · Claude, opcional</p>
+            </li>
+            <li class="paso" data-paso="texto">
+              <p class="paso-num">07 <span class="vuelta">Vuelta</span></p>
+              <h3>Del texto a las palabras</h3>
+              <p>Lo que la persona oyente escribe o dicta se divide en palabras y frases que el avatar conoce. Primero
+                la frase más larga —«buenos días» antes que «buenos»—, sin importar acentos ni mayúsculas.</p>
+              <p class="paso-tec">texto.js · avisa las palabras que el avatar aún no sabe</p>
+            </li>
+            <li class="paso" data-paso="clips">
+              <p class="paso-num">08 <span class="vuelta">Vuelta</span></p>
+              <h3>Clips de movimiento</h3>
+              <p>Cada palabra es un clip JSON con el movimiento 3D de una persona real, suavizado con un
+                <b>filtro One Euro</b>. Antes de guardarla, cada toma se recorta en una línea de tiempo.</p>
+              <p class="paso-tec">Formato «inclusion-movimiento» · solo coordenadas, nunca imagen</p>
+            </li>
+            <li class="paso" data-paso="retarget">
+              <p class="paso-num">09 <span class="vuelta">Vuelta</span></p>
+              <h3>Retargeting por direcciones</h3>
+              <p>Cada hueso del personaje <b>apunta como el segmento de la persona</b>: hombro → codo, codo → muñeca,
+                cada falange. No importa la estatura. Está escrito en Blender y en three.js, y las dos versiones
+                coinciden a <b>0.003°</b>.</p>
+              <p class="paso-tec">42 huesos resueltos de 78 · dedos completos</p>
+            </li>
+            <li class="paso" data-paso="avatar">
+              <p class="paso-num">10 <span class="vuelta">Vuelta</span></p>
+              <h3>El avatar</h3>
+              <p>El personaje encadena los clips con transiciones suaves de 0.3 s y vuelve al reposo, respirando. Puedes
+                verlo justo aquí abajo.</p>
+              <p class="paso-tec">three.js · GLB · escenarios</p>
+            </li>
+          </ol>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================ 4 · EL AVATAR EN VIVO -->
+    <section class="seccion seccion-avatar" id="avatar" aria-labelledby="titulo-avatar">
+      <div class="contenedor">
+        <header class="seccion-cabeza">
+          <div class="seccion-num" data-maya="4"><span aria-hidden="true">04</span></div>
+          <p class="sobretitulo">El avatar en vivo</p>
+          <h2 id="titulo-avatar" class="seccion-titulo revelar">El mismo personaje de la app, en tu navegador.</h2>
+        </header>
+
+        <div class="avatar-zona">
+          <div class="escenario" id="escenario" data-escenario="estudio">
+            <div class="escenario-fondo" aria-hidden="true"></div>
+            <div class="escenario-lienzo" id="avatar-lienzo" role="img" aria-label="Avatar 3D de K'ab T'aan. Arrástralo para girarlo."></div>
+            <div class="escenario-carga" id="avatar-carga">
+              <span class="girador" aria-hidden="true"></span>
+              <span>Cargando el personaje…</span>
+            </div>
+            <p class="escenario-ayuda" aria-hidden="true">Arrastra para girar</p>
+            <p class="escenario-estado" id="avatar-estado" aria-live="polite"></p>
+            <video id="imitame-video" class="imitame-video" playsinline muted aria-hidden="true"></video>
+          </div>
+
+          <div class="avatar-panel">
+            <div class="control-grupo">
+              <p class="control-titulo" id="t-mov">Movimientos de muestra</p>
+              <div class="botones-fila" role="group" aria-labelledby="t-mov">
+                <button class="boton-control" data-gesto="saludo"><span class="icono" style="--i:url(../assets/iconos/senas.png)"></span>Saludar</button>
+                <button class="boton-control" data-gesto="contar"><span class="icono" style="--i:url(../assets/iconos/una_mano.png)"></span>Contar con los dedos</button>
+                <button class="boton-control" data-gesto="pulgar"><span class="icono" style="--i:url(../assets/iconos/correcto.png)"></span>Pulgar arriba</button>
+                <button class="boton-control" data-gesto="reposo"><span class="icono" style="--i:url(../assets/iconos/detener.png)"></span>Reposo</button>
+              </div>
+            </div>
+
+            <div class="control-grupo">
+              <p class="control-titulo" id="t-esc">Escenario</p>
+              <div class="escenarios-fila" role="radiogroup" aria-labelledby="t-esc">
+                <button role="radio" aria-checked="true" data-escenario="estudio" style="--img:url(../assets/img/fondo_avatar.webp)"><span>Estudio</span></button>
+                <button role="radio" aria-checked="false" data-escenario="jade" style="--img:url(../assets/img/escenarios/maya.webp)"><span>Jade</span></button>
+                <button role="radio" aria-checked="false" data-escenario="aula" style="--img:url(../assets/img/escenarios/aula.webp)"><span>Aula</span></button>
+                <button role="radio" aria-checked="false" data-escenario="plaza" style="--img:url(../assets/img/escenarios/plaza.webp)"><span>Plaza</span></button>
+              </div>
+            </div>
+
+            <div class="control-grupo imitame">
+              <p class="control-titulo">Pruébalo con tu cámara</p>
+              <p class="control-texto">El avatar copia tus brazos y tus manos con MediaPipe para web. Todo se procesa en
+                tu navegador: el video no se guarda ni se envía. La primera vez descarga los modelos de detección de
+                Google (unos 15 MB).</p>
+              <button class="boton boton-principal boton-chico" id="imitame-boton"><span class="icono" style="--i:url(../assets/iconos/camara.png)"></span><span id="imitame-texto">Imítame</span></button>
+            </div>
+
+            <dl class="ficha">
+              <div><dt>Huesos</dt><dd>78 <small>· 42 resueltos</small></dd></div>
+              <div><dt>Dedos</dt><dd>3 falanges cada uno</dd></div>
+              <div><dt>Blender vs. web</dt><dd>0.003°</dd></div>
+              <div><dt>Transición</dt><dd>0.3 s</dd></div>
+            </dl>
+            <p class="nota nota-bloque">Los movimientos de muestra se generaron para este sitio y no son señas de LSM. En la
+              app, el avatar reproduce movimientos grabados de una persona real, que no se publican aquí porque son datos
+              personales.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================ 5 · FUNCIONES -->
+    <section class="seccion" id="funciones" aria-labelledby="titulo-funciones">
+      <div class="contenedor">
+        <header class="seccion-cabeza">
+          <div class="seccion-num" data-maya="5"><span aria-hidden="true">05</span></div>
+          <p class="sobretitulo">Funciones de la app</p>
+          <h2 id="titulo-funciones" class="seccion-titulo revelar">Traducir, aprender, consultar y enseñarle señas nuevas.</h2>
+        </header>
+
+        <div class="mosaico">
+          <!-- Traducir -->
+          <article class="tesela tesela-traducir revelar">
+            <div class="tesela-texto">
+              <p class="tesela-etiqueta"><span class="icono" style="--i:url(../assets/iconos/subtitulos.png)"></span>Traducir</p>
+              <h3>Subtítulos grandes, voz y un historial.</h3>
+              <p>La seña reconocida aparece en grande con su confianza. Del otro lado, la persona oyente dicta con el
+                micrófono o escribe, y el avatar lo dice en señas.</p>
+            </div>
+            <div class="maqueta" aria-hidden="true">
+              <div class="maqueta-barra"><i></i><i></i><i></i><span>Traducir</span></div>
+              <div class="maqueta-cuerpo">
+                <div class="maqueta-camara">
+                  <img src="assets/img/encuadre.webp" width="480" height="480" loading="lazy" alt="">
+                  <span class="maqueta-vivo">● En vivo</span>
+                </div>
+                <div class="maqueta-lado">
+                  <p class="maqueta-palabra" id="maqueta-palabra">Buenos días</p>
+                  <div class="maqueta-conf"><i style="--v:.91"></i><span>91 %</span></div>
+                  <p class="maqueta-hist">Hola · Gracias · <b>Buenos días</b></p>
+                  <p class="maqueta-oracion">«Hola, buenos días. Gracias.»</p>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <!-- Aprender -->
+          <article class="tesela tesela-aprender revelar">
+            <div class="tesela-texto">
+              <p class="tesela-etiqueta"><span class="icono" style="--i:url(../assets/iconos/aprender.png)"></span>Aprender</p>
+              <h3>El avatar enseña; el traductor califica.</h3>
+              <p>De una a tres estrellas por intento, una racha diaria y nueve insignias de estilo maya. Los conteos se
+                escriben con numerales mayas.</p>
+            </div>
+            <div class="estrellas" aria-label="Ejemplo: dos de tres estrellas">
+              <span class="estrella llena"></span><span class="estrella llena"></span><span class="estrella"></span>
+              <span class="racha"><span class="icono" style="--i:url(../assets/iconos/racha.png)"></span><span class="maya-mini" data-maya="7"></span> días</span>
+            </div>
+            <figure class="leccion">
+              <img src="assets/img/estados/bien_hecho.webp" width="360" height="360" loading="lazy" alt="Dos manos que celebran con confeti y una estrella.">
+              <figcaption><b>¡Bien hecho!</b> Al acertar, una celebración. Si no, el avatar la repite en cámara lenta para volver a intentarlo.</figcaption>
+            </figure>
+            <ul class="insignias" aria-label="Las nueve insignias">
+              <li><img src="assets/img/insignias/primera_sena.webp" width="256" height="256" loading="lazy" alt="Insignia Primera seña: una mano abierta con un destello."></li>
+              <li><img src="assets/img/insignias/saludos.webp" width="256" height="256" loading="lazy" alt="Insignia Saludos: una mano que saluda frente al sol."></li>
+              <li><img src="assets/img/insignias/diez_senas.webp" width="256" height="256" loading="lazy" alt="Insignia Diez señas: dos barras, el diez en numeración maya."></li>
+              <li><img src="assets/img/insignias/racha_3.webp" width="256" height="256" loading="lazy" alt="Insignia Racha de tres días: una flama con tres puntos."></li>
+              <li><img src="assets/img/insignias/racha_7.webp" width="256" height="256" loading="lazy" alt="Insignia Racha de siete días: una flama con una barra y dos puntos."></li>
+              <li><img src="assets/img/insignias/explorador.webp" width="256" height="256" loading="lazy" alt="Insignia Explorador: una rosa de los vientos."></li>
+              <li><img src="assets/img/insignias/conversacion.webp" width="256" height="256" loading="lazy" alt="Insignia Conversación: dos globos de diálogo."></li>
+              <li><img src="assets/img/insignias/primer_movimiento.webp" width="256" height="256" loading="lazy" alt="Insignia Primer movimiento: un rostro con flechas que giran."></li>
+              <li><img src="assets/img/insignias/traductor.webp" width="256" height="256" loading="lazy" alt="Insignia Traductor: un cerebro de puntos conectados."></li>
+            </ul>
+          </article>
+
+          <!-- Diccionario -->
+          <article class="tesela tesela-diccionario revelar">
+            <div class="tesela-texto">
+              <p class="tesela-etiqueta"><span class="icono" style="--i:url(../assets/iconos/diccionario.png)"></span>Diccionario</p>
+              <h3>Todas las señas, por categoría.</h3>
+              <p>Con buscador. En la app, al tocar una palabra el avatar la hace. Pruébalo con el vocabulario inicial
+                del proyecto:</p>
+            </div>
+            <div class="buscador">
+              <label for="dicc-buscar" class="solo-lector">Buscar una seña</label>
+              <span class="icono buscador-icono" style="--i:url(../assets/iconos/buscar.png)" aria-hidden="true"></span>
+              <input id="dicc-buscar" type="search" placeholder="Buscar: gracias, noches…" autocomplete="off">
+            </div>
+            <ul class="vocab" id="vocab" aria-live="polite"></ul>
+            <ul class="categorias" aria-label="Categorías del diccionario">
+              <li><img src="assets/img/categorias/saludos.webp" width="200" height="200" loading="lazy" alt=""><span>Saludos</span></li>
+              <li><img src="assets/img/categorias/cortesia.webp" width="200" height="200" loading="lazy" alt=""><span>Cortesía</span></li>
+              <li><img src="assets/img/categorias/preguntas.webp" width="200" height="200" loading="lazy" alt=""><span>Preguntas</span></li>
+              <li><img src="assets/img/categorias/familia.webp" width="200" height="200" loading="lazy" alt=""><span>Familia</span></li>
+              <li><img src="assets/img/categorias/emociones.webp" width="200" height="200" loading="lazy" alt=""><span>Emociones</span></li>
+              <li><img src="assets/img/categorias/numeros.webp" width="200" height="200" loading="lazy" alt=""><span>Números</span></li>
+            </ul>
+          </article>
+
+          <!-- Entrenar -->
+          <article class="tesela tesela-entrenar revelar">
+            <div class="tesela-texto">
+              <p class="tesela-etiqueta"><span class="icono" style="--i:url(../assets/iconos/entrenar.png)"></span>Entrenar</p>
+              <h3>Enséñale una seña nueva.</h3>
+              <p>Escribe la palabra, elige si es de una o de dos manos y graba: manos arriba, seña, manos abajo. Después,
+                un botón entrena el traductor. Si a una muestra le falta una de sus manos, la app la rechaza y te dice cuál
+                no vio.</p>
+            </div>
+            <ol class="ciclo" aria-label="Ciclo de grabación">
+              <li><span class="ciclo-num">1</span>Manos arriba</li>
+              <li><span class="ciclo-num">2</span>Seña</li>
+              <li><span class="ciclo-num">3</span>Manos abajo</li>
+              <li><span class="ciclo-num">✓</span>Muestra guardada</li>
+            </ol>
+            <div class="manos-elige" role="group" aria-label="Ejemplo: elegir cuántas manos usa la seña">
+              <button aria-pressed="true"><span class="icono" style="--i:url(../assets/iconos/dos_manos.png)"></span>Dos manos</button>
+              <button aria-pressed="false"><span class="icono" style="--i:url(../assets/iconos/una_mano.png)"></span>Derecha</button>
+              <button aria-pressed="false"><span class="icono icono-espejo" style="--i:url(../assets/iconos/una_mano.png)"></span>Izquierda</button>
+            </div>
+          </article>
+
+          <!-- Avatar: recorte de tomas -->
+          <article class="tesela tesela-recorte revelar">
+            <div class="tesela-texto">
+              <p class="tesela-etiqueta"><span class="icono" style="--i:url(../assets/iconos/recortar.png)"></span>Avatar</p>
+              <h3>Graba el movimiento y recórtalo.</h3>
+              <p>El avatar te imita en vivo. Cada toma se revisa en bucle antes de guardarla: arrastra los extremos para
+                quitar lo que sobra, en cámara lenta si hace falta.</p>
+            </div>
+            <div class="recorte" id="recorte">
+              <div class="recorte-onda" aria-hidden="true"><canvas id="recorte-canvas"></canvas></div>
+              <div class="recorte-pista">
+                <div class="recorte-sel" id="recorte-sel"></div>
+                <label class="solo-lector" for="recorte-ini">Inicio del recorte</label>
+                <input type="range" id="recorte-ini" min="0" max="100" value="12">
+                <label class="solo-lector" for="recorte-fin">Fin del recorte</label>
+                <input type="range" id="recorte-fin" min="0" max="100" value="84">
+              </div>
+              <p class="recorte-info"><span id="recorte-dur">1.73 s</span> de toma · <kbd>Enter</kbd> guarda · <kbd>Esc</kbd> descarta</p>
+            </div>
+          </article>
+
+          <!-- Escenarios -->
+          <article class="tesela tesela-escenarios revelar">
+            <div class="tesela-texto">
+              <p class="tesela-etiqueta"><span class="icono" style="--i:url(../assets/iconos/escenario.png)"></span>Escenarios</p>
+              <h3>Cuatro lugares para el avatar.</h3>
+              <p>Estudio, muro de jade, aula y plaza: la app recuerda el que elijas. Pruébalos arriba, con el avatar en vivo.</p>
+            </div>
+            <ul class="mini-escenarios">
+              <li><img src="assets/img/fondo_avatar.webp" width="1376" height="768" loading="lazy" alt="Estudio oscuro con luz suave."><span>Estudio</span></li>
+              <li><img src="assets/img/escenarios/maya.webp" width="1376" height="768" loading="lazy" alt="Muro de jade con greca escalonada."><span>Jade</span></li>
+              <li><img src="assets/img/escenarios/aula.webp" width="1376" height="768" loading="lazy" alt="Un salón de clases iluminado."><span>Aula</span></li>
+              <li><img src="assets/img/escenarios/plaza.webp" width="1376" height="768" loading="lazy" alt="Una calle con casas de colores y foquitos."><span>Plaza</span></li>
+            </ul>
+          </article>
+        </div>
+        <div class="capturas">
+          <div class="capturas-cabeza revelar">
+            <p class="control-titulo">Así se ve la app</p>
+            <p class="capturas-nota">Capturas reales de la versión nueva, corriendo con un video de prueba. La imagen de la cámara está
+              difuminada a propósito.</p>
+          </div>
+          <div class="capturas-fila">
+            <figure class="captura captura-grande revelar">
+              <button class="captura-abrir" data-ampliar aria-label="Ampliar la captura de la pantalla Traducir">
+                <img src="assets/img/app/traducir.webp" width="1440" height="900" loading="lazy" alt="Pantalla Traducir de la app: arriba, la cámara (difuminada) y el avatar; abajo, la seña reconocida «Buenas tardes» en grande, con su confianza, y el panel donde la persona oyente escribe o dicta.">
+              </button>
+              <figcaption><b>Traducir.</b> La seña reconocida en grande —aquí «buenas tardes»— y, al lado, lo que la persona oyente escribe o dicta.</figcaption>
+            </figure>
+            <figure class="captura revelar">
+              <button class="captura-abrir" data-ampliar aria-label="Ampliar la captura de la pantalla Aprender">
+                <img src="assets/img/app/aprender.webp" width="1440" height="900" loading="lazy" alt="Pantalla Aprender: estrellas, racha y señas aprendidas arriba; la cámara difuminada, el avatar y la seña que hay que hacer, «Hola».">
+              </button>
+              <figcaption><b>Aprender.</b> Estrellas, racha y logros; la seña a practicar en grande.</figcaption>
+            </figure>
+            <figure class="captura revelar">
+              <button class="captura-abrir" data-ampliar aria-label="Ampliar la captura de la pantalla Diccionario">
+                <img src="assets/img/app/diccionario.webp" width="1440" height="900" loading="lazy" alt="Pantalla Diccionario: buscador, filtros por categoría y tarjetas de señas por categoría, con el avatar a la derecha.">
+              </button>
+              <figcaption><b>Diccionario.</b> Buscador, categorías y el avatar listo para hacer la seña.</figcaption>
+            </figure>
+            <figure class="captura revelar">
+              <button class="captura-abrir" data-ampliar aria-label="Ampliar la captura de la pantalla Entrenar">
+                <img src="assets/img/app/entrenar.webp" width="1440" height="900" loading="lazy" alt="Pantalla Entrenar: la cámara difuminada, el formulario para grabar una seña y la lista de señas grabadas con su número de muestras.">
+              </button>
+              <figcaption><b>Entrenar.</b> Graba muestras y entrena el traductor con un botón.</figcaption>
+            </figure>
+            <figure class="captura revelar">
+              <button class="captura-abrir" data-ampliar aria-label="Ampliar la captura de la pantalla Inicio">
+                <img src="assets/img/app/inicio.webp" width="1440" height="900" loading="lazy" alt="Pantalla de inicio de la app: logo, nombre K'ab T'aan y accesos a Traducir, Aprender, Diccionario, Entrenar y Avatar.">
+              </button>
+              <figcaption><b>Inicio.</b> Todas las funciones a un clic, con el estado de la cámara, el traductor y el avatar.</figcaption>
+            </figure>
+          </div>
+        </div>
+        <dialog class="visor-img" id="visor-img" aria-label="Captura ampliada">
+          <img src="" alt="" id="visor-img-img">
+          <button class="visor-cerrar" id="visor-cerrar" aria-label="Cerrar">
+            <svg viewBox="0 0 20 20" width="20" height="20" aria-hidden="true"><path d="M5 5l10 10M15 5L5 15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          </button>
+        </dialog>
+      </div>
+    </section>
+
+    <!-- ============================================================ 6 · TECNOLOGÍA Y RESULTADOS -->
+    <section class="seccion seccion-alterna" id="resultados" aria-labelledby="titulo-resultados">
+      <div class="contenedor">
+        <header class="seccion-cabeza">
+          <div class="seccion-num" data-maya="6"><span aria-hidden="true">06</span></div>
+          <p class="sobretitulo">Tecnología y resultados</p>
+          <h2 id="titulo-resultados" class="seccion-titulo revelar">Números honestos, con su letra chica.</h2>
+          <p class="seccion-intro revelar">Todas las cifras salen de las pruebas del repositorio. Cuando una cifra es
+            optimista, lo decimos.</p>
+        </header>
+
+        <div class="resultados">
+          <figure class="grafica revelar" aria-labelledby="g-titulo">
+            <figcaption id="g-titulo">
+              <span class="control-titulo">Exactitud del traductor</span>
+              <span class="grafica-sub">Dataset de <b>una sola persona</b>, con señas de saludo y cortesía</span>
+            </figcaption>
+            <div class="barras" role="list">
+              <div class="barra-fila" role="listitem" style="--v:97.9">
+                <span class="barra-nombre">Validación cruzada</span>
+                <span class="barra-pista"><i></i></span>
+                <span class="barra-valor">97.9 %</span>
+              </div>
+              <div class="barra-fila" role="listitem" style="--v:89.4">
+                <span class="barra-nombre">Cámara simulada, 4 velocidades</span>
+                <span class="barra-pista"><i></i></span>
+                <span class="barra-valor">89.4 %</span>
+              </div>
+              <div class="barra-fila barra-pendiente" role="listitem" style="--v:90">
+                <span class="barra-nombre">Personas que el modelo no vio</span>
+                <span class="barra-pista"><i></i></span>
+                <span class="barra-valor">pendiente</span>
+              </div>
+              <div class="barra-meta" style="--v:90" aria-hidden="true"><span>meta 90 %</span></div>
+            </div>
+            <p class="grafica-nota">
+              Con una sola persona grabando, estas cifras son optimistas. La meta del protocolo es <b>90 % con personas
+              que el modelo no vio</b> (al menos 3 personas y 20 muestras por seña), y todavía no se mide. Las fallas de
+              la cámara simulada son 5 muestras concretas que conviene volver a grabar.
+            </p>
+          </figure>
+
+          <div class="cifras-tec">
+            <div class="ctec revelar">
+              <p class="ctec-num">28–29 <small>cps</small></p>
+              <p>Cámara en vivo con manos y cuerpo, en una laptop sin GPU dedicada. El mínimo pedido es 15.</p>
+            </div>
+            <div class="ctec revelar">
+              <p class="ctec-num">0.003°</p>
+              <p>Diferencia entre el retargeting de Blender y el de la app web, hueso por hueso. El límite pedido: 0.5°.</p>
+            </div>
+            <div class="ctec revelar">
+              <p class="ctec-num">150</p>
+              <p>Pruebas automáticas en Python, JavaScript (Node) y Blender. Corren sin cámara y sin internet.</p>
+            </div>
+            <div class="ctec revelar">
+              <p class="ctec-num">1 <small>persona</small></p>
+              <p>grabó el dataset actual: unas pocas señas de saludo y cortesía. Es una prueba de concepto ampliable, no «toda la LSM».</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="tecnologias">
+          <div class="pila revelar">
+            <p class="control-titulo">Con qué está hecho</p>
+            <ul class="pila-lista">
+              <li><b>Python 3.10</b><span>motor y servidor local</span></li>
+              <li><b>OpenCV</b><span>cámara</span></li>
+              <li><b>MediaPipe Tasks 0.10</b><span>manos y cuerpo</span></li>
+              <li><b>scikit-learn</b><span>bosque aleatorio</span></li>
+              <li><b>three.js</b><span>avatar en la app</span></li>
+              <li><b>Blender</b><span>personaje y add-on</span></li>
+              <li><b>Lexend</b><span>fuente legible, OFL</span></li>
+              <li><b>Claude API</b><span>oración natural, opcional</span></li>
+            </ul>
+          </div>
+          <div class="metodo revelar">
+            <p class="control-titulo">Cómo se prueba</p>
+            <ol class="metodo-lista">
+              <li><b>Sin cámara.</b> La lógica de la app está separada del bucle de video: se prueba completa con cuadros y teclas simulados.</li>
+              <li><b>Validación cruzada.</b> Cada muestra se clasifica con un modelo que no la vio.</li>
+              <li><b>Cámara simulada.</b> <code>verificar_senas.py</code> reproduce cada muestra a cuatro velocidades por el segmentador real y lista las que fallan.</li>
+              <li><b>Dos avatares, un resultado.</b> El retargeting de Blender y el de three.js se comparan hueso por hueso.</li>
+              <li><b>En cada cambio.</b> GitHub Actions corre las pruebas en Windows y Linux con Python 3.10, 3.11 y 3.12.</li>
+            </ol>
+          </div>
+          <div class="arquitectura revelar" aria-label="Arquitectura de la app">
+            <p class="control-titulo">Arquitectura</p>
+            <div class="arq">
+              <div class="arq-caja arq-motor"><b>Motor</b><span>Python · cámara, señas, avatar</span></div>
+              <div class="arq-flecha"><span>MJPEG · SSE</span></div>
+              <div class="arq-caja arq-server"><b>Servidor local</b><span>solo 127.0.0.1</span></div>
+              <div class="arq-flecha"><span>HTTP</span></div>
+              <div class="arq-caja arq-ui"><b>Interfaz</b><span>ventana propia · three.js</span></div>
+            </div>
+            <p class="nota nota-bloque">Funciona sin internet. La voz y el dictado en línea y la oración con Claude son opcionales; sin
+              conexión, la app usa la voz del sistema y muestra las palabras tal cual.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================ 7 · PRIVACIDAD Y ÉTICA -->
+    <section class="seccion" id="privacidad" aria-labelledby="titulo-privacidad">
+      <div class="contenedor privacidad">
+        <div class="privacidad-img revelar">
+          <img src="assets/img/sitio/privacidad.webp" width="900" height="900" loading="lazy" alt="Ilustración: una laptop muestra solo los puntos de una mano, dentro de un escudo; una nube tachada indica que nada se sube.">
+        </div>
+        <div>
+          <header class="seccion-cabeza">
+            <div class="seccion-num" data-maya="7"><span aria-hidden="true">07</span></div>
+            <p class="sobretitulo">Privacidad y ética</p>
+            <h2 id="titulo-privacidad" class="seccion-titulo revelar">Tu imagen se queda contigo.</h2>
+          </header>
+          <ul class="compromisos">
+            <li class="revelar"><span class="compromiso-icono" style="--i:url(../assets/iconos/camara.png)"></span>
+              <div><b>El video no se guarda ni sale del equipo.</b> Se procesa en la computadora, cuadro por cuadro, y se descarta.</div></li>
+            <li class="revelar"><span class="compromiso-icono" style="--i:url(../assets/iconos/datos.png)"></span>
+              <div><b>El dataset solo tiene coordenadas.</b> Puntos de manos y cuerpo, nunca fotos. Los datos de cada persona quedan fuera del repositorio.</div></li>
+            <li class="revelar"><span class="compromiso-icono" style="--i:url(../assets/iconos/ajustes.png)"></span>
+              <div><b>Lo que sale a internet es opcional y se puede apagar.</b> La oración natural (Claude) y la voz en línea reciben solo las palabras reconocidas. El dictado en línea envía la voz de la persona oyente solo mientras se usa el micrófono; con el modelo Vosk instalado, el dictado también funciona sin internet.</div></li>
+            <li class="revelar"><span class="compromiso-icono" style="--i:url(../assets/iconos/info.png)"></span>
+              <div><b>Sin promesas imposibles.</b> La versión de MediaPipe que usamos trae un registro de uso de Google que no se puede apagar desde Python. Está documentado (RNF-04) y pendiente de revisar; por eso no prometemos «cero conexiones».</div></li>
+          </ul>
+          <div class="etica revelar">
+            <p class="control-titulo">Lo que todavía falta</p>
+            <p>K'ab T'aan <b>no sustituye a un intérprete de LSM</b>. Y una herramienta para la comunidad Sorda tiene que
+              probarse con ella: la <b>validación con personas Sordas está pendiente</b> y es el siguiente paso más
+              importante.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================ 8 · IDENTIDAD MAYA -->
+    <section class="seccion seccion-maya" id="identidad" aria-labelledby="titulo-identidad">
+      <div class="maya-fondo" aria-hidden="true"><img src="assets/img/sitio/maya_estela.webp" width="1376" height="768" loading="lazy" alt=""></div>
+      <div class="contenedor">
+        <header class="seccion-cabeza">
+          <div class="seccion-num" data-maya="8"><span aria-hidden="true">08</span></div>
+          <p class="sobretitulo">Identidad maya</p>
+          <h2 id="titulo-identidad" class="seccion-titulo revelar">Un nombre en maya yucateco.</h2>
+        </header>
+
+        <div class="nombre-partes revelar">
+          <div class="parte">
+            <p class="parte-maya" lang="yua">K'ab</p>
+            <p class="parte-es">mano, brazo</p>
+          </div>
+          <span class="parte-mas" aria-hidden="true">+</span>
+          <div class="parte">
+            <p class="parte-maya" lang="yua">T'aan</p>
+            <p class="parte-es">palabra, lengua</p>
+          </div>
+          <span class="parte-mas" aria-hidden="true">=</span>
+          <div class="parte parte-total">
+            <p class="parte-maya">lengua de manos</p>
+            <p class="parte-es">se escribe siempre con apóstrofos</p>
+          </div>
+        </div>
+
+        <div class="maya-tarjetas">
+          <article class="maya-tarjeta revelar">
+            <div class="greca-muestra" aria-hidden="true"></div>
+            <h3>La greca escalonada</h3>
+            <p>Rodea el logo y separa las secciones de este sitio. Sube y baja en escalones, como una seña: manos
+              arriba, seña, manos abajo.</p>
+          </article>
+          <article class="maya-tarjeta revelar">
+            <div class="logo-explica" aria-hidden="true">
+              <img src="assets/img/logo.webp" width="512" height="512" alt="">
+            </div>
+            <h3>El logo</h3>
+            <p>Una mano sólida jade —la persona— frente a una mano de puntos azul —el sistema, como los puntos de
+              seguimiento—. Entre las dos, una estrella ámbar.</p>
+          </article>
+          <article class="maya-tarjeta maya-numerales revelar">
+            <div class="numeral-demo">
+              <label for="numeral-in" class="control-titulo">Escribe un número</label>
+              <div class="numeral-fila">
+                <input id="numeral-in" type="number" min="0" max="7999" value="19" inputmode="numeric">
+                <div class="numeral-salida" id="numeral-salida" aria-live="polite"></div>
+              </div>
+            </div>
+            <h3>Los numerales mayas</h3>
+            <p>En la app, los conteos (señas aprendidas, días de racha) se escriben con puntos y barras: un punto vale
+              uno, una barra vale cinco, la concha es el cero, y cada nivel hacia arriba vale veinte veces más.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================ 9 · PRÓXIMOS PASOS -->
+    <section class="seccion" id="siguiente" aria-labelledby="titulo-siguiente">
+      <div class="contenedor">
+        <header class="seccion-cabeza">
+          <div class="seccion-num" data-maya="9"><span aria-hidden="true">09</span></div>
+          <p class="sobretitulo">Próximos pasos</p>
+          <h2 id="titulo-siguiente" class="seccion-titulo revelar">Lo que sigue: más manos, más señas, más personas.</h2>
+        </header>
+
+        <div class="ruta-camino">
+          <figure class="ruta-img revelar">
+            <img src="assets/img/sitio/comunidad.webp" width="1376" height="768" loading="lazy" alt="Ilustración: cuatro jóvenes de distintas complexiones señan frente a una laptop con webcam; sobre ella flotan constelaciones de puntos en forma de mano.">
+          </figure>
+          <ol class="linea-tiempo">
+            <li class="hito hecho revelar">
+              <span class="hito-estado">Hecho</span>
+              <h3>Traductor, avatar y app completa</h3>
+              <p>Siete iteraciones: pipeline, avatar en Blender, retargeting, app unificada, una o dos manos, Aprender y Diccionario.</p>
+            </li>
+            <li class="hito ahora revelar">
+              <span class="hito-estado">Ahora</span>
+              <h3>Más personas en el dataset</h3>
+              <p>Al menos 3 personas, 20 muestras por seña, distintas complexiones y una persona zurda, para medir la meta de 90 %.</p>
+            </li>
+            <li class="hito revelar">
+              <span class="hito-estado">Siguiente</span>
+              <h3>Más vocabulario y frases</h3>
+              <p>Grabar el movimiento del avatar para cada seña y mejorar los contactos (mano en la cara o en el pecho).</p>
+            </li>
+            <li class="hito revelar">
+              <span class="hito-estado">Siguiente</span>
+              <h3>Versión completa en el navegador</h3>
+              <p>Con MediaPipe para web, como el «Imítame» de esta página: sin instalar nada.</p>
+            </li>
+            <li class="hito importante revelar">
+              <span class="hito-estado">Lo más importante</span>
+              <h3>Validación con usuarios Sordos</h3>
+              <p>Probarla con la comunidad Sorda, escuchar qué sirve y qué no, y corregir el rumbo con ellos.</p>
+            </li>
+          </ol>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================ 10 · EQUIPO Y CRÉDITOS -->
+    <section class="seccion seccion-alterna" id="equipo" aria-labelledby="titulo-equipo">
+      <div class="contenedor">
+        <header class="seccion-cabeza">
+          <div class="seccion-num" data-maya="10"><span aria-hidden="true">10</span></div>
+          <p class="sobretitulo">Equipo y créditos</p>
+          <h2 id="titulo-equipo" class="seccion-titulo revelar">Quién está detrás.</h2>
+        </header>
+
+        <!-- Datos del registro en Infomatrix (proyecto 41085) -->
+        <div class="registro revelar">
+          <p class="registro-num">Proyecto <b>41085</b> · Infomatrix 2026</p>
+          <p class="registro-titulo">K'ab T'aan: reconocimiento de Lengua de Señas Mexicana con visión por computadora y avatar 3D para
+            conversaciones cortas</p>
+        </div>
+        <div class="equipo">
+          <ul class="integrantes">
+            <li class="integrante revelar">
+              <span class="integrante-inicial" aria-hidden="true">AP</span>
+              <p class="integrante-rol">Autor</p>
+              <p class="integrante-nombre">Angel Antonio Pérez Reyes</p>
+            </li>
+            <li class="integrante integrante-asesor revelar">
+              <span class="integrante-inicial" aria-hidden="true">JR</span>
+              <p class="integrante-rol">Asesor</p>
+              <p class="integrante-nombre">Justino Ramírez Ortegón</p>
+            </li>
+          </ul>
+          <dl class="equipo-datos revelar">
+            <div><dt>Escuela</dt><dd>Universidad Autónoma de Campeche</dd></div>
+            <div><dt>Nivel</dt><dd>Superior</dd></div>
+            <div><dt>Categoría</dt><dd>Desarrollo de Software</dd></div>
+            <div><dt>Sede</dt><dd>Carmen, Campeche, México</dd></div>
+            <div><dt>Lugar y fecha</dt><dd>Colegio Morelos Lizardi · 27 y 28 de noviembre de 2026</dd></div>
+          </dl>
+        </div>
+
+        <div class="creditos revelar">
+          <p class="control-titulo">Créditos</p>
+          <ul>
+            <li><b>MediaPipe</b> (Google) — detección de manos y cuerpo, licencia Apache 2.0.</li>
+            <li><b>three.js</b> — el avatar en la app y en este sitio, licencia MIT.</li>
+            <li><b>Lexend</b> — la fuente, SIL Open Font License.</li>
+            <li><b>Nano Banana 2.1</b> (WaveSpeedAI) — logo, ilustraciones, insignias y fondos generados.</li>
+            <li><b>Blender</b> — rig del personaje, add-on de captura y retargeting.</li>
+            <li><b>Cifras</b> — INEGI, ENADID 2023; Ley General para la Inclusión de las Personas con Discapacidad.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- Cierre -->
+    <section class="cierre" aria-labelledby="titulo-cierre">
+      <div class="greca" aria-hidden="true"></div>
+      <div class="contenedor cierre-dentro">
+        <img src="assets/img/logo.webp" width="512" height="512" loading="lazy" alt="" class="cierre-logo">
+        <h2 id="titulo-cierre" class="cierre-titulo revelar">Hablemos con las manos.</h2>
+        <p class="revelar">El código, los requerimientos y cada prueba están abiertos en GitHub.</p>
+        <div class="heroe-acciones revelar">
+          <a class="boton boton-principal" href="https://github.com/tonyluno9/inclusion-digital" target="_blank" rel="noopener">Ver el repositorio</a>
+          <a class="boton boton-borde" href="#inicio">Volver arriba</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="pie">
+    <div class="contenedor pie-dentro">
+      <p class="marca-nombre">K<i>'</i>ab T<i>'</i>aan</p>
+      <p>Herramienta de apoyo para conversaciones cortas en Lengua de Señas Mexicana. No sustituye a un intérprete.</p>
+      <p class="pie-chico">Proyecto 41085 · Infomatrix 2026 · Universidad Autónoma de Campeche<br>
+        <a href="https://github.com/tonyluno9/inclusion-digital" target="_blank" rel="noopener">tonyluno9/inclusion-digital</a></p>
+    </div>
+  </footer>
+</body>
+</html>
