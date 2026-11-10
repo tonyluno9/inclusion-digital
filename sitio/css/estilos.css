@@ -15,7 +15,7 @@
   --superficie-2: #222C3F;
   --texto: #F4F6FA;
   --texto-2: #9AA4B5;
-  --texto-3: #6F7A8E;
+  --texto-3: #8B95A8;
   --linea: rgba(154, 164, 181, 0.16);
   --linea-fuerte: rgba(154, 164, 181, 0.32);
   --jade: #2EC4B6;
@@ -561,9 +561,8 @@ code, kbd {
   position: absolute; right: 14px; bottom: 14px; width: 26%; aspect-ratio: 4 / 3; object-fit: cover;
   border-radius: 14px; border: 1px solid var(--linea-fuerte); transform: scaleX(-1);
   opacity: 0; pointer-events: none; transition: opacity .4s;
-  filter: blur(10px) saturate(.6);
 }
-.imitame-video.visible { opacity: .85; }
+.imitame-video.visible { opacity: .9; }
 
 .avatar-panel { display: grid; gap: 28px; }
 .botones-fila { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
@@ -915,7 +914,7 @@ code, kbd {
 .cierre { position: relative; padding: 0 0 var(--sep); text-align: center; overflow: hidden; }
 .cierre-dentro { display: grid; justify-items: center; padding-top: var(--sep); }
 .cierre-logo { width: 120px; height: 120px; margin-bottom: 36px; filter: drop-shadow(0 0 40px rgba(46, 196, 182, .35)); }
-.cierre-titulo { font-size: clamp(2.6rem, 1.4rem + 5vw, 6rem); font-weight: 700; letter-spacing: -0.05em; line-height: 1; max-width: 14ch; }
+.cierre-titulo { font-size: clamp(2.6rem, 1.4rem + 5vw, 6rem); font-weight: 700; letter-spacing: -0.05em; line-height: 1; max-width: 14ch; text-wrap: balance; }
 .cierre p { margin-top: 20px; color: var(--texto-2); font-size: 1.1rem; }
 .cierre .heroe-acciones { justify-content: center; }
 .pie { border-top: 1px solid var(--linea); padding: 40px 0 48px; background: var(--fondo-hondo); }

@@ -20,7 +20,7 @@ export class Imitador {
   async iniciar(alFrame, alEstado) {
     this.alFrame = alFrame; this.alEstado = alEstado;
     if (!this.manos) {
-      const vision = await import(/* webpackIgnore: true */ `${CDN}/vision_bundle.mjs`);
+      const vision = await import(`${CDN}/vision_bundle.mjs`);
       const archivos = await vision.FilesetResolver.forVisionTasks(`${CDN}/wasm`);
       const crear = (Clase, modelo, extra) => Clase.createFromOptions(archivos, {
         baseOptions: { modelAssetPath: modelo, delegate: 'GPU' }, runningMode: 'VIDEO', ...extra,
