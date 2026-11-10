@@ -1,6 +1,7 @@
 // K'ab T'aan · sitio informativo. Todo lo que no es el diagrama del proceso ni el avatar 3D.
 import { numeralMaya } from './maya.js';
 
+window.kabtaanListo = true;
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
 const movimientoReducido = matchMedia('(prefers-reduced-motion: reduce)');
@@ -83,6 +84,7 @@ const observaContar = new IntersectionObserver((entradas) => {
       if (k < 1) requestAnimationFrame(paso);
     };
     requestAnimationFrame(paso);
+    setTimeout(() => { el.textContent = formato(fin, dec); }, dur + 200);   // por si la pestaña no anima
   }
 }, { threshold: 0.6 });
 $$('[data-contar]').forEach((el) => observaContar.observe(el));
@@ -189,6 +191,24 @@ if (!movimientoReducido.matches && maquetaPalabra) {
     maquetaPalabra.style.opacity = 0;
     setTimeout(() => { maquetaPalabra.textContent = PALABRAS[j][0]; maquetaPalabra.style.opacity = 1; }, 300);
   }, 3100);
+}
+
+// ----------------------------------------------------------- capturas ampliadas
+const visor = $('#visor-img');
+if (visor && visor.showModal) {
+  const visorImg = $('#visor-img-img');
+  let origen = null;
+  $$('[data-ampliar]').forEach((b) => b.addEventListener('click', () => {
+    const img = b.querySelector('img');
+    visorImg.src = img.currentSrc || img.src; visorImg.alt = img.alt;
+    origen = b; visor.showModal();
+  }));
+  const cerrar = () => visor.close();
+  $('#visor-cerrar').addEventListener('click', cerrar);
+  visor.addEventListener('click', (e) => { if (e.target === visor) cerrar(); });
+  visor.addEventListener('close', () => origen?.focus());
+} else {
+  $$('[data-ampliar]').forEach((b) => b.addEventListener('click', () => open(b.querySelector('img').src, '_blank', 'noopener')));
 }
 
 // ----------------------------------------------------------- carga diferida: proceso y avatar

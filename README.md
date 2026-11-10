@@ -10,6 +10,7 @@ avatar 3D lo dice en señas.
 | [`requerimientos/`](requerimientos/) | Qué debe cumplir el sistema, cómo se verifica y el estado de cada requerimiento |
 | [`blender/`](blender/) | El personaje del avatar y el add-on de Blender ([blender/README.md](blender/README.md)) |
 | [`diseno/`](diseno/) | Identidad visual: paleta, fuente, prompts de las imágenes y cómo se convierten en recursos |
+| [`sitio/`](sitio/) | Sitio informativo para Infomatrix (estático, se publica en GitHub Pages). Ver [sitio/README.md](sitio/README.md) |
 
 Inicio rápido en Windows: doble clic en `app/instalar.bat` y después en `app/iniciar.bat`, que abre la app en su
 propia ventana (traducir, entrenar y avatar). La versión anterior, con la ventana de OpenCV: `app/iniciar_clasico.bat`.
