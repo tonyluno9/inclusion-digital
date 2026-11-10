@@ -1,0 +1,157 @@
+{
+  "modelo": "google/nano-banana-2.1/text-to-image",
+  "resolucion": "1k",
+  "imagenes": {
+    "problema_ventanilla": {
+      "archivo": "problema_ventanilla.png",
+      "modelo": "google/nano-banana-2.1/edit",
+      "referencias": [
+        "diseno/generadas/app_completa/bienvenida.png",
+        "diseno/generadas/app_completa/portada.png"
+      ],
+      "prompt_final": "Use the reference image(s) ONLY as a style guide: match their flat vector illustration style, clean shapes, line weight, character design and color palette, but draw completely NEW content as described below; do not copy the references' subjects or layout. Brand palette of K'ab T'aan (a Mexican Sign Language support app whose name means 'language of the hands' in Yucatec Maya): deep navy #0F1724 background, jade teal #2EC4B6, Maya blue #3A86C8, violet #7C5CFF, coral #FF6B6B, warm amber #FFC857, soft off-white. Calm, warm, respectful and dignified mood, never pitiful, never infantilizing. People are Mexican, diverse in skin tone and build, drawn with friendly simple faces. Hands are always drawn simply and anatomically correct, with exactly five fingers. Absolutely no text, no letters, no words, no Latin-script numbers, no signs with writing, no watermark, no signature, no logo. A full-bleed flat vector scene at night-blue tones, filling the whole frame edge to edge with a deep navy #0F1724 environment (no white background). A public service counter window with a glass partition. On the left, a young Deaf woman with a teal top signs calmly with both hands toward the window. On the right, behind the glass, a clerk with a violet shirt looks kindly but unsure, one hand raised near the ear. Between them, floating in the air, an empty rounded speech bubble drawn with a dashed outline, showing the communication gap. Soft warm amber lamp light, subtle jade and Maya blue accents, simple geometric background shapes. Horizontal composition, characters at mid size, generous negative space at the top.",
+      "tamano_pedido": {
+        "aspecto": "4:3",
+        "resolucion": "1k",
+        "referencia": "1024x768"
+      },
+      "id_tarea": "2730b944eec6442aaeb627adb04552c8",
+      "fecha": "2026-11-10T05:15:51+00:00",
+      "tamano_real": "1200x896",
+      "formato_entregado": "PNG",
+      "coincide_aspecto": true,
+      "tiempo_inferencia_ms": 53285,
+      "costo_usd": null,
+      "costo_documentado_usd": 0.044,
+      "revision_estado": "ok",
+      "revision_notas": "Bien: ventanilla con vidrio, globo vacío punteado, sin texto, manos de 5 dedos."
+    },
+    "problema_consultorio": {
+      "archivo": "problema_consultorio.png",
+      "modelo": "google/nano-banana-2.1/edit",
+      "referencias": [
+        "diseno/generadas/app_completa/bienvenida.png",
+        "diseno/generadas/app_completa/portada.png"
+      ],
+      "prompt_final": "Use the reference image(s) ONLY as a style guide: match their flat vector illustration style, clean shapes, line weight, character design and color palette, but draw completely NEW content as described below; do not copy the references' subjects or layout. Brand palette of K'ab T'aan (a Mexican Sign Language support app whose name means 'language of the hands' in Yucatec Maya): deep navy #0F1724 background, jade teal #2EC4B6, Maya blue #3A86C8, violet #7C5CFF, coral #FF6B6B, warm amber #FFC857, soft off-white. Calm, warm, respectful and dignified mood, never pitiful, never infantilizing. People are Mexican, diverse in skin tone and build, drawn with friendly simple faces. Hands are always drawn simply and anatomically correct, with exactly five fingers. Absolutely no text, no letters, no words, no Latin-script numbers, no signs with writing, no watermark, no signature, no logo. A full-bleed flat vector scene in deep navy #0F1724 tones filling the whole frame edge to edge (no white background). A small doctor's office: a desk, a simple stethoscope, a potted plant, a window with a night sky. A Deaf young man in a coral shirt sits and signs with both hands, expressive and calm. A doctor in a white coat with a Maya blue shirt sits across the desk holding a clipboard, leaning in attentively but clearly not understanding, with a small dashed empty speech bubble between them. Soft amber desk lamp light, jade accents. Horizontal composition, characters at mid size.",
+      "tamano_pedido": {
+        "aspecto": "4:3",
+        "resolucion": "1k",
+        "referencia": "1024x768"
+      },
+      "id_tarea": "acb7765b1fc74c1b8c19f9b29c1a8051",
+      "fecha": "2026-11-10T05:16:47+00:00",
+      "tamano_real": "1200x896",
+      "formato_entregado": "PNG",
+      "coincide_aspecto": true,
+      "tiempo_inferencia_ms": 44634,
+      "costo_usd": null,
+      "costo_documentado_usd": 0.044,
+      "revision_estado": "ok",
+      "revision_notas": "Bien: consultorio, médico con tabla, globo vacío. Sin texto."
+    },
+    "problema_tienda": {
+      "archivo": "problema_tienda.png",
+      "modelo": "google/nano-banana-2.1/edit",
+      "referencias": [
+        "diseno/generadas/app_completa/bienvenida.png",
+        "diseno/generadas/app_completa/portada.png"
+      ],
+      "prompt_final": "Use the reference image(s) ONLY as a style guide: match their flat vector illustration style, clean shapes, line weight, character design and color palette, but draw completely NEW content as described below; do not copy the references' subjects or layout. Brand palette of K'ab T'aan (a Mexican Sign Language support app whose name means 'language of the hands' in Yucatec Maya): deep navy #0F1724 background, jade teal #2EC4B6, Maya blue #3A86C8, violet #7C5CFF, coral #FF6B6B, warm amber #FFC857, soft off-white. Calm, warm, respectful and dignified mood, never pitiful, never infantilizing. People are Mexican, diverse in skin tone and build, drawn with friendly simple faces. Hands are always drawn simply and anatomically correct, with exactly five fingers. Absolutely no text, no letters, no words, no Latin-script numbers, no signs with writing, no watermark, no signature, no logo. A full-bleed flat vector scene in deep navy #0F1724 tones filling the whole frame edge to edge (no white background). A small Mexican neighborhood corner shop at dusk: a counter, shelves with colorful simple packages without any writing, a string of warm amber bulbs. An older Deaf man in a jade shirt signs with one hand while pointing with the other toward a shelf. Behind the counter, a shopkeeper in a violet apron smiles politely but looks puzzled, shoulders slightly raised. A small dashed empty speech bubble floats between them. Calm and warm mood. Horizontal composition, characters at mid size.",
+      "tamano_pedido": {
+        "aspecto": "4:3",
+        "resolucion": "1k",
+        "referencia": "1024x768"
+      },
+      "id_tarea": "c92df3c315ae4b86b423555fb8149693",
+      "fecha": "2026-11-10T05:17:33+00:00",
+      "tamano_real": "1200x896",
+      "formato_entregado": "PNG",
+      "coincide_aspecto": true,
+      "tiempo_inferencia_ms": 64400,
+      "costo_usd": null,
+      "costo_documentado_usd": 0.044,
+      "revision_estado": "ok",
+      "revision_notas": "Bien: tiendita con foquitos, empaques sin letras, globo vacío."
+    },
+    "privacidad": {
+      "archivo": "privacidad.png",
+      "modelo": "google/nano-banana-2.1/edit",
+      "referencias": [
+        "diseno/generadas/app_completa/bienvenida.png",
+        "diseno/generadas/logo_kab_taan/concepto_dialogo.png"
+      ],
+      "prompt_final": "Use the reference image(s) ONLY as a style guide: match their flat vector illustration style, clean shapes, line weight, character design and color palette, but draw completely NEW content as described below; do not copy the references' subjects or layout. Brand palette of K'ab T'aan (a Mexican Sign Language support app whose name means 'language of the hands' in Yucatec Maya): deep navy #0F1724 background, jade teal #2EC4B6, Maya blue #3A86C8, violet #7C5CFF, coral #FF6B6B, warm amber #FFC857, soft off-white. Calm, warm, respectful and dignified mood, never pitiful, never infantilizing. People are Mexican, diverse in skin tone and build, drawn with friendly simple faces. Hands are always drawn simply and anatomically correct, with exactly five fingers. Absolutely no text, no letters, no words, no Latin-script numbers, no signs with writing, no watermark, no signature, no logo. A full-bleed flat vector illustration on a solid deep navy #0F1724 background filling the whole frame (no white background). A laptop seen at three-quarter angle with a small webcam on top. On its screen, instead of a video image, only a glowing Maya blue hand skeleton made of round dots connected by thin lines (like hand tracking landmarks). Around the laptop, a soft jade translucent rounded shield shape encloses it like a protective bubble. Outside the shield, at the top right, a simple cloud shape drawn with a dashed outline and a coral diagonal line crossing it out, meaning nothing is uploaded. A few tiny amber sparkles. Centered composition with generous margins.",
+      "tamano_pedido": {
+        "aspecto": "1:1",
+        "resolucion": "1k",
+        "referencia": "1024x1024"
+      },
+      "id_tarea": "71c82d61c92b433c854269d2892ec3b7",
+      "fecha": "2026-11-10T05:18:40+00:00",
+      "tamano_real": "1024x1024",
+      "formato_entregado": "PNG",
+      "coincide_aspecto": true,
+      "tiempo_inferencia_ms": 56606,
+      "costo_usd": null,
+      "costo_documentado_usd": 0.044,
+      "revision_estado": "ok",
+      "revision_notas": "Bien: laptop con mano de puntos, escudo jade y nube tachada."
+    },
+    "maya_estela": {
+      "archivo": "maya_estela.png",
+      "modelo": "google/nano-banana-2.1/edit",
+      "referencias": [
+        "diseno/generadas/app_completa/escenario_maya.png",
+        "diseno/generadas/logo_kab_taan/concepto_dialogo.png"
+      ],
+      "prompt_final": "Use the reference image(s) ONLY as a style guide: match their flat vector illustration style, clean shapes, line weight, character design and color palette, but draw completely NEW content as described below; do not copy the references' subjects or layout. Brand palette of K'ab T'aan (a Mexican Sign Language support app whose name means 'language of the hands' in Yucatec Maya): deep navy #0F1724 background, jade teal #2EC4B6, Maya blue #3A86C8, violet #7C5CFF, coral #FF6B6B, warm amber #FFC857, soft off-white. Calm, warm, respectful and dignified mood, never pitiful, never infantilizing. People are Mexican, diverse in skin tone and build, drawn with friendly simple faces. Hands are always drawn simply and anatomically correct, with exactly five fingers. Absolutely no text, no letters, no words, no Latin-script numbers, no signs with writing, no watermark, no signature, no logo. A wide atmospheric scene: a carved dark jade stone stela relief, softly lit from the left by warm amber light, against a deep navy #0F1724 darkness. The carving shows a large stylized open human hand with exactly five fingers in the center, and around it a border of Maya stepped fret (greca escalonada) patterns and small rows of dots and bars like Maya numerals. Subtle jade teal glow in the grooves, faint floating dust particles. Place the stela on the right two thirds of the frame and keep the left third dark and calm for a title. No pyramids, no feathered headdresses, no skulls, no faces, no glyph text.",
+      "tamano_pedido": {
+        "aspecto": "16:9",
+        "resolucion": "1k",
+        "referencia": "1376x768"
+      },
+      "id_tarea": "43c696259eb048be9bd8fbcbeda9c641",
+      "fecha": "2026-11-10T05:19:40+00:00",
+      "tamano_real": "1376x768",
+      "formato_entregado": "PNG",
+      "coincide_aspecto": true,
+      "tiempo_inferencia_ms": 89796,
+      "costo_usd": null,
+      "costo_documentado_usd": 0.044,
+      "revision_estado": "ok",
+      "revision_notas": "Bien: estela de jade con mano y greca; tercio izquierdo oscuro para el título."
+    },
+    "comunidad": {
+      "archivo": "comunidad.png",
+      "modelo": "google/nano-banana-2.1/edit",
+      "referencias": [
+        "diseno/generadas/app_completa/bienvenida.png",
+        "diseno/generadas/app_completa/portada.png"
+      ],
+      "prompt_final": "Use the reference image(s) ONLY as a style guide: match their flat vector illustration style, clean shapes, line weight, character design and color palette, but draw completely NEW content as described below; do not copy the references' subjects or layout. Brand palette of K'ab T'aan (a Mexican Sign Language support app whose name means 'language of the hands' in Yucatec Maya): deep navy #0F1724 background, jade teal #2EC4B6, Maya blue #3A86C8, violet #7C5CFF, coral #FF6B6B, warm amber #FFC857, soft off-white. Calm, warm, respectful and dignified mood, never pitiful, never infantilizing. People are Mexican, diverse in skin tone and build, drawn with friendly simple faces. Hands are always drawn simply and anatomically correct, with exactly five fingers. Absolutely no text, no letters, no words, no Latin-script numbers, no signs with writing, no watermark, no signature, no logo. A full-bleed flat vector scene in deep navy #0F1724 tones filling the whole frame edge to edge (no white background). A bright community room at night with a big window. Four young people of different skin tones and builds, one of them clearly left-handed, stand in a relaxed half circle in front of a laptop on a table with a small webcam. One of them signs toward the webcam while the others watch, smile and sign to each other. Floating softly above the laptop, a few small glowing dot constellations shaped like hand skeletons in Maya blue and jade. Warm amber light, violet and coral clothing accents. Wide horizontal composition, characters at mid size, a calm empty area on the left third.",
+      "tamano_pedido": {
+        "aspecto": "16:9",
+        "resolucion": "1k",
+        "referencia": "1376x768"
+      },
+      "id_tarea": "42de65931ad04fdea84b72e340dace39",
+      "fecha": "2026-11-10T05:21:12+00:00",
+      "tamano_real": "1376x768",
+      "formato_entregado": "PNG",
+      "coincide_aspecto": true,
+      "tiempo_inferencia_ms": 125743,
+      "costo_usd": null,
+      "costo_documentado_usd": 0.044,
+      "revision_estado": "ok",
+      "revision_notas": "Bien: cuatro jóvenes señando frente a la laptop; constelaciones de manos. Las personas quedan a la derecha."
+    }
+  },
+  "subidas": {
+    "diseno/generadas/app_completa/bienvenida.png": "https://d2h7xmz5gqybh9.cloudfront.net/media/images/51572364-e578-433f-95e8-f075ae09561a.png",
+    "diseno/generadas/app_completa/portada.png": "https://d2h7xmz5gqybh9.cloudfront.net/media/images/7ec55d66-01a4-451c-9f52-773f9d54aa88.png",
+    "diseno/generadas/logo_kab_taan/concepto_dialogo.png": "https://d2h7xmz5gqybh9.cloudfront.net/media/images/363249bc-6021-43c5-801b-3c44212523fd.png",
+    "diseno/generadas/app_completa/escenario_maya.png": "https://d2h7xmz5gqybh9.cloudfront.net/media/images/8fac5bd2-4faf-4b2d-99cc-f37fe86aeaea.png"
+  },
+  "acepta_prompt_negativo": false
+}
