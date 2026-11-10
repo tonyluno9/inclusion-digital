@@ -187,7 +187,10 @@ function frameReposoNatural(reposo) {
 }
 
 // ------------------------------------------------------------------ interfaz de la sección
+let iniciado = false;
 export async function iniciarAvatar() {
+  if (iniciado) return;
+  iniciado = true;
   const lienzo = $('#avatar-lienzo'); const carga = $('#avatar-carga'); const estado = $('#avatar-estado');
   const escenario = $('#escenario');
   const av = new AvatarSitio(lienzo);

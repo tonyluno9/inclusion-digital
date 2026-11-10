@@ -4,7 +4,7 @@
 import { figura, CONEXIONES_MANO, PUNTAS, PERIODO, UMBRAL, manoContando } from './figura.js';
 
 const C = {
-  fondo: '#0A111C', sup: '#1A2333', sup2: '#222C3F', texto: '#F4F6FA', texto2: '#9AA4B5', texto3: '#6F7A8E',
+  fondo: '#0A111C', sup: '#1A2333', sup2: '#222C3F', texto: '#F4F6FA', texto2: '#9AA4B5', texto3: '#8B95A8',
   linea: 'rgba(154,164,181,0.18)', jade: '#2EC4B6', maya: '#3A86C8', violeta: '#7C5CFF', coral: '#FF6B6B',
   ambar: '#FFC857', naranja: '#FFA53C',
 };
