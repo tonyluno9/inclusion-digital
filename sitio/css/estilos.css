@@ -894,17 +894,26 @@ code, kbd {
 .hito p { margin-top: 6px; color: var(--texto-2); font-size: .94rem; max-width: 46ch; }
 
 /* ------------------------------------------------------------------ 10 · equipo */
-.equipo { display: grid; grid-template-columns: 1fr 1.6fr; gap: clamp(20px, 3vw, 40px); align-items: start; }
+.registro {
+  margin-bottom: clamp(28px, 3.5vw, 44px); padding: clamp(22px, 3vw, 34px) clamp(22px, 3vw, 40px);
+  border-radius: var(--radio); border: 1px solid rgba(255, 200, 87, .3);
+  background: linear-gradient(110deg, rgba(255, 200, 87, .08), rgba(46, 196, 182, .04) 60%, transparent);
+}
+.registro-num { font-size: .8rem; letter-spacing: .14em; text-transform: uppercase; color: var(--ambar); font-variant-numeric: tabular-nums; }
+.registro-num b { font-weight: 700; }
+.registro-titulo { margin-top: 12px; font-size: clamp(1.2rem, 1rem + .9vw, 1.75rem); font-weight: 500; line-height: 1.3; letter-spacing: -0.02em; max-width: 46ch; text-wrap: balance; }
+.equipo { display: grid; grid-template-columns: 1.15fr 1fr; gap: clamp(20px, 3vw, 40px); align-items: start; }
 .equipo-datos { display: grid; gap: 0; border-top: 1px solid var(--linea-fuerte); }
-.equipo-datos div { display: grid; grid-template-columns: 120px 1fr; gap: 16px; padding: 16px 0; border-bottom: 1px solid var(--linea); }
+.equipo-datos div { display: grid; grid-template-columns: 130px 1fr; gap: 16px; padding: 15px 0; border-bottom: 1px solid var(--linea); }
 .equipo-datos dt { color: var(--texto-3); font-size: .86rem; }
 .equipo-datos dd { font-weight: 500; }
-.integrantes { list-style: none; padding: 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
-.integrante { padding: 24px; border-radius: var(--radio); background: var(--superficie); border: 1px solid var(--linea); }
-.integrante-inicial { display: grid; place-items: center; width: 56px; height: 56px; border-radius: 18px; background: linear-gradient(135deg, var(--jade), var(--maya)); color: #062420; font-weight: 700; font-size: 1.3rem; margin-bottom: 20px; }
-.integrante-nombre { font-weight: 600; font-size: 1.06rem; }
-.integrante-rol { color: var(--texto-2); font-size: .9rem; margin-top: 2px; }
-.por-llenar { color: var(--ambar) !important; outline: 1px dashed rgba(255, 200, 87, .55); outline-offset: 3px; border-radius: 4px; width: fit-content; }
+.integrantes { list-style: none; padding: 0; display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
+.integrante { padding: clamp(22px, 2.6vw, 32px); border-radius: var(--radio); background: var(--superficie); border: 1px solid var(--linea); }
+.integrante-inicial { display: grid; place-items: center; width: 64px; height: 64px; border-radius: 20px; background: linear-gradient(135deg, var(--jade), var(--maya)); color: #062420; font-weight: 700; font-size: 1.25rem; letter-spacing: -0.02em; margin-bottom: 28px; }
+.integrante-asesor .integrante-inicial { background: linear-gradient(135deg, var(--ambar), var(--naranja)); color: #2A1A00; }
+.integrante-nombre { font-weight: 600; font-size: clamp(1.15rem, 1rem + .5vw, 1.4rem); letter-spacing: -0.02em; line-height: 1.25; margin-top: 6px; }
+.integrante-rol { color: var(--jade); font-size: .76rem; letter-spacing: .14em; text-transform: uppercase; font-weight: 500; }
+.integrante-asesor .integrante-rol { color: var(--ambar); }
 .creditos { margin-top: clamp(48px, 6vw, 80px); padding-top: 28px; border-top: 1px solid var(--linea-fuerte); }
 .creditos ul { list-style: none; padding: 0; display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px 40px; }
 .creditos li { color: var(--texto-2); font-size: .92rem; padding: 8px 0; border-bottom: 1px solid var(--linea); }
