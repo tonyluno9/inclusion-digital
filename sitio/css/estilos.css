@@ -737,12 +737,37 @@ code, kbd {
 .mini-escenarios span { position: absolute; left: 0; right: 0; bottom: 0; padding: 22px 10px 8px; font-size: .78rem; font-weight: 500; background: linear-gradient(transparent, rgba(10, 17, 28, .9)); }
 
 /* Capturas de la app */
-.capturas { margin-top: clamp(48px, 6vw, 80px); }
-.capturas-fila { display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(14px, 1.6vw, 22px); }
-.captura { border-radius: 16px; overflow: hidden; border: 1px solid var(--linea-fuerte); background: var(--superficie); }
-.captura img { width: 100%; aspect-ratio: 16 / 10; object-fit: cover; object-position: top; }
-.captura figcaption { padding: 12px 16px; font-size: .86rem; color: var(--texto-2); }
-.captura figcaption b { color: var(--texto); }
+.capturas { margin-top: clamp(64px, 8vw, 112px); }
+.capturas-cabeza { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px 32px; margin-bottom: 22px; }
+.capturas-cabeza .control-titulo { margin: 0; color: var(--jade); }
+.capturas-nota { color: var(--texto-2); font-size: .9rem; max-width: 60ch; }
+.capturas-fila { display: grid; grid-template-columns: repeat(4, 1fr); gap: clamp(12px, 1.4vw, 20px); }
+.captura { margin: 0; }
+.captura-grande { grid-column: span 2; grid-row: span 2; }
+.captura-abrir {
+  display: block; width: 100%; padding: 0; border: 1px solid var(--linea-fuerte); border-radius: 14px; overflow: hidden;
+  background: var(--superficie); cursor: zoom-in;
+  transition: border-color .25s, transform .35s var(--suave), box-shadow .35s;
+}
+.captura-abrir:hover { border-color: rgba(46, 196, 182, .6); transform: translateY(-3px); box-shadow: 0 24px 50px -28px rgba(0, 0, 0, .8); }
+.captura img { width: 100%; aspect-ratio: 16 / 10; object-fit: cover; object-position: top left; }
+.captura figcaption { padding: 12px 2px 0; font-size: .84rem; color: var(--texto-2); line-height: 1.5; }
+.captura figcaption b { color: var(--texto); font-weight: 600; }
+.captura-grande figcaption { font-size: .92rem; }
+
+.visor-img {
+  max-width: min(1440px, 94vw); max-height: 92vh; width: auto; padding: 0; border: 1px solid var(--linea-fuerte);
+  border-radius: 18px; background: var(--fondo); color: var(--texto); overflow: hidden;
+}
+.visor-img::backdrop { background: rgba(5, 9, 15, .82); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); }
+.visor-img img { display: block; max-width: 100%; max-height: 92vh; width: auto; height: auto; }
+.visor-img[open] { animation: visor .35s var(--suave); }
+@keyframes visor { from { opacity: 0; transform: scale(.96); } }
+.visor-cerrar {
+  position: absolute; top: 12px; right: 12px; width: 44px; height: 44px; border-radius: 50%;
+  display: grid; place-items: center; border: 1px solid var(--linea-fuerte); background: rgba(10, 17, 28, .8); color: var(--texto);
+}
+.visor-cerrar:hover { background: var(--superficie-2); }
 
 /* ------------------------------------------------------------------ 6 · resultados */
 .resultados { display: grid; grid-template-columns: 1.2fr 1fr; gap: clamp(20px, 3vw, 40px); }
@@ -960,8 +985,14 @@ code, kbd {
 
   .heroe { align-items: flex-end; padding-bottom: 210px; }
   .heroe-fondo img { width: 100%; height: 72%; object-position: 72% 50%; -webkit-mask-image: linear-gradient(180deg, #000 55%, transparent); mask-image: linear-gradient(180deg, #000 55%, transparent); opacity: .7; }
-  .heroe-subtitulo { left: var(--margen); right: auto; bottom: 96px; width: auto; min-width: 230px; }
+  .heroe-subtitulo { display: none; }
   .bajar { display: none; }
+  .heroe { padding-bottom: 72px; }
+  .heroe-fondo img { opacity: .55; }
+  .heroe-fondo::before {
+    content: ""; position: absolute; inset: 0; z-index: 1;
+    background: linear-gradient(180deg, rgba(15, 23, 36, .25) 0%, rgba(15, 23, 36, .82) 42%, var(--fondo) 70%);
+  }
 
   .escenas { grid-template-columns: 1fr; }
   .escena:nth-child(n) { margin-top: 0; }
@@ -982,7 +1013,8 @@ code, kbd {
   .tesela-traducir { grid-template-columns: 1fr; }
   .insignias { grid-template-columns: repeat(5, 1fr); }
   .categorias { grid-template-columns: repeat(3, 1fr); }
-  .capturas-fila { grid-template-columns: 1fr; }
+  .capturas-fila { grid-template-columns: 1fr 1fr; }
+  .captura-grande { grid-column: 1 / -1; grid-row: auto; }
 
   .avatar-panel { grid-template-columns: 1fr; }
   .tecnologias { grid-template-columns: 1fr; }
@@ -1016,6 +1048,7 @@ code, kbd {
   .puente-lado img { width: 110px; }
   .lienzo-pista { display: none; }
   .equipo-datos div { grid-template-columns: 1fr; gap: 2px; }
+  .capturas-fila { grid-template-columns: 1fr; }
   .nombre-partes { gap: 8px 16px; }
 }
 

@@ -93,6 +93,19 @@ function caja(c, x, y, w, h, r) {
 function texto(c, s, x, y, { tam = 13, peso = 400, color = C.texto2, alin = 'left', fuente = FUENTE, base = 'alphabetic' } = {}) {
   c.font = `${peso} ${tam}px ${fuente}`; c.fillStyle = color; c.textAlign = alin; c.textBaseline = base; c.fillText(s, x, y);
 }
+// Texto que se parte en varias líneas si no cabe en `ancho`
+function parrafo(c, s, x, y, ancho, opciones = {}) {
+  const tam = opciones.tam || 13;
+  c.font = `${opciones.peso || 400} ${tam}px ${opciones.fuente || FUENTE}`;
+  const lineas = []; let linea = '';
+  for (const p of s.split(' ')) {
+    const prueba = linea ? `${linea} ${p}` : p;
+    if (c.measureText(prueba).width > ancho && linea) { lineas.push(linea); linea = p; } else linea = prueba;
+  }
+  lineas.push(linea);
+  lineas.forEach((l, i) => texto(c, l, x, y + i * tam * 1.45, opciones));
+  return lineas.length;
+}
 // Marco de la «cámara»: rectángulo 4:3 centrado en el área disponible
 function visor(w, h, margen = 0.12, arriba = 64, abajo = 70) {
   const aw = w * (1 - margen * 2); const ah = h - arriba - abajo;
@@ -192,7 +205,7 @@ const ESCENAS = {
     c.fillStyle = C.coral; c.beginPath(); c.arc(v.x + 18, v.y + 20, 4, 0, 6.283); c.fill();
     texto(c, `${fps} cps`, v.x + 30, v.y + 24, { tam: 12, color: C.texto, peso: 500 });
     texto(c, 'espejo · 640 × 480', v.x + v.w - 14, v.y + 24, { tam: 11, color: C.texto3, alin: 'right' });
-    texto(c, 'El video se procesa aquí y se descarta: nunca se guarda.', w / 2, v.y + v.h + 36, { tam: 13, alin: 'center' });
+    parrafo(c, 'El video se procesa aquí y se descarta: nunca se guarda.', w / 2, v.y + v.h + 34, w - 40, { tam: w < 420 ? 12 : 13, alin: 'center' });
   },
 
   puntos(c, w, h, t) {
@@ -204,8 +217,10 @@ const ESCENAS = {
     esqueleto(c, F, P, { radio: Math.max(2.4, v.h / 150) });
     c.restore();
     esquinas(c, v, C.texto3);
-    // Contador de valores
-    const y = v.y + v.h + 34;
+    // Contador de valores (se encoge si el lienzo es angosto)
+    const esc = Math.min(1, (w - 24) / 400);
+    c.save(); c.translate(w / 2, v.y + v.h + 34); c.scale(esc, esc); c.translate(-w / 2, 0);
+    const y = 0;
     const partes = [['21', C.jade, 'mano izq.'], ['21', C.maya, 'mano der.'], ['7', C.texto, 'cuerpo']];
     let x = w / 2 - 190;
     partes.forEach(([n, col, nom], i) => {
@@ -217,6 +232,7 @@ const ESCENAS = {
     texto(c, '× (x, y, z)  =', x - 4, y, { tam: 14, color: C.texto2 });
     texto(c, '147', x + 98, y, { tam: 26, peso: 700, color: C.ambar });
     texto(c, 'valores', x + 98, y + 18, { tam: 11, color: C.texto3 });
+    c.restore();
   },
 
   corte(c, w, h, t) {
@@ -228,9 +244,9 @@ const ESCENAS = {
     esquinas(c, v, C.texto3, 12);
     // Estado
     const ex = v.x + v.w + 22;
-    texto(c, F.arriba ? 'Manos arriba: grabando la seña' : 'Manos abajo: en espera', ex, v.y + 22, { tam: 14, peso: 500, color: F.arriba ? C.jade : C.texto2 });
-    texto(c, 'La seña empieza al levantar las manos', ex, v.y + 46, { tam: 12, color: C.texto3 });
-    texto(c, 'y termina al bajarlas.', ex, v.y + 64, { tam: 12, color: C.texto3 });
+    const anchoTxt = w - ex - 16;
+    const n1 = parrafo(c, F.arriba ? 'Manos arriba: grabando la seña' : 'Manos abajo: en espera', ex, v.y + 22, anchoTxt, { tam: 14, peso: 500, color: F.arriba ? C.jade : C.texto2 });
+    parrafo(c, 'La seña empieza al levantar las manos y termina al bajarlas.', ex, v.y + 26 + n1 * 20, anchoTxt, { tam: 12, color: C.texto3 });
 
     // Gráfica: últimos 7 s
     const g = { x: 24, y: v.y + v.h + 40, w: w - 48, h: h - (v.y + v.h + 40) - 66 };

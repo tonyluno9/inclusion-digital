@@ -9,7 +9,13 @@
   <meta property="og:type" content="website">
   <meta property="og:title" content="K'ab T'aan · Lengua de manos">
   <meta property="og:description" content="De señas a texto y voz. De texto y voz a señas, con un avatar 3D. Un proyecto para Infomatrix.">
-  <meta property="og:image" content="assets/img/compartir.jpg">
+  <!-- Si el sitio se publica en otra dirección, cambia estas dos URL -->
+  <meta property="og:url" content="https://tonyluno9.github.io/inclusion-digital/">
+  <meta property="og:image" content="https://tonyluno9.github.io/inclusion-digital/assets/img/compartir.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="K'ab T'aan, lengua de manos: una mano jade frente a una mano de puntos azul, con una estrella ámbar en medio.">
+  <meta property="og:site_name" content="K'ab T'aan">
   <meta property="og:locale" content="es_MX">
   <meta name="twitter:card" content="summary_large_image">
   <link rel="icon" href="assets/img/icono-32.png" sizes="32x32" type="image/png">
@@ -18,7 +24,11 @@
   <link rel="preload" href="assets/fuentes/Lexend-latin.woff" as="font" type="font/woff" crossorigin>
   <link rel="preload" href="assets/img/portada.webp" as="image" type="image/webp">
   <link rel="stylesheet" href="css/estilos.css">
-  <script>document.documentElement.classList.add('js');</script>
+  <script>
+    // Las animaciones de entrada solo se activan si el JavaScript del sitio carga; si no, todo se ve igual.
+    document.documentElement.classList.add('js');
+    setTimeout(function () { if (!window.kabtaanListo) document.documentElement.classList.remove('js'); }, 4000);
+  </script>
   <script type="importmap">
     { "imports": { "three": "./vendor/three/three.module.js", "three/addons/": "./vendor/three/addons/" } }
   </script>
@@ -592,7 +602,51 @@
             </ul>
           </article>
         </div>
-        <!-- CAPTURAS -->
+        <div class="capturas">
+          <div class="capturas-cabeza revelar">
+            <p class="control-titulo">Así se ve la app</p>
+            <p class="capturas-nota">Capturas reales de la versión nueva, corriendo con un video de prueba. La imagen de la cámara está
+              difuminada a propósito.</p>
+          </div>
+          <div class="capturas-fila">
+            <figure class="captura captura-grande revelar">
+              <button class="captura-abrir" data-ampliar aria-label="Ampliar la captura de la pantalla Traducir">
+                <img src="assets/img/app/traducir.webp" width="1440" height="900" loading="lazy" alt="Pantalla Traducir de la app: arriba, la cámara (difuminada) y el avatar; abajo, la seña reconocida «Buenas tardes» en grande, con su confianza, y el panel donde la persona oyente escribe o dicta.">
+              </button>
+              <figcaption><b>Traducir.</b> La seña reconocida en grande —aquí «buenas tardes»— y, al lado, lo que la persona oyente escribe o dicta.</figcaption>
+            </figure>
+            <figure class="captura revelar">
+              <button class="captura-abrir" data-ampliar aria-label="Ampliar la captura de la pantalla Aprender">
+                <img src="assets/img/app/aprender.webp" width="1440" height="900" loading="lazy" alt="Pantalla Aprender: estrellas, racha y señas aprendidas arriba; la cámara difuminada, el avatar y la seña que hay que hacer, «Hola».">
+              </button>
+              <figcaption><b>Aprender.</b> Estrellas, racha y logros; la seña a practicar en grande.</figcaption>
+            </figure>
+            <figure class="captura revelar">
+              <button class="captura-abrir" data-ampliar aria-label="Ampliar la captura de la pantalla Diccionario">
+                <img src="assets/img/app/diccionario.webp" width="1440" height="900" loading="lazy" alt="Pantalla Diccionario: buscador, filtros por categoría y tarjetas de señas por categoría, con el avatar a la derecha.">
+              </button>
+              <figcaption><b>Diccionario.</b> Buscador, categorías y el avatar listo para hacer la seña.</figcaption>
+            </figure>
+            <figure class="captura revelar">
+              <button class="captura-abrir" data-ampliar aria-label="Ampliar la captura de la pantalla Entrenar">
+                <img src="assets/img/app/entrenar.webp" width="1440" height="900" loading="lazy" alt="Pantalla Entrenar: la cámara difuminada, el formulario para grabar una seña y la lista de señas grabadas con su número de muestras.">
+              </button>
+              <figcaption><b>Entrenar.</b> Graba muestras y entrena el traductor con un botón.</figcaption>
+            </figure>
+            <figure class="captura revelar">
+              <button class="captura-abrir" data-ampliar aria-label="Ampliar la captura de la pantalla Inicio">
+                <img src="assets/img/app/inicio.webp" width="1440" height="900" loading="lazy" alt="Pantalla de inicio de la app: logo, nombre K'ab T'aan y accesos a Traducir, Aprender, Diccionario, Entrenar y Avatar.">
+              </button>
+              <figcaption><b>Inicio.</b> Todas las funciones a un clic, con el estado de la cámara, el traductor y el avatar.</figcaption>
+            </figure>
+          </div>
+        </div>
+        <dialog class="visor-img" id="visor-img" aria-label="Captura ampliada">
+          <img src="" alt="" id="visor-img-img">
+          <button class="visor-cerrar" id="visor-cerrar" aria-label="Cerrar">
+            <svg viewBox="0 0 20 20" width="20" height="20" aria-hidden="true"><path d="M5 5l10 10M15 5L5 15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          </button>
+        </dialog>
       </div>
     </section>
 
