@@ -29,13 +29,13 @@ Luego abre <http://127.0.0.1:8780>.
 | 07 | Privacidad y ética | Qué se guarda, qué sale a internet y qué falta (validación con la comunidad Sorda) |
 | 08 | Identidad maya | El nombre, la greca escalonada, el logo y un convertidor a numerales mayas (`js/maya.js`) |
 | 09 | Próximos pasos | Línea de tiempo |
-| 10 | Equipo y créditos | **Datos por llenar** (ver abajo) |
+| 10 | Equipo y créditos | Proyecto 41085: título, autor, asesor, escuela, categoría, sede y fecha; créditos |
 
-## Llenar los datos del equipo
+## Datos del proyecto
 
-En `index.html`, busca el comentario `EQUIPO: LLENA AQUÍ LOS DATOS`. Cambia cada texto entre corchetes
-(`[Nombre completo]`, `[Nombre de la escuela]`, etc.) y borra la clase `por-llenar` de esa etiqueta para que deje de
-verse marcada en ámbar. Para quitar una tarjeta, borra su `<li>` completo.
+Los datos del registro en Infomatrix (proyecto 41085, autor, asesor, escuela, categoría, sede y fecha) están en
+`index.html`, en la sección 10 (busca `Datos del registro en Infomatrix`), y se repiten en la portada y en el pie
+de página. Si alguno cambia, corrígelo en los tres lugares.
 
 ## Publicar en GitHub Pages
 
