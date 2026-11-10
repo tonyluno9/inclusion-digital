@@ -1,0 +1,61 @@
+{
+  "proyecto": "K'ab T'aan - imágenes para el sitio informativo (Infomatrix): el problema, privacidad, identidad maya y próximos pasos",
+  "salida": "diseno/generadas/sitio_web",
+  "reglas_generales": [
+    "Modelo: Nano Banana 2.1, calidad 1K como máximo, modo edición con las imágenes de referencia de cada una (solo guía de estilo).",
+    "Exactamente UNA generación por imagen (6 en total, ~0.25 USD). Nunca reintentar: se anota y se sigue.",
+    "Ninguna imagen lleva texto, letras ni números escritos.",
+    "Escenas a sangre completa sobre azul marino profundo, para usarse en el sitio con tema oscuro (no hace falta quitar el fondo)."
+  ],
+  "estilo_comun": "Use the reference image(s) ONLY as a style guide: match their flat vector illustration style, clean shapes, line weight, character design and color palette, but draw completely NEW content as described below; do not copy the references' subjects or layout. Brand palette of K'ab T'aan (a Mexican Sign Language support app whose name means 'language of the hands' in Yucatec Maya): deep navy #0F1724 background, jade teal #2EC4B6, Maya blue #3A86C8, violet #7C5CFF, coral #FF6B6B, warm amber #FFC857, soft off-white. Calm, warm, respectful and dignified mood, never pitiful, never infantilizing. People are Mexican, diverse in skin tone and build, drawn with friendly simple faces. Hands are always drawn simply and anatomically correct, with exactly five fingers. Absolutely no text, no letters, no words, no Latin-script numbers, no signs with writing, no watermark, no signature, no logo.",
+  "imagenes": [
+    {
+      "id": "problema_ventanilla",
+      "archivo": "problema_ventanilla.png",
+      "referencias": ["diseno/generadas/app_completa/bienvenida.png", "diseno/generadas/app_completa/portada.png"],
+      "para_que": "Sección «El problema»: trámite en una ventanilla de servicio.",
+      "ancho": 1024, "alto": 768, "aspecto": "4:3",
+      "prompt": "A full-bleed flat vector scene at night-blue tones, filling the whole frame edge to edge with a deep navy #0F1724 environment (no white background). A public service counter window with a glass partition. On the left, a young Deaf woman with a teal top signs calmly with both hands toward the window. On the right, behind the glass, a clerk with a violet shirt looks kindly but unsure, one hand raised near the ear. Between them, floating in the air, an empty rounded speech bubble drawn with a dashed outline, showing the communication gap. Soft warm amber lamp light, subtle jade and Maya blue accents, simple geometric background shapes. Horizontal composition, characters at mid size, generous negative space at the top."
+    },
+    {
+      "id": "problema_consultorio",
+      "archivo": "problema_consultorio.png",
+      "referencias": ["diseno/generadas/app_completa/bienvenida.png", "diseno/generadas/app_completa/portada.png"],
+      "para_que": "Sección «El problema»: una consulta médica.",
+      "ancho": 1024, "alto": 768, "aspecto": "4:3",
+      "prompt": "A full-bleed flat vector scene in deep navy #0F1724 tones filling the whole frame edge to edge (no white background). A small doctor's office: a desk, a simple stethoscope, a potted plant, a window with a night sky. A Deaf young man in a coral shirt sits and signs with both hands, expressive and calm. A doctor in a white coat with a Maya blue shirt sits across the desk holding a clipboard, leaning in attentively but clearly not understanding, with a small dashed empty speech bubble between them. Soft amber desk lamp light, jade accents. Horizontal composition, characters at mid size."
+    },
+    {
+      "id": "problema_tienda",
+      "archivo": "problema_tienda.png",
+      "referencias": ["diseno/generadas/app_completa/bienvenida.png", "diseno/generadas/app_completa/portada.png"],
+      "para_que": "Sección «El problema»: comprar en una tiendita de barrio.",
+      "ancho": 1024, "alto": 768, "aspecto": "4:3",
+      "prompt": "A full-bleed flat vector scene in deep navy #0F1724 tones filling the whole frame edge to edge (no white background). A small Mexican neighborhood corner shop at dusk: a counter, shelves with colorful simple packages without any writing, a string of warm amber bulbs. An older Deaf man in a jade shirt signs with one hand while pointing with the other toward a shelf. Behind the counter, a shopkeeper in a violet apron smiles politely but looks puzzled, shoulders slightly raised. A small dashed empty speech bubble floats between them. Calm and warm mood. Horizontal composition, characters at mid size."
+    },
+    {
+      "id": "privacidad",
+      "archivo": "privacidad.png",
+      "referencias": ["diseno/generadas/app_completa/bienvenida.png", "diseno/generadas/logo_kab_taan/concepto_dialogo.png"],
+      "para_que": "Sección «Privacidad»: el video no sale del equipo, solo puntos.",
+      "ancho": 1024, "alto": 1024, "aspecto": "1:1",
+      "prompt": "A full-bleed flat vector illustration on a solid deep navy #0F1724 background filling the whole frame (no white background). A laptop seen at three-quarter angle with a small webcam on top. On its screen, instead of a video image, only a glowing Maya blue hand skeleton made of round dots connected by thin lines (like hand tracking landmarks). Around the laptop, a soft jade translucent rounded shield shape encloses it like a protective bubble. Outside the shield, at the top right, a simple cloud shape drawn with a dashed outline and a coral diagonal line crossing it out, meaning nothing is uploaded. A few tiny amber sparkles. Centered composition with generous margins."
+    },
+    {
+      "id": "maya_estela",
+      "archivo": "maya_estela.png",
+      "referencias": ["diseno/generadas/app_completa/escenario_maya.png", "diseno/generadas/logo_kab_taan/concepto_dialogo.png"],
+      "para_que": "Sección «Identidad maya»: fondo con una estela de jade con la mano y la greca escalonada.",
+      "ancho": 1376, "alto": 768, "aspecto": "16:9",
+      "prompt": "A wide atmospheric scene: a carved dark jade stone stela relief, softly lit from the left by warm amber light, against a deep navy #0F1724 darkness. The carving shows a large stylized open human hand with exactly five fingers in the center, and around it a border of Maya stepped fret (greca escalonada) patterns and small rows of dots and bars like Maya numerals. Subtle jade teal glow in the grooves, faint floating dust particles. Place the stela on the right two thirds of the frame and keep the left third dark and calm for a title. No pyramids, no feathered headdresses, no skulls, no faces, no glyph text."
+    },
+    {
+      "id": "comunidad",
+      "archivo": "comunidad.png",
+      "referencias": ["diseno/generadas/app_completa/bienvenida.png", "diseno/generadas/app_completa/portada.png"],
+      "para_que": "Sección «Próximos pasos»: más personas grabando señas y validación con la comunidad Sorda.",
+      "ancho": 1376, "alto": 768, "aspecto": "16:9",
+      "prompt": "A full-bleed flat vector scene in deep navy #0F1724 tones filling the whole frame edge to edge (no white background). A bright community room at night with a big window. Four young people of different skin tones and builds, one of them clearly left-handed, stand in a relaxed half circle in front of a laptop on a table with a small webcam. One of them signs toward the webcam while the others watch, smile and sign to each other. Floating softly above the laptop, a few small glowing dot constellations shaped like hand skeletons in Maya blue and jade. Warm amber light, violet and coral clothing accents. Wide horizontal composition, characters at mid size, a calm empty area on the left third."
+    }
+  ]
+}
