@@ -33,6 +33,10 @@ jobs:
       - name: Revisar que no falte ningún archivo enlazado
         run: python3 .github/revisar_sitio.py
 
+      # «Pruébalo» solo se publica si su motor en JavaScript sigue dando lo mismo que la app en Python
+      - name: Pruebas de paridad del motor de «Pruébalo»
+        run: for f in sitio/probar/tests/*.test.mjs; do node "$f" || exit 1; done
+
       - uses: actions/configure-pages@v5
 
       - uses: actions/upload-pages-artifact@v3

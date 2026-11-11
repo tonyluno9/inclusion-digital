@@ -31,6 +31,12 @@ Luego abre <http://127.0.0.1:8780>.
 | 09 | Próximos pasos | Línea de tiempo |
 | 10 | Equipo y créditos | Proyecto 41085: título, autor, asesor, escuela, categoría, sede y fecha; créditos |
 
+## «Pruébalo» (`probar/`)
+
+La app de K'ab T'aan funcionando en el navegador (cámara, traductor, avatar, Aprender y Diccionario), enlazada
+desde la portada y el menú. Su motor es el de la app portado a JavaScript, con pruebas de paridad contra Python.
+Todo está en [`probar/README.md`](probar/README.md).
+
 ## Datos del proyecto
 
 Los datos del registro en Infomatrix (proyecto 41085, autor, asesor, escuela, categoría, sede y fecha) están en
@@ -66,5 +72,5 @@ falte ningún archivo enlazado.
 
 - Ningún dato personal: ni el dataset, ni `model.pkl`, ni los clips del avatar grabados por una persona, ni correos.
 - Ninguna foto de personas reales.
-- «Imítame» descarga MediaPipe para web (de jsDelivr) y sus modelos (de Google) **solo si el visitante lo pide**;
-  el video de su cámara no sale de su navegador.
+- «Imítame» y «Pruébalo» cargan MediaPipe para web y sus modelos desde el propio sitio (`vendor/mediapipe/`,
+  sin CDN ni servidores de Google) **solo si el visitante lo pide**; el video de su cámara no sale de su navegador.

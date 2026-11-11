@@ -213,6 +213,7 @@ code, kbd {
   transition: color .2s, background-color .2s;
 }
 .menu a:hover { color: var(--texto); }
+.menu a.menu-probar { color: var(--jade); font-weight: 600; }
 .menu a.activo { color: var(--texto); background: rgba(244, 246, 250, .06); }
 .barra-github { flex: none; }
 
