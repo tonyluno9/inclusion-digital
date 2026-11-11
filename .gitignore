@@ -49,3 +49,7 @@ app/data/progreso.json
 
 # Perfil del navegador de la ventana de la app (cookies, caché)
 app/data/navegador/
+
+# «Pruébalo» (sitio/probar): casos de prueba con datos reales de quien grabó (solo locales).
+# El traductor y los clips de demostración (sitio/probar/datos/demo/) sí se publican, sin nombres.
+sitio/probar/tests/local/

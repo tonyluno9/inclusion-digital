@@ -1,0 +1,141 @@
+/* «Pruébalo»: solo lo que no existe en la app de escritorio (app.css es la copia de la app). */
+
+/* Cámara apagada: botón para encenderla y explicación del permiso */
+.camara-vacia { padding: 24px; text-align: center; }
+.camara-vacia img { width: 150px; }
+.encender-titulo { margin: 4px 0 0; font-size: 18px; font-weight: 600; color: var(--texto); }
+.encender-nota { margin: 0; max-width: 440px; font-size: 14px; color: var(--texto-2); }
+.camara-vacia .boton { margin: 6px 0 2px; }
+.carga-barra.mini { width: 200px; }
+.camara > canvas[data-video] { transform: none; }
+.btn-apagar-camara {
+  position: absolute; top: 12px; right: 12px; z-index: 2;
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 6px 12px; border-radius: 999px; cursor: pointer;
+  background: rgba(7, 11, 18, .72); border: 1px solid rgba(255, 255, 255, .18); color: var(--texto);
+  font-size: 13px; backdrop-filter: blur(4px);
+}
+.btn-apagar-camara .icono { width: 16px; height: 16px; }
+.btn-apagar-camara:hover { border-color: var(--coral); color: #FFD0D0; }
+.camara.sin-senal .btn-apagar-camara { display: none; }
+
+/* Aviso de prueba de concepto (Inicio) */
+.aviso-poc {
+  display: flex; gap: 14px; align-items: flex-start;
+  max-width: 720px; margin: 0 0 26px; padding: 14px 18px;
+  border-radius: 14px; border: 1px solid rgba(255, 200, 87, .45); background: rgba(18, 24, 38, .9);
+  backdrop-filter: blur(6px);
+  font-size: 15px; line-height: 1.5; color: var(--texto);
+}
+.aviso-poc > .icono { color: var(--ambar); margin-top: 2px; }
+.aviso-poc b { color: var(--ambar); }
+.poc-privacidad { display: block; margin-top: 6px; color: var(--texto-2); font-size: 14px; }
+
+/* Ayuda: tus datos y privacidad */
+label.boton { cursor: pointer; }
+.lista-privacidad { margin: 0; padding-left: 20px; color: var(--texto-2); font-size: 14px; line-height: 1.55; }
+.lista-privacidad li { margin-bottom: 6px; }
+.lista-privacidad b { color: var(--texto); }
+#pagina-ayuda .rejilla.abajo { margin-top: 18px; }
+
+/* Diálogo antes de dictar */
+.botones.centro { justify-content: center; }
+
+/* Navegador sin WebGL o sin cámara */
+.aviso-navegador {
+  position: fixed; left: 50%; bottom: 18px; transform: translateX(-50%); z-index: 60;
+  max-width: min(680px, calc(100vw - 32px)); padding: 12px 18px; border-radius: 12px;
+  background: #3A1F14; border: 1px solid var(--naranja); color: var(--texto); font-size: 14px; box-shadow: var(--sombra);
+}
+
+/* Enlace «El proyecto» en la barra lateral: igual que los botones */
+a.nav { text-decoration: none; }
+
+/* Foco visible con teclado (la app no lo marcaba en todos los botones) */
+:focus-visible { outline: 3px solid var(--ambar); outline-offset: 2px; }
+.nav:focus-visible, .boton:focus-visible { outline-offset: -3px; }
+
+/* Aviso de modo rápido (computadoras lentas) */
+.aviso-rapido { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.aviso-rapido .boton { padding: 6px 12px; }
+
+/* Sin animaciones para quien las desactivó en su sistema */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+  .confeti { display: none; }
+}
+
+/* ======================================================================
+   Celular y pantallas angostas: la barra lateral pasa abajo, la página se
+   desplaza y el avatar del Diccionario se queda arriba mientras se busca.
+   ====================================================================== */
+@media (max-width: 760px) {
+  html, body { height: auto; min-height: 100%; }
+  body { display: block; overflow-x: hidden; overflow-y: auto; }
+  main { display: block; padding-bottom: calc(76px + env(safe-area-inset-bottom)); }
+
+  .lateral {
+    position: fixed; z-index: 30; left: 0; right: 0; bottom: 0; width: 100%; height: auto;
+    flex-direction: row; align-items: stretch; padding: 6px 6px calc(6px + env(safe-area-inset-bottom));
+    border-right: 0; border-top: 1px solid var(--borde); overflow-x: auto; overflow-y: hidden;
+  }
+  .lateral-logo { display: none; }
+  .lateral nav, .lateral-pie { flex-direction: row; width: auto; margin: 0; gap: 2px; }
+  .lateral-pie { margin-left: 6px; padding-left: 6px; border-left: 1px solid var(--borde); }
+  .nav, .nav.chico { flex: none; width: 64px; padding: 6px 2px; gap: 3px; font-size: 11px; }
+  .nav .icono, .nav.chico .icono { width: 22px; height: 22px; }
+
+  .barra { flex-wrap: wrap; padding: 12px 16px 4px; gap: 8px; }
+  .barra h1 { font-size: 22px; }
+  .chips { justify-content: flex-start; gap: 6px; }
+  .chip { padding: 5px 10px; font-size: 12px; }
+
+  .pagina { padding: 10px 16px 18px; overflow: visible; }
+  .pagina.visible { gap: 14px; }
+  .tarjeta { padding: 16px; border-radius: 16px; }
+
+  .inicio { padding: 24px 16px; background-position: 70% center; }
+  .inicio-logo { width: 88px; height: 88px; }
+  .inicio h2 { font-size: 44px; }
+  .lema { font-size: 17px; margin-bottom: 20px; }
+  .aviso-poc { font-size: 14px; padding: 12px 14px; }
+  .tarjetas-inicio { grid-template-columns: 1fr; }
+
+  .camara { min-height: 220px; }
+  .camara.sin-senal { min-height: 330px; }
+  .camara-vacia { padding: 16px; gap: 6px; }
+  .camara-vacia img { width: 90px; }
+  .encender-titulo { font-size: 17px; }
+  .escenario { min-height: 280px; }
+  .subtitulo .palabra { font-size: 44px; }
+  .subtitulo .palabra.esperando { font-size: 22px; }
+  .barra-conf { flex-basis: 110px; }
+  .oracion, .interlocutor-texto { font-size: 22px; }
+  .fila-form { flex-wrap: wrap; }
+  .fila-form .boton { flex: 1 1 100%; }
+
+  /* Diccionario: el avatar arriba y fijo; las señas debajo */
+  .dic-rejilla { display: flex; flex-direction: column; }
+  .dic-lateral { order: -1; position: sticky; top: 0; z-index: 5; box-shadow: 0 10px 24px rgba(0, 0, 0, .45); }
+  .dic-lateral .escenario { height: 24vh; min-height: 160px; }
+  .dic-detalle { padding: 8px 14px 10px; max-height: 17vh; overflow-y: auto; }
+  .dic-detalle h2 { font-size: 24px; margin-bottom: 6px; }
+  .dic-estado { margin-bottom: 8px; font-size: 14px; }
+  .dic-detalle .botones .boton { padding: 8px 12px; font-size: 14px; }
+  .dic-palabras { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .dic-seccion header img, .dic-otras { width: 48px; height: 48px; }
+
+  .apr-barra { gap: 14px; }
+  .apr-logros { margin-left: 0; }
+  .apr-palabra { font-size: 40px; }
+
+  .capa { padding: 12px; }
+  .dialogo { max-height: calc(100vh - 24px); border-radius: 18px; }
+  .tutorial > img { max-height: 200px; padding: 14px; }
+  .tutorial-texto { padding: 20px; }
+  .tutorial-texto p { font-size: 16px; }
+  .celebracion img { width: 140px; height: 140px; }
+  .avisos { left: 12px; right: 12px; bottom: calc(84px + env(safe-area-inset-bottom)); }
+  .aviso { max-width: none; }
+  .aviso-navegador { bottom: calc(84px + env(safe-area-inset-bottom)); }
+}

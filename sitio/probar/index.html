@@ -1,0 +1,418 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Pruébalo · K'ab T'aan</title>
+  <meta name="description" content="Prueba K'ab T'aan en tu navegador: traduce señas con tu cámara, mira al avatar, practica y consulta el diccionario. Tu video no sale de tu computadora.">
+  <meta name="theme-color" content="#0F1724">
+  <link rel="icon" href="../assets/img/icono-32.png" sizes="32x32">
+  <link rel="apple-touch-icon" href="../assets/img/icono-180.png">
+  <link rel="preload" href="../assets/fuentes/Lexend-latin.woff" as="font" type="font/woff" crossorigin>
+  <link rel="stylesheet" href="app.css">
+  <link rel="stylesheet" href="probar.css">
+  <script type="importmap">
+    { "imports": { "three": "../vendor/three/three.module.js", "three/addons/": "../vendor/three/addons/" } }
+  </script>
+</head>
+<body>
+  <aside class="lateral">
+    <img class="lateral-logo" src="../assets/img/logo.webp" alt="K'ab T'aan">
+    <nav aria-label="Pantallas">
+      <button class="nav" data-pagina="inicio"><span class="icono" style="--i:url(../assets/iconos/inicio.png)"></span>Inicio</button>
+      <button class="nav" data-pagina="traducir"><span class="icono" style="--i:url(../assets/iconos/subtitulos.png)"></span>Traducir</button>
+      <button class="nav" data-pagina="aprender"><span class="icono" style="--i:url(../assets/iconos/aprender.png)"></span>Aprender</button>
+      <button class="nav" data-pagina="diccionario"><span class="icono" style="--i:url(../assets/iconos/diccionario.png)"></span>Diccionario</button>
+      <button class="nav" data-pagina="entrenar"><span class="icono" style="--i:url(../assets/iconos/senas.png)"></span>Entrenar</button>
+      <button class="nav" data-pagina="avatar"><span class="icono" style="--i:url(../assets/iconos/avatar.png)"></span>Avatar</button>
+      <button class="nav" data-pagina="ayuda"><span class="icono" style="--i:url(../assets/iconos/ayuda.png)"></span>Ayuda</button>
+    </nav>
+    <div class="lateral-pie">
+      <a class="nav chico" href="../index.html" title="Volver al sitio de K'ab T'aan"><span class="icono" style="--i:url(../assets/iconos/info.png)"></span>El proyecto</a>
+      <button class="nav chico" id="btn-voz" title="Voz (V)"><span class="icono" style="--i:url(../assets/iconos/voz.png)"></span><span id="txt-voz">Voz</span></button>
+      <button class="nav chico" id="btn-pantalla" title="Pantalla completa (F)"><span class="icono" style="--i:url(../assets/iconos/pantalla_completa.png)"></span>Pantalla</button>
+    </div>
+  </aside>
+
+  <main>
+    <header class="barra">
+      <h1 id="titulo">Inicio</h1>
+      <div class="chips">
+        <span class="chip aviso-encuadre oculto" id="chip-encuadre"></span>
+        <span class="chip" id="chip-camara"><i class="punto"></i>Cámara</span>
+        <span class="chip" id="chip-modelo"><i class="punto"></i>Modelo</span>
+        <span class="chip" id="chip-clips"><i class="punto"></i>Avatar</span>
+      </div>
+    </header>
+
+    <!-- ============================ INICIO ============================ -->
+    <section class="pagina" id="pagina-inicio">
+      <div class="inicio">
+        <div class="inicio-texto">
+          <img class="inicio-logo" src="../assets/img/logo.webp" alt="">
+          <h2>K'ab T'aan</h2>
+          <p class="significado">En maya: <b>«lengua de manos»</b></p>
+          <p class="lema">Lengua de Señas Mexicana a texto, voz y avatar.<br>Para conversaciones cortas entre una persona Sorda y una oyente.</p>
+          <div class="aviso-poc" id="aviso-poc" role="note">
+            <span class="icono" style="--i:url(../assets/iconos/info.png)"></span>
+            <div>
+              <b>Prueba de concepto, en tu navegador.</b>
+              <span id="poc-modelo">El traductor de demostración conoce pocas señas, grabadas por una sola persona: contigo puede equivocarse.</span>
+              Enséñale las tuyas en <b>Entrenar</b>. No sustituye a un intérprete de LSM.
+              <span class="poc-privacidad">Tu cámara se procesa aquí mismo: el video no sale de tu computadora y no hay analítica ni rastreadores.</span>
+            </div>
+          </div>
+          <div class="tarjetas-inicio">
+            <button class="tarjeta-accion" data-ir="traducir">
+              <span class="icono grande" style="--i:url(../assets/iconos/subtitulos.png)"></span>
+              <b>Traducir</b><small>Tus señas se vuelven subtítulos y voz. El avatar responde con señas.</small>
+            </button>
+            <button class="tarjeta-accion" data-ir="aprender">
+              <span class="icono grande" style="--i:url(../assets/iconos/aprender.png)"></span>
+              <b>Aprender</b><small>El avatar te enseña una seña y el traductor te califica. Gana estrellas e insignias.</small>
+            </button>
+            <button class="tarjeta-accion" data-ir="diccionario">
+              <span class="icono grande" style="--i:url(../assets/iconos/diccionario.png)"></span>
+              <b>Diccionario</b><small>Todas las señas por categoría. Toca una y el avatar te la muestra.</small>
+            </button>
+            <button class="tarjeta-accion" data-ir="entrenar">
+              <span class="icono grande" style="--i:url(../assets/iconos/senas.png)"></span>
+              <b>Entrenar</b><small>Graba ejemplos de una seña para que el traductor la aprenda.</small>
+            </button>
+            <button class="tarjeta-accion" data-ir="avatar">
+              <span class="icono grande" style="--i:url(../assets/iconos/avatar.png)"></span>
+              <b>Avatar</b><small>El avatar te imita en vivo. Graba cómo se hace cada seña.</small>
+            </button>
+          </div>
+          <p class="resumen" id="resumen-inicio"></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================ TRADUCIR ============================ -->
+    <section class="pagina" id="pagina-traducir">
+      <div class="rejilla dos">
+        <div class="tarjeta camara-tarjeta">
+          <div class="camara sin-senal" data-camara><div class="camara-vacia" data-encender></div></div>
+        </div>
+        <div class="tarjeta escenario-tarjeta">
+          <div class="escenario" id="escenario-traducir"></div>
+          <div class="escenario-pie" id="pie-traducir">El avatar repite cada seña reconocida y dice en señas lo que escribe el interlocutor.</div>
+        </div>
+      </div>
+      <div class="rejilla subtitulos-fila">
+        <div class="tarjeta subtitulo">
+          <div class="etiqueta">Seña reconocida</div>
+          <div class="palabra esperando" id="palabra" aria-live="polite" aria-atomic="true">Esperando una seña…</div>
+          <div class="confianza"><div class="barra-conf"><i id="conf-relleno"></i></div><span id="conf-texto"></span></div>
+          <div class="historial" id="historial"></div>
+          <div class="etiqueta">Traducción</div>
+          <div class="oracion" id="oracion" aria-live="polite">Haz una seña: levanta las manos, hazla y bájalas.</div>
+        </div>
+        <div class="tarjeta interlocutor">
+          <div class="etiqueta">El interlocutor dice</div>
+          <div class="interlocutor-texto vacio" id="interlocutor" aria-live="polite"></div>
+          <form class="fila-form" id="form-interlocutor">
+            <input id="entrada-interlocutor" placeholder="Escribe aquí lo que quieres decir…" autocomplete="off">
+            <button class="boton primario" type="submit"><span class="icono" style="--i:url(../assets/iconos/avatar.png)"></span>Decir en señas</button>
+          </form>
+          <button class="boton" id="btn-escuchar"><span class="icono" style="--i:url(../assets/iconos/microfono.png)"></span><span>Dictar con el micrófono (S)</span></button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================ ENTRENAR ============================ -->
+    <section class="pagina" id="pagina-entrenar">
+      <div class="rejilla dos">
+        <div class="tarjeta camara-tarjeta">
+          <div class="camara sin-senal" data-camara><div class="camara-vacia" data-encender></div></div>
+          <div class="grabacion" data-grabacion></div>
+        </div>
+        <div class="columna">
+          <div class="tarjeta">
+            <h3>Grabar una seña</h3>
+            <form class="campos" id="form-entrenar">
+              <label>Palabra<input id="entrenar-palabra" placeholder="ej. hola" autocomplete="off" required></label>
+              <label>Quién graba<input id="entrenar-persona" placeholder="tu nombre" autocomplete="off"></label>
+              <button class="boton primario" type="submit"><span class="icono" style="--i:url(../assets/iconos/senas.png)"></span>Empezar</button>
+            </form>
+            <div class="estado-grabacion" id="estado-entrenar">
+              <div class="contador"><b id="muestras">0</b><span>muestras de <i id="palabra-entrenar"></i></span></div>
+              <div class="manos-fila">
+                <span class="etiqueta">La seña se hace con</span>
+                <div class="segmentado" role="group" aria-label="Manos de la seña">
+                  <button type="button" data-manos="dos"><span class="icono" style="--i:url(../assets/iconos/dos_manos.png)"></span>Dos manos</button><button type="button" data-manos="derecha"><span class="icono" style="--i:url(../assets/iconos/una_mano.png)"></span>Mano derecha</button><button type="button" data-manos="izquierda"><span class="icono espejo" style="--i:url(../assets/iconos/una_mano.png)"></span>Mano izquierda</button>
+                </div>
+              </div>
+              <div class="botones">
+                <button class="boton grabar" data-accion="grabar"><span class="icono" style="--i:url(../assets/iconos/grabar.png)"></span><span data-txt-grabar>Grabar (Espacio)</span></button>
+                <button class="boton" data-accion="deshacer"><span class="icono" style="--i:url(../assets/iconos/deshacer.png)"></span>Deshacer (Z)</button>
+              </div>
+              <p class="ayuda-corta">Con la grabación activa, cada seña (manos arriba → manos abajo) se guarda sola. Si la seña es de una mano, la otra puede quedarse abajo: no se graba.</p>
+            </div>
+          </div>
+          <div class="tarjeta">
+            <div class="titulo-fila"><h3>Señas grabadas</h3>
+              <button class="boton primario" data-accion="entrenar_modelo" id="btn-entrenar"><span class="icono" style="--i:url(../assets/iconos/entrenar.png)"></span><span>Entrenar el traductor</span></button>
+            </div>
+            <div class="tabla" id="tabla-senas"></div>
+            <p class="ayuda-corta" id="info-modelo"></p>
+            <p class="ayuda-corta oculto" id="volver-demo">Se entrena aquí mismo, en tu navegador, con tus muestras (unos segundos).
+              <button type="button" class="boton enlace mini" id="btn-volver-demo">Volver al traductor de demostración</button></p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================ AVATAR ============================ -->
+    <section class="pagina" id="pagina-avatar">
+      <div class="rejilla dos">
+        <div class="tarjeta camara-tarjeta">
+          <div class="camara sin-senal" data-camara><div class="camara-vacia" data-encender></div></div>
+          <div class="grabacion" data-grabacion></div>
+        </div>
+        <div class="tarjeta escenario-tarjeta">
+          <div class="escenario" id="escenario-avatar"></div>
+          <div class="escenario-pie" id="pie-avatar">El avatar te imita en vivo.</div>
+        </div>
+      </div>
+      <div class="rejilla dos abajo">
+        <div class="tarjeta" id="tarjeta-grabar-avatar">
+          <h3>Grabar el movimiento de una seña</h3>
+          <form class="campos" id="form-avatar">
+            <label>Palabra<input id="avatar-palabra" placeholder="ej. gracias" autocomplete="off" required></label>
+            <button class="boton primario" type="submit"><span class="icono" style="--i:url(../assets/iconos/avatar.png)"></span>Elegir</button>
+          </form>
+          <div class="estado-grabacion">
+            <div class="contador"><b id="palabra-avatar" class="tenue">Sin palabra</b><span id="estado-avatar">Escribe la palabra y pulsa Elegir</span></div>
+            <div class="manos-fila">
+              <span class="etiqueta">La seña se hace con</span>
+              <div class="segmentado" role="group" aria-label="Manos de la seña">
+                <button type="button" data-manos="dos"><span class="icono" style="--i:url(../assets/iconos/dos_manos.png)"></span>Dos manos</button><button type="button" data-manos="derecha"><span class="icono" style="--i:url(../assets/iconos/una_mano.png)"></span>Mano derecha</button><button type="button" data-manos="izquierda"><span class="icono espejo" style="--i:url(../assets/iconos/una_mano.png)"></span>Mano izquierda</button>
+              </div>
+            </div>
+            <div class="botones">
+              <button class="boton grabar" data-accion="grabar"><span class="icono" style="--i:url(../assets/iconos/grabar.png)"></span><span data-txt-grabar>Grabar (Espacio)</span></button>
+              <button class="boton" data-accion="deshacer"><span class="icono" style="--i:url(../assets/iconos/deshacer.png)"></span>Deshacer (Z)</button>
+            </div>
+            <p class="ayuda-corta">Empieza y termina con los brazos abajo. Al terminar, revisas la toma y la recortas antes de guardarla.</p>
+          </div>
+        </div>
+        <div class="tarjeta oculto" id="tarjeta-revision">
+          <div class="titulo-fila"><h3 class="con-icono"><span class="icono" style="--i:url(../assets/iconos/recortar.png)"></span>Revisa la toma de «<span id="rev-palabra"></span>»</h3><span class="rev-tiempos" id="rev-tiempos"></span></div>
+          <p class="ayuda-corta sin-margen">Arrastra los extremos para dejar solo la seña. Mientras arrastras, el avatar muestra ese instante.</p>
+          <div class="linea-tiempo" id="linea-tiempo">
+            <div class="lt-pista"></div>
+            <div class="lt-rango" id="lt-rango"></div>
+            <div class="lt-cabezal" id="lt-cabezal"></div>
+            <button type="button" class="lt-asa" id="asa-inicio" aria-label="Inicio del recorte" title="Inicio (← → para ajustar)"></button>
+            <button type="button" class="lt-asa" id="asa-fin" aria-label="Fin del recorte" title="Fin (← → para ajustar)"></button>
+          </div>
+          <div class="lt-marcas"><span>0 s</span><span id="lt-total"></span></div>
+          <div class="botones">
+            <button type="button" class="boton" id="rev-reproducir"><span class="icono" style="--i:url(../assets/iconos/reproducir.png)"></span><span>Pausa</span></button>
+            <button type="button" class="boton" id="rev-velocidad"><span class="icono" style="--i:url(../assets/iconos/lento.png)"></span><span>Velocidad 1×</span></button>
+            <button type="button" class="boton primario" id="rev-guardar"><span class="icono" style="--i:url(../assets/iconos/datos.png)"></span>Guardar (Enter)</button>
+            <button type="button" class="boton peligro" id="rev-descartar"><span class="icono" style="--i:url(../assets/iconos/borrar.png)"></span>Descartar (Esc)</button>
+          </div>
+        </div>
+        <div class="tarjeta">
+          <h3>Movimientos grabados</h3>
+          <div class="lista-clips" id="lista-clips"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================ APRENDER ============================ -->
+    <section class="pagina" id="pagina-aprender">
+      <div class="tarjeta apr-barra">
+        <div class="apr-dato"><span class="icono grande estrella-icono" style="--i:url(../assets/iconos/estrella.png)"></span><div><b id="apr-estrellas">0</b><small>estrellas</small></div></div>
+        <div class="apr-dato" id="apr-racha-caja"><span class="icono grande racha-icono" style="--i:url(../assets/iconos/racha.png)"></span><div><b id="apr-racha">0 días</b><small>de racha</small></div></div>
+        <div class="apr-dato"><span class="icono grande" style="--i:url(../assets/iconos/correcto.png)"></span><div><b id="apr-aprendidas">0</b><small>señas aprendidas</small></div></div>
+        <button type="button" class="boton apr-logros" id="apr-abrir-logros"><span class="icono" style="--i:url(../assets/iconos/trofeo.png)"></span><span>Logros <b id="apr-logros">0 / 9</b></span></button>
+      </div>
+      <div class="rejilla dos apr-vista">
+        <div class="tarjeta camara-tarjeta">
+          <div class="camara sin-senal" data-camara><div class="camara-vacia" data-encender></div></div>
+        </div>
+        <div class="tarjeta escenario-tarjeta">
+          <div class="escenario" id="escenario-aprender"></div>
+          <div class="escenario-pie" id="pie-aprender">El avatar te enseña la seña.</div>
+        </div>
+      </div>
+      <div class="tarjeta apr-reto" id="apr-reto">
+        <div class="apr-cabeza">
+          <div><div class="etiqueta">Haz la seña</div><div class="apr-palabra" id="apr-palabra">…</div></div>
+          <div class="apr-mejor" title="Tu mejor resultado en esta seña"><span class="etiqueta">Tu mejor</span><div class="estrellas" id="apr-mejor"></div></div>
+        </div>
+        <div class="apr-estado" id="apr-estado" aria-live="polite"></div>
+        <div class="botones">
+          <button type="button" class="boton" id="apr-ver"><span class="icono" style="--i:url(../assets/iconos/repetir.png)"></span>Ver otra vez</button>
+          <button type="button" class="boton" id="apr-lento"><span class="icono" style="--i:url(../assets/iconos/lento.png)"></span><span>Velocidad 1×</span></button>
+          <button type="button" class="boton" id="apr-saltar"><span class="icono" style="--i:url(../assets/iconos/reproducir.png)"></span>Otra seña</button>
+          <button type="button" class="boton primario oculto" id="apr-siguiente"><span class="icono" style="--i:url(../assets/iconos/estrella.png)"></span>Siguiente (Enter)</button>
+        </div>
+      </div>
+      <div class="tarjeta vacio-grande oculto" id="apr-vacio">
+        <img src="../assets/img/entrenando.webp" alt="">
+        <h3>Primero, enséñale señas al traductor</h3>
+        <p>Para practicar, el traductor tiene que reconocer al menos una seña. Grábala en <b>Entrenar</b> y, si quieres que el avatar te la enseñe, graba también su movimiento en <b>Avatar</b>.</p>
+        <button type="button" class="boton primario" data-ir="entrenar"><span class="icono" style="--i:url(../assets/iconos/senas.png)"></span>Ir a Entrenar</button>
+      </div>
+    </section>
+
+    <!-- ============================ DICCIONARIO ============================ -->
+    <section class="pagina" id="pagina-diccionario">
+      <div class="dic-rejilla">
+        <div class="columna">
+          <div class="tarjeta dic-busqueda">
+            <label class="buscador"><span class="icono" style="--i:url(../assets/iconos/buscar.png)"></span><input id="dic-buscar" type="search" placeholder="Buscar una seña…" autocomplete="off"></label>
+            <div class="filtros" id="dic-filtros"></div>
+          </div>
+          <div class="dic-secciones" id="dic-secciones"></div>
+        </div>
+        <div class="tarjeta escenario-tarjeta dic-lateral">
+          <div class="escenario" id="escenario-diccionario"></div>
+          <div class="dic-detalle" id="dic-detalle"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================ AYUDA ============================ -->
+    <section class="pagina" id="pagina-ayuda">
+      <div class="rejilla dos">
+        <div class="tarjeta ayuda-ilustrada">
+          <img src="../assets/img/encuadre.webp" alt="Persona frente a la cámara con cabeza, hombros y codos a la vista">
+          <h3>Cómo ponerte frente a la cámara</h3>
+          <ul>
+            <li>A 1 metro, con <b>cabeza, hombros, codos y manos</b> a la vista. Si estás muy cerca, arriba aparece <span class="naranja">Aléjate: no veo tus codos</span>.</li>
+            <li>Luz de frente, nada brillante detrás de ti.</li>
+            <li>Cada seña: <b>levanta las manos, hazla y bájalas</b>. Al bajar las manos la seña termina.</li>
+          </ul>
+        </div>
+        <div class="tarjeta ayuda-ilustrada">
+          <img src="../assets/img/entrenando.webp" alt="">
+          <h3>Cómo enseñarle una seña nueva</h3>
+          <ol>
+            <li>En <b>Entrenar</b>, escribe la palabra y tu nombre, y pulsa Empezar.</li>
+            <li>Activa la grabación y haz la seña unas 20 veces (normal, lenta y rápida).</li>
+            <li>Elige si la seña es de <b>dos manos</b> o de <b>una</b>. Con una mano, la otra puede quedarse abajo: no se graba y el avatar la deja quieta. La app lo recuerda para cada palabra.</li>
+            <li>Pulsa <b>Entrenar el traductor</b>. Con más personas grabando, el traductor acierta más.</li>
+            <li>En <b>Avatar</b>, graba una vez el movimiento de la palabra para que el avatar también la sepa hacer. Antes de guardarla, recorta la toma para dejar solo la seña.</li>
+          </ol>
+          <button type="button" class="boton" id="btn-tutorial"><span class="icono" style="--i:url(../assets/iconos/consejo.png)"></span>Ver el tutorial de bienvenida</button>
+          <h3 class="separado">Teclas</h3>
+          <div class="teclas">
+            <span><kbd>Espacio</kbd> grabar / pausar</span><span><kbd>Z</kbd> deshacer</span><span><kbd>M</kbd> una / dos manos</span>
+            <span><kbd>Enter</kbd> guardar la toma</span><span><kbd>Esc</kbd> descartarla</span>
+            <span><kbd>V</kbd> voz</span><span><kbd>S</kbd> micrófono</span><span><kbd>F</kbd> pantalla completa</span>
+          </div>
+        </div>
+      </div>
+      <div class="rejilla dos abajo">
+        <div class="tarjeta" id="tarjeta-datos">
+          <h3 class="con-icono"><span class="icono" style="--i:url(../assets/iconos/datos.png)"></span>Tus datos</h3>
+          <p class="ayuda-corta sin-margen" id="datos-resumen"></p>
+          <p class="ayuda-corta">Todo lo que grabas (muestras, movimientos del avatar, tu traductor y tu progreso) se guarda <b>solo en este navegador</b>.
+            Guárdalo en un archivo para llevarlo a otra computadora, o bórralo.</p>
+          <div class="botones">
+            <button type="button" class="boton" id="datos-exportar"><span class="icono" style="--i:url(../assets/iconos/exportar.png)"></span>Guardar en un archivo</button>
+            <label class="boton" id="datos-importar-et"><span class="icono" style="--i:url(../assets/iconos/datos.png)"></span>Abrir un archivo<input type="file" id="datos-importar" accept=".json,application/json" hidden></label>
+            <button type="button" class="boton peligro" id="datos-borrar"><span class="icono" style="--i:url(../assets/iconos/borrar.png)"></span>Borrar mis datos</button>
+          </div>
+        </div>
+        <div class="tarjeta">
+          <h3 class="con-icono"><span class="icono" style="--i:url(../assets/iconos/info.png)"></span>Privacidad y qué usa internet</h3>
+          <ul class="lista-privacidad">
+            <li><b>Cámara:</b> se procesa en tu navegador con MediaPipe. El video y los puntos del cuerpo no se envían a ningún lado.</li>
+            <li><b>Voz:</b> la del navegador. Algunas voces del sistema funcionan sin internet; otras (como las «en línea» de Edge) mandan el texto a su servicio.</li>
+            <li><b>Dictado:</b> usa el reconocimiento de voz del navegador. En Chrome y Edge el audio lo procesa su servicio en internet (Google o Microsoft). Te avisamos antes de usarlo.</li>
+            <li><b>Oración:</b> en la app, Claude arma una oración natural. Aquí las palabras se unen tal cual: una página web no puede guardar una clave en secreto.</li>
+            <li>Sin cuentas, sin analítica y sin rastreadores.</li>
+            <li><b>Rendimiento de esta computadora:</b> <span id="info-rendimiento">cámara apagada</span>.
+              <button type="button" class="boton enlace mini" id="btn-modo-pose"></button></li>
+          </ul>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div class="avisos" id="avisos" role="status" aria-live="polite"></div>
+
+  <!-- Pantalla de carga (RF-33) -->
+  <div class="carga" id="carga">
+    <div class="carga-texto">
+      <img src="../assets/img/logo.webp" alt="">
+      <h2>K'ab T'aan</h2>
+      <p>«Lengua de manos» · Lengua de Señas Mexicana a texto, voz y avatar</p>
+      <div class="carga-barra"><i></i></div>
+    </div>
+  </div>
+
+  <!-- Tutorial de bienvenida (RF-33) -->
+  <div class="capa oculto" id="tutorial" role="dialog" aria-modal="true" aria-labelledby="tut-titulo">
+    <div class="dialogo tutorial">
+      <img id="tut-img" alt="">
+      <div class="tutorial-texto">
+        <span class="etiqueta" id="tut-numero"></span>
+        <h2 id="tut-titulo"></h2>
+        <p id="tut-texto"></p>
+        <div class="puntos" id="tut-puntos"></div>
+        <div class="botones">
+          <button type="button" class="boton" id="tut-anterior">Anterior</button>
+          <button type="button" class="boton primario" id="tut-siguiente"><span>Siguiente</span></button>
+          <button type="button" class="boton enlace" id="tut-saltar">Saltar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Celebraciones: insignias nuevas y traductor entrenado (RF-35, RF-36) -->
+  <div class="capa oculto" id="celebracion" role="dialog" aria-modal="true" aria-labelledby="cel-titulo">
+    <div class="dialogo celebracion">
+      <div class="confeti" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+      <img id="cel-img" alt="">
+      <h2 id="cel-titulo"></h2>
+      <p id="cel-texto"></p>
+      <button type="button" class="boton primario" id="cel-ok">¡Genial!</button>
+    </div>
+  </div>
+
+  <!-- Logros (RF-35) -->
+  <div class="capa oculto" id="logros" role="dialog" aria-modal="true" aria-labelledby="logros-titulo">
+    <div class="dialogo logros">
+      <div class="titulo-fila"><h2 id="logros-titulo" class="con-icono"><span class="icono" style="--i:url(../assets/iconos/trofeo.png)"></span>Logros</h2>
+        <button type="button" class="boton mini" id="logros-cerrar" aria-label="Cerrar"><span class="icono" style="--i:url(../assets/iconos/incorrecto.png)"></span></button></div>
+      <p class="ayuda-corta sin-margen" id="logros-resumen"></p>
+      <div class="logros-rejilla" id="logros-rejilla"></div>
+    </div>
+  </div>
+
+  <!-- Pruébalo: antes de dictar, qué servicio procesa el audio -->
+  <div class="capa oculto" id="aviso-dictado" role="dialog" aria-modal="true" aria-labelledby="ad-titulo">
+    <div class="dialogo celebracion">
+      <img src="../assets/img/sitio/privacidad.webp" alt="">
+      <h2 id="ad-titulo">Antes de dictar</h2>
+      <p>El dictado usa el reconocimiento de voz de tu navegador. En Chrome y Edge, <b>el audio se envía a su servicio en internet</b>
+        (Google o Microsoft) para convertirlo en texto. K'ab T'aan no lo guarda. Si prefieres, escribe el texto.</p>
+      <div class="botones centro">
+        <button type="button" class="boton" id="ad-no">Mejor escribo</button>
+        <button type="button" class="boton primario" id="ad-si">Dictar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pruébalo: la computadora va lenta (menos de 15 cuadros por segundo) -->
+  <div class="aviso-navegador aviso-rapido oculto" id="aviso-rapido" role="status">
+    <span id="ar-texto"></span>
+    <button type="button" class="boton primario" id="ar-si">Usar el modo rápido</button>
+    <button type="button" class="boton enlace" id="ar-no">Así está bien</button>
+  </div>
+
+  <!-- Pruébalo: el navegador no puede con la página (sin WebGL, sin cámara o sin HTTPS) -->
+  <div class="aviso-navegador oculto" id="aviso-navegador" role="alert"></div>
+
+  <noscript><div class="aviso-navegador">«Pruébalo» necesita JavaScript.</div></noscript>
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>

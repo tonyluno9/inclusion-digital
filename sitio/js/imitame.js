@@ -2,11 +2,12 @@
 // Usa MediaPipe para web (manos y cuerpo) y arma los mismos frames que la app
 // (app/modules/motion.py, world_frame): puntos en metros con x a la izquierda de la persona,
 // y hacia arriba y z hacia la cámara, y cada mano colocada en la muñeca de su lado del cuerpo.
-// El video nunca sale del navegador; solo se descargan los modelos.
-const VERSION = '0.10.14';
-const CDN = `https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@${VERSION}`;
-const MODELO_MANOS = 'https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task';
-const MODELO_CUERPO = 'https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_lite/float16/1/pose_landmarker_lite.task';
+// El video nunca sale del navegador. MediaPipe (0.10.35, la versión de la app) y sus modelos vienen
+// de este mismo sitio (vendor/mediapipe/), no de un CDN ni de los servidores de Google.
+const LOCAL = new URL('../vendor/mediapipe/', import.meta.url).href;
+const BASE = LOCAL.replace(/\/$/, '');
+const MODELO_MANOS = `${LOCAL}modelos/hand_landmarker.task`;
+const MODELO_CUERPO = `${LOCAL}modelos/pose_landmarker_lite.task`;
 const MUNECA = { left: 15, right: 16 };
 const SUAVIZADO = 0.55;          // 0 = sin suavizar, 1 = inmóvil
 
@@ -20,8 +21,8 @@ export class Imitador {
   async iniciar(alFrame, alEstado) {
     this.alFrame = alFrame; this.alEstado = alEstado;
     if (!this.manos) {
-      const vision = await import(`${CDN}/vision_bundle.mjs`);
-      const archivos = await vision.FilesetResolver.forVisionTasks(`${CDN}/wasm`);
+      const vision = await import(`${BASE}/vision_bundle.mjs`);
+      const archivos = await vision.FilesetResolver.forVisionTasks(`${BASE}/wasm`);
       const crear = (Clase, modelo, extra) => Clase.createFromOptions(archivos, {
         baseOptions: { modelAssetPath: modelo, delegate: 'GPU' }, runningMode: 'VIDEO', ...extra,
       }).catch(() => Clase.createFromOptions(archivos, {

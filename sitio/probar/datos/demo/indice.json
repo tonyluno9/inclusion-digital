@@ -1,0 +1,11 @@
+{
+ "nota": "Datos de demostración: traductor y movimientos de una sola persona. Ver sitio/probar/README.md.",
+ "modelo": "modelo.json",
+ "clips": [
+  "hola"
+ ],
+ "manos": {
+  "adios": "derecha",
+  "hola": "derecha"
+ }
+}

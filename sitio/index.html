@@ -55,6 +55,7 @@
           <li><a href="#resultados">Resultados</a></li>
           <li><a href="#privacidad">Privacidad</a></li>
           <li><a href="#equipo">Equipo</a></li>
+          <li><a class="menu-probar" href="probar/">Pruébalo</a></li>
         </ul>
       </nav>
       <a class="boton boton-chico boton-borde barra-github" href="https://github.com/tonyluno9/inclusion-digital" target="_blank" rel="noopener">
@@ -94,7 +95,11 @@
           persona oyente. Las señas se vuelven texto y voz; lo que se escribe o se dice, un avatar 3D lo responde en señas.
         </p>
         <div class="heroe-acciones revelar">
-          <a class="boton boton-principal" href="#como-funciona">
+          <a class="boton boton-principal" href="probar/">
+            Pruébalo en tu navegador
+            <svg viewBox="0 0 20 20" width="18" height="18" aria-hidden="true"><path d="M4 10h12m0 0l-5-5m5 5l-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </a>
+          <a class="boton boton-borde" href="#como-funciona">
             Ver cómo funciona
             <svg viewBox="0 0 20 20" width="18" height="18" aria-hidden="true"><path d="M10 4v12m0 0l-5-5m5 5l5-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </a>
@@ -438,9 +443,10 @@
             <div class="control-grupo imitame">
               <p class="control-titulo">Pruébalo con tu cámara</p>
               <p class="control-texto">El avatar copia tus brazos y tus manos con MediaPipe para web. Todo se procesa en
-                tu navegador: el video no se guarda ni se envía. La primera vez descarga los modelos de detección de
-                Google (unos 15 MB).</p>
+                tu navegador: el video no se guarda ni se envía. La primera vez descarga MediaPipe y sus modelos de
+                detección desde este mismo sitio (unos 25 MB).</p>
               <button class="boton boton-principal boton-chico" id="imitame-boton"><span class="icono" style="--i:url(../assets/iconos/camara.png)"></span><span id="imitame-texto">Imítame</span></button>
+              <p class="control-texto"><a href="probar/">Prueba la app completa</a>: traduce tus señas, practica y enséñale las tuyas.</p>
             </div>
 
             <dl class="ficha">
