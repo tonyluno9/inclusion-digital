@@ -1,0 +1,222 @@
+{
+  "modelo": "google/nano-banana-2.1/text-to-image",
+  "resolucion": "1k",
+  "imagenes": {
+    "iconos_2": {
+      "archivo": "iconos_2.png",
+      "modelo": "google/nano-banana-2.1/edit",
+      "referencias": [
+        "diseno/generadas/iconos.png"
+      ],
+      "prompt_final": "Use the reference image(s) ONLY as a style guide: match their exact visual style, rendering technique, line weight, level of detail, lighting and color palette, but draw completely NEW content as described below; do not copy the reference's subjects or layout. Brand palette of K'ab T'aan (a Mexican Sign Language app whose name means 'language of the hands' in Yucatec Maya): deep navy #0F1724, jade teal #2EC4B6, Maya blue #3A86C8, violet #7C5CFF, coral #FF6B6B, warm amber #FFC857. Hands are always drawn simply and correctly, with exactly five fingers. Absolutely no text, no letters, no words, no Latin-script numbers, no watermark, no signature, no logo text. A NEW sprite sheet of 20 user interface icons in exactly the same style as the reference sheet: consistent minimalist line icons, solid pure black strokes of the same uniform thickness with rounded caps, on a plain solid pure white background, arranged in a perfectly regular grid of 5 columns and 4 rows, every icon centered in its own equal square cell with lots of empty space around it, all the same visual size, no grid lines, no borders, no shadows, no color, no text, no labels. Row 1, left to right: an open book (dictionary); a graduation cap (learn); a trophy cup; a five-point star; a flame (streak). Row 2: two overlapping speech bubbles (conversation); a magnifying glass (search); a pair of scissors (trim); a stopwatch; a turtle seen from the side (slow motion). Row 3: one single open hand, palm facing the viewer; two open hands side by side; a check mark inside a circle; a small x inside a circle; a light bulb (tip). Row 4: a painter's palette (theme); a framed landscape picture with a mountain and a sun (background); an arrow leaving an open box (export); a lowercase letter-free information symbol drawn as a dot above a short vertical line inside a circle; two curved arrows forming a circle (repeat).",
+      "tamano_pedido": {
+        "aspecto": "5:4",
+        "resolucion": "1k",
+        "referencia": "1024x819"
+      },
+      "id_tarea": "95bfe7da49f84d5e9391820d496a2dbb",
+      "fecha": "2026-11-04T21:18:35+00:00",
+      "tamano_real": "1152x928",
+      "formato_entregado": "PNG",
+      "coincide_aspecto": true,
+      "tiempo_inferencia_ms": 38168,
+      "costo_usd": null,
+      "costo_documentado_usd": 0.042,
+      "revision_estado": "cumple",
+      "revision_notas": "20 íconos en 5 × 4 y en el orden pedido: libro, birrete, trofeo, estrella, flama / diálogo, lupa, tijeras, cronómetro, tortuga / una mano, dos manos, palomita, tache, foco / paleta, cuadro con paisaje, exportar, información, repetir. Mismo trazo negro redondeado que iconos.png, sobre blanco, sin texto. Las manos tienen 5 dedos. Comprobado con la cuadrícula regular: ningún elemento cruza las líneas guía ni toca el borde. Detalle menor: el ícono de información es la forma de una «i» (punto sobre una barra), que es lo que se pidió."
+    },
+    "insignias": {
+      "archivo": "insignias.png",
+      "modelo": "google/nano-banana-2.1/edit",
+      "referencias": [
+        "diseno/generadas/logo_kab_taan/concepto_dialogo.png"
+      ],
+      "prompt_final": "Use the reference image(s) ONLY as a style guide: match their exact visual style, rendering technique, line weight, level of detail, lighting and color palette, but draw completely NEW content as described below; do not copy the reference's subjects or layout. Brand palette of K'ab T'aan (a Mexican Sign Language app whose name means 'language of the hands' in Yucatec Maya): deep navy #0F1724, jade teal #2EC4B6, Maya blue #3A86C8, violet #7C5CFF, coral #FF6B6B, warm amber #FFC857. Hands are always drawn simply and correctly, with exactly five fingers. Absolutely no text, no letters, no words, no Latin-script numbers, no watermark, no signature, no logo text. A sheet of 9 achievement badges arranged in a perfectly regular 3 by 3 grid, each badge centered in its own equal square cell with generous empty margins, all the same size and the same style, on a plain solid pure white background, no grid lines, no text. Each badge is a round flat vector medallion inspired by carved ancient Maya jade and stone medallions: a deep navy outer rim decorated with a small stepped-fret (greca escalonada) pattern, a thin warm amber #FFC857 inner ring, and a jade teal or Maya blue center holding one simple bold white symbol. Counts are shown ONLY as Maya numerals made of dots and bars (one dot = 1, one bar = 5). Row 1: a single open hand with one small sparkle (first sign learned); a Maya numeral of two horizontal bars (ten signs learned); a flame above a Maya numeral of three dots (three-day streak). Row 2: a flame above a Maya numeral of one bar and two dots (seven-day streak); a waving open hand with a small sun (greetings master); a 3D-style friendly character head with a small motion arc (first avatar recording). Row 3: a brain made of connected dots (model trained); two overlapping speech bubbles (first full conversation); a compass rose with a four-petal Maya k'in sun center (explorer of all categories). Crisp, collectible, game-like but elegant.",
+      "tamano_pedido": {
+        "aspecto": "1:1",
+        "resolucion": "1k",
+        "referencia": "1024x1024"
+      },
+      "id_tarea": "4951e9f08fa144c9aba7c41a0d3bc3a5",
+      "fecha": "2026-11-04T21:19:16+00:00",
+      "tamano_real": "1024x1024",
+      "formato_entregado": "PNG",
+      "coincide_aspecto": true,
+      "tiempo_inferencia_ms": 32057,
+      "costo_usd": null,
+      "costo_documentado_usd": 0.042,
+      "revision_estado": "cumple, con detalles",
+      "revision_notas": "9 medallones iguales en 3 × 3 y en el orden pedido. Conteos correctos con puntos y barras mayas: dos barras = 10, tres puntos = 3, una barra y dos puntos = 7. Centros jade y azul con aro ámbar, sin texto; las manos tienen 5 dedos. Comprobado con la cuadrícula regular: ningún elemento cruza las líneas guía ni toca el borde. Detalles: el borde no lleva una greca escalonada alrededor, solo unas muescas pequeñas arriba y abajo; la cabeza del avatar es una cara de caricatura plana, no «estilo 3D»."
+    },
+    "bienvenida": {
+      "archivo": "bienvenida.png",
+      "modelo": "google/nano-banana-2.1/edit",
+      "referencias": [
+        "diseno/generadas/ilustraciones.png"
+      ],
+      "prompt_final": "Use the reference image(s) ONLY as a style guide: match their exact visual style, rendering technique, line weight, level of detail, lighting and color palette, but draw completely NEW content as described below; do not copy the reference's subjects or layout. Brand palette of K'ab T'aan (a Mexican Sign Language app whose name means 'language of the hands' in Yucatec Maya): deep navy #0F1724, jade teal #2EC4B6, Maya blue #3A86C8, violet #7C5CFF, coral #FF6B6B, warm amber #FFC857. Hands are always drawn simply and correctly, with exactly five fingers. Absolutely no text, no letters, no words, no Latin-script numbers, no watermark, no signature, no logo text. Four NEW spot illustrations in exactly the same flat vector style as the reference sheet, arranged in a perfectly regular 2 by 2 grid, each centered in its own equal quadrant with generous empty margins, on a plain solid pure white background, no grid lines, no borders, no text. Top left (step 1, get ready): a young Mexican adult sitting about one meter in front of a laptop with a webcam, seen from the side, the upper body from head to waist visible with both elbows, a soft dashed rounded frame around head, shoulders and elbows. Top right (step 2, sign): the same person facing the viewer, both hands raised making a sign, with three short curved motion lines next to the hands. Bottom left (step 3, the app understands): a laptop screen showing a large speech bubble with three thick horizontal bars (subtitles, no letters) and a speaker icon with sound waves. Bottom right (step 4, the avatar answers): a friendly 3D-style humanoid avatar character on a laptop screen signing back with both hands toward a smiling hearing person who waves. Same characters across the four scenes. Hands simple and correct with five fingers.",
+      "tamano_pedido": {
+        "aspecto": "1:1",
+        "resolucion": "1k",
+        "referencia": "1024x1024"
+      },
+      "id_tarea": "86abbafb764545859ca6e1d02034a7b7",
+      "fecha": "2026-11-04T21:19:51+00:00",
+      "tamano_real": "1024x1024",
+      "formato_entregado": "PNG",
+      "coincide_aspecto": true,
+      "tiempo_inferencia_ms": 16382,
+      "costo_usd": null,
+      "costo_documentado_usd": 0.042,
+      "revision_estado": "cumple a medias",
+      "revision_notas": "4 escenas en 2 × 2, mismo estilo que ilustraciones.png y el mismo personaje, sin texto. Comprobado con la cuadrícula regular: ningún elemento cruza las líneas guía ni toca el borde. Problemas: (paso 1) la persona escribe en la laptop, de lado y pegada a ella, en vez de estar a un metro, y el marco punteado solo rodea la cabeza, no hombros ni codos; (paso 2) solo una mano está levantada (la otra en el pecho) y hay un recuadro punteado suelto en el codo; (paso 3) aparecen manos tecleando, que sugieren escribir en lugar de signar; (paso 4) el avatar es una carita morada tipo emoji con las manos en las mejillas, no un humanoide 3D que signa. Las manos visibles tienen 5 dedos."
+    },
+    "categorias": {
+      "archivo": "categorias.png",
+      "modelo": "google/nano-banana-2.1/edit",
+      "referencias": [
+        "diseno/generadas/ilustraciones.png"
+      ],
+      "prompt_final": "Use the reference image(s) ONLY as a style guide: match their exact visual style, rendering technique, line weight, level of detail, lighting and color palette, but draw completely NEW content as described below; do not copy the reference's subjects or layout. Brand palette of K'ab T'aan (a Mexican Sign Language app whose name means 'language of the hands' in Yucatec Maya): deep navy #0F1724, jade teal #2EC4B6, Maya blue #3A86C8, violet #7C5CFF, coral #FF6B6B, warm amber #FFC857. Hands are always drawn simply and correctly, with exactly five fingers. Absolutely no text, no letters, no words, no Latin-script numbers, no watermark, no signature, no logo text. Six NEW small spot illustrations in exactly the same flat vector style as the reference sheet, arranged in a perfectly regular grid of 3 columns and 2 rows, each centered in its own equal cell with generous empty margins, all the same visual size, on a plain solid pure white background, no grid lines, no borders, no text. Top row, left to right: greetings (an open waving hand with a small rising sun behind it); courtesy (two open hands held together forming a heart shape); questions (a large rounded speech bubble with a big question-like curl drawn as a simple swirl, no letters). Bottom row: family (a simple family of three, two adults and a child, holding hands); emotions (two round faces side by side, one smiling and one sad); numbers (smooth jade and amber counting stones arranged as Maya numerals of dots and bars). Cheerful, simple, readable at small size.",
+      "tamano_pedido": {
+        "aspecto": "3:2",
+        "resolucion": "1k",
+        "referencia": "1024x683"
+      },
+      "id_tarea": "a166b3b13e134fe4b8ec2806ff1d6242",
+      "fecha": "2026-11-04T21:20:12+00:00",
+      "tamano_real": "1264x848",
+      "formato_entregado": "PNG",
+      "coincide_aspecto": true,
+      "tiempo_inferencia_ms": 24761,
+      "costo_usd": null,
+      "costo_documentado_usd": 0.042,
+      "revision_estado": "cumple, con detalles",
+      "revision_notas": "6 ilustraciones en 3 × 2 y en el orden pedido: saludos (mano y sol), cortesía (manos en corazón), preguntas (burbuja con espiral), familia, emociones (una cara feliz y una triste) y números (piedras de puntos y barras). Mismo estilo que ilustraciones.png, sin texto ni números latinos. Comprobado con la cuadrícula regular: ningún elemento cruza las líneas guía ni toca el borde. Detalles: en «números», el grupo de la izquierda (1 punto sobre 3 puntos y 2 barras) no es un numeral maya bien formado; el de la derecha (2 puntos y 3 barras = 17) sí. La familia ocupa más alto que las demás celdas. En el corazón, los dedos quedan parcialmente ocultos por el gesto."
+    },
+    "estados": {
+      "archivo": "estados.png",
+      "modelo": "google/nano-banana-2.1/edit",
+      "referencias": [
+        "diseno/generadas/ilustraciones.png"
+      ],
+      "prompt_final": "Use the reference image(s) ONLY as a style guide: match their exact visual style, rendering technique, line weight, level of detail, lighting and color palette, but draw completely NEW content as described below; do not copy the reference's subjects or layout. Brand palette of K'ab T'aan (a Mexican Sign Language app whose name means 'language of the hands' in Yucatec Maya): deep navy #0F1724, jade teal #2EC4B6, Maya blue #3A86C8, violet #7C5CFF, coral #FF6B6B, warm amber #FFC857. Hands are always drawn simply and correctly, with exactly five fingers. Absolutely no text, no letters, no words, no Latin-script numbers, no watermark, no signature, no logo text. Four NEW spot illustrations in exactly the same flat vector style as the reference sheet, arranged in a perfectly regular 2 by 2 grid, each centered in its own equal quadrant with generous empty margins, on a plain solid pure white background, no grid lines, no borders, no text. Top left (well done): two raised open hands with fingers spread, twisting in the air, which is the Deaf applause in sign language, surrounded by colorful confetti and a small amber star. Top right (try again): a friendly open hand next to a big circular retry arrow, calm and encouraging, not sad. Bottom left (no internet): a soft cloud with a diagonal slash and a small unplugged cable. Bottom right (translator trained): a brain made of connected dots and lines with a green check mark badge. Hands simple and correct with five fingers.",
+      "tamano_pedido": {
+        "aspecto": "1:1",
+        "resolucion": "1k",
+        "referencia": "1024x1024"
+      },
+      "id_tarea": "1aab3dcc505a412d86f11ea5a089b7c8",
+      "fecha": "2026-11-04T21:20:39+00:00",
+      "tamano_real": "1024x1024",
+      "formato_entregado": "PNG",
+      "coincide_aspecto": true,
+      "tiempo_inferencia_ms": 21168,
+      "costo_usd": null,
+      "costo_documentado_usd": 0.042,
+      "revision_estado": "cumple",
+      "revision_notas": "4 escenas en 2 × 2 y en el orden pedido: aplauso sordo (dos manos arriba con líneas de giro, confeti y estrella ámbar), inténtalo otra vez (mano con flecha circular), sin internet (nube tachada y clavija suelta) y traductor entrenado (cerebro de puntos con insignia de palomita). Manos de 5 dedos, sin texto. Comprobado con la cuadrícula regular: ningún elemento cruza las líneas guía ni toca el borde. Detalle menor: la estrella tiene carita."
+    },
+    "portada": {
+      "archivo": "portada.png",
+      "modelo": "google/nano-banana-2.1/edit",
+      "referencias": [
+        "diseno/generadas/logo_kab_taan/concepto_dialogo.png",
+        "diseno/generadas/fondo_inicio.png"
+      ],
+      "prompt_final": "Use the reference image(s) ONLY as a style guide: match their exact visual style, rendering technique, line weight, level of detail, lighting and color palette, but draw completely NEW content as described below; do not copy the reference's subjects or layout. Brand palette of K'ab T'aan (a Mexican Sign Language app whose name means 'language of the hands' in Yucatec Maya): deep navy #0F1724, jade teal #2EC4B6, Maya blue #3A86C8, violet #7C5CFF, coral #FF6B6B, warm amber #FFC857. Hands are always drawn simply and correctly, with exactly five fingers. Absolutely no text, no letters, no words, no Latin-script numbers, no watermark, no signature, no logo text. A NEW wide hero artwork for the app's loading screen, combining the visual language of both references: the glowing flowing ribbons and dark navy atmosphere of the background reference, and the concept of the logo reference. On the right two thirds: a large solid jade teal human hand and a hand made of glowing Maya blue connected dots and lines (hand-tracking landmarks) reaching toward each other, fingertips almost touching, with a bright four-pointed amber star of light between them; behind them a large faint circle with a subtle Maya stepped-fret border, and soft flowing ribbons of teal, violet and amber with small connected tracking dots. The left third is calm, dark, nearly empty deep navy #0F1724 negative space for the app name. Smooth gradients, subtle depth, fine grain, hopeful and premium. No text, no letters, no people, no faces.",
+      "tamano_pedido": {
+        "aspecto": "16:9",
+        "resolucion": "1k",
+        "referencia": "1024x576"
+      },
+      "id_tarea": "b68fab0ed0c04cd69c7b13621e05ee01",
+      "fecha": "2026-11-04T21:21:04+00:00",
+      "tamano_real": "1376x768",
+      "formato_entregado": "PNG",
+      "coincide_aspecto": true,
+      "tiempo_inferencia_ms": 22086,
+      "costo_usd": null,
+      "costo_documentado_usd": 0.044,
+      "revision_estado": "cumple",
+      "revision_notas": "Mano sólida jade y mano de puntos azul a la derecha, con la estrella ámbar entre ellas, dentro de un aro con greca arriba y abajo. Cintas de luz turquesa, violeta, coral y ámbar con puntos de seguimiento, en el estilo de fondo_inicio.png. El tercio izquierdo queda oscuro y limpio para el nombre. Sin texto ni personas; la mano sólida tiene 5 dedos."
+    },
+    "escenario_maya": {
+      "archivo": "escenario_maya.png",
+      "modelo": "google/nano-banana-2.1/edit",
+      "referencias": [
+        "diseno/generadas/fondo_avatar.png"
+      ],
+      "prompt_final": "Use the reference image(s) ONLY as a style guide: match their exact visual style, rendering technique, line weight, level of detail, lighting and color palette, but draw completely NEW content as described below; do not copy the reference's subjects or layout. Brand palette of K'ab T'aan (a Mexican Sign Language app whose name means 'language of the hands' in Yucatec Maya): deep navy #0F1724, jade teal #2EC4B6, Maya blue #3A86C8, violet #7C5CFF, coral #FF6B6B, warm amber #FFC857. Hands are always drawn simply and correctly, with exactly five fingers. Absolutely no text, no letters, no words, no Latin-script numbers, no watermark, no signature, no logo text. A NEW empty presentation backdrop for a 3D character, with the same calm studio lighting, composition and softness as the reference: a softly lit center where a character will stand and a gentle light spot on the floor at bottom center. The back wall is a smooth carved stone wall in deep jade and dark teal tones with an elegant band of ancient Maya stepped-fret (greca escalonada) relief running horizontally behind, subtly lit from above, the edges falling into deep navy shadow with a faint amber glow. Shallow depth of field so the wall is slightly blurred. Completely empty: no objects in the center, no people, no text. Calm, premium, uncluttered.",
+      "tamano_pedido": {
+        "aspecto": "16:9",
+        "resolucion": "1k",
+        "referencia": "1024x576"
+      },
+      "id_tarea": "07f78265380f490688a8102b70236725",
+      "fecha": "2026-11-04T21:21:29+00:00",
+      "tamano_real": "1376x768",
+      "formato_entregado": "PNG",
+      "coincide_aspecto": true,
+      "tiempo_inferencia_ms": 24233,
+      "costo_usd": null,
+      "costo_documentado_usd": 0.042,
+      "revision_estado": "cumple, con detalles",
+      "revision_notas": "Escenario vacío, piso con mancha de luz al centro, muro de piedra jade con banda de relieve, resplandor ámbar a los lados y bordes en sombra azul marino. Sin personas ni texto. Detalles: la greca es un meandro tipo «griego» en espiral, no la greca escalonada maya; el muro casi no está desenfocado (la banda se ve nítida)."
+    },
+    "escenario_aula": {
+      "archivo": "escenario_aula.png",
+      "modelo": "google/nano-banana-2.1/edit",
+      "referencias": [
+        "diseno/generadas/fondo_avatar.png"
+      ],
+      "prompt_final": "Use the reference image(s) ONLY as a style guide: match their exact visual style, rendering technique, line weight, level of detail, lighting and color palette, but draw completely NEW content as described below; do not copy the reference's subjects or layout. Brand palette of K'ab T'aan (a Mexican Sign Language app whose name means 'language of the hands' in Yucatec Maya): deep navy #0F1724, jade teal #2EC4B6, Maya blue #3A86C8, violet #7C5CFF, coral #FF6B6B, warm amber #FFC857. Hands are always drawn simply and correctly, with exactly five fingers. Absolutely no text, no letters, no words, no Latin-script numbers, no watermark, no signature, no logo text. A NEW backdrop for a 3D character with the same framing as the reference (a clear, softly lit center where a character will stand, gentle light spot on the floor at bottom center): a bright, friendly modern classroom strongly blurred with shallow depth of field, soft daylight from large windows on one side, warm wood tones, a few colorful blurred shapes of books and plants on shelves, light teal and amber accents. The center area directly behind where the character stands is calm and uncluttered. No people, no readable text, no letters on boards or books.",
+      "tamano_pedido": {
+        "aspecto": "16:9",
+        "resolucion": "1k",
+        "referencia": "1024x576"
+      },
+      "id_tarea": "38674279a9b441d38f9c93b8d735403a",
+      "fecha": "2026-11-04T21:21:56+00:00",
+      "tamano_real": "1376x768",
+      "formato_entregado": "PNG",
+      "coincide_aspecto": true,
+      "tiempo_inferencia_ms": 24831,
+      "costo_usd": null,
+      "costo_documentado_usd": 0.042,
+      "revision_estado": "cumple",
+      "revision_notas": "Aula muy desenfocada con ventanales a la izquierda, madera, libros, plantas y acentos turquesa y ámbar. El centro está despejado, con una mancha de luz en el piso. Sin personas ni texto legible. Detalle: la pared del fondo es azul marino oscuro, así que el conjunto es menos «luminoso» de lo pedido."
+    },
+    "escenario_plaza": {
+      "archivo": "escenario_plaza.png",
+      "modelo": "google/nano-banana-2.1/edit",
+      "referencias": [
+        "diseno/generadas/fondo_avatar.png"
+      ],
+      "prompt_final": "Use the reference image(s) ONLY as a style guide: match their exact visual style, rendering technique, line weight, level of detail, lighting and color palette, but draw completely NEW content as described below; do not copy the reference's subjects or layout. Brand palette of K'ab T'aan (a Mexican Sign Language app whose name means 'language of the hands' in Yucatec Maya): deep navy #0F1724, jade teal #2EC4B6, Maya blue #3A86C8, violet #7C5CFF, coral #FF6B6B, warm amber #FFC857. Hands are always drawn simply and correctly, with exactly five fingers. Absolutely no text, no letters, no words, no Latin-script numbers, no watermark, no signature, no logo text. A NEW backdrop for a 3D character with the same framing as the reference (a clear, softly lit center where a character will stand, gentle light spot on the ground at bottom center): a colorful colonial street in Merida, Yucatan at golden hour, pastel facades in coral, amber, teal and soft yellow with arched doorways and iron balconies, warm string lights, strongly blurred with shallow depth of field and soft bokeh. The center behind where the character stands is calm and uncluttered. No people, no cars, no readable signs, no text.",
+      "tamano_pedido": {
+        "aspecto": "16:9",
+        "resolucion": "1k",
+        "referencia": "1024x576"
+      },
+      "id_tarea": "bf9d2f2db21646f89b9f727e9783c7f6",
+      "fecha": "2026-11-04T21:22:23+00:00",
+      "tamano_real": "1376x768",
+      "formato_entregado": "PNG",
+      "coincide_aspecto": true,
+      "tiempo_inferencia_ms": 32185,
+      "costo_usd": null,
+      "costo_documentado_usd": 0.042,
+      "revision_estado": "cumple, con detalles",
+      "revision_notas": "Calle colonial con fachadas coral, ámbar y turquesa, puertas en arco, balcones de hierro, macetas y series de luces. Centro despejado, sin personas, autos ni letreros. Detalles: es de noche o en la hora azul (cielo azul marino), no al atardecer dorado; el desenfoque es moderado (las fachadas del frente se ven bastante nítidas); la mancha de luz del piso es turquesa fría en vez de cálida."
+    }
+  },
+  "subidas": {
+    "diseno/generadas/iconos.png": "https://d2h7xmz5gqybh9.cloudfront.net/media/images/7837e197-0636-4cd9-91c6-85fac9a66f96.png",
+    "diseno/generadas/logo_kab_taan/concepto_dialogo.png": "https://d2h7xmz5gqybh9.cloudfront.net/media/images/3d11208c-9a87-41ad-9c4e-73bc369e4b63.png",
+    "diseno/generadas/ilustraciones.png": "https://d2h7xmz5gqybh9.cloudfront.net/media/images/de03b03e-d57b-4125-bd7a-2d3526eb9835.png",
+    "diseno/generadas/fondo_inicio.png": "https://d2h7xmz5gqybh9.cloudfront.net/media/images/f7514ef3-fabc-401f-aa69-f8c09cd609f7.png",
+    "diseno/generadas/fondo_avatar.png": "https://d2h7xmz5gqybh9.cloudfront.net/media/images/4ce89aa1-9122-405a-bb58-8ce3050f097c.png"
+  },
+  "acepta_prompt_negativo": false
+}

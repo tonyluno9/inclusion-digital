@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="es"><head><meta charset="utf-8"><title>INCLUSION - galería de imágenes generadas</title>
+<style>
+body { font-family: system-ui, sans-serif; background:#0F1724; color:#e8ecf3; margin:0; padding:24px; }
+h1 { margin-top:0 }
+.card { background:#18223a; border-radius:12px; padding:20px; margin:0 auto 28px; max-width:1200px; }
+.card img { width:100%; height:auto; border-radius:8px; background:repeating-conic-gradient(#ccc 0 25%,#eee 0 50%) 0/20px 20px; }
+.tag { font-size:14px; padding:3px 10px; border-radius:20px; vertical-align:middle; }
+.ok { background:#2EC4B6; color:#0F1724; } .problemas { background:#FF6B6B; color:#0F1724; }
+li { margin:4px 0 }
+</style></head><body>
+<h1>Imágenes generadas · google/nano-banana-2.1/text-to-image · 1k</h1>
+<p>Una generación por imagen, sin reintentos. La API no informó el costo. Precio publicado: 0.04 USD por imagen a 1K, unos 0.20 USD en total.</p>
+
+<section class="card">
+  <h2>logo.png <span class="tag ok">OK</span></h2>
+  <img src="logo.png" alt="logo">
+  <p><b>Para qué es:</b> Ícono de la ventana, pantalla de inicio y encabezado. Sin texto: el nombre lo escribe la app.</p>
+  <p><b>Lista de revisión:</b> Una sola figura centrada sobre fondo blanco liso; mano con 5 dedos bien formados; sin texto.</p>
+  <p><b>Tamaño:</b> pedido 1:1 a 1K, real 1024x1024 · tarea 087716daae9a4538bae00b1eafbad732</p>
+  <ul><li>Una sola figura centrada sobre fondo blanco liso, sin texto: cumple.</li><li>Mano con 5 dedos (4 dedos y el pulgar): cumple, aunque los dedos se marcan con líneas finas del degradado y se ven algo irregulares.</li><li>El símbolo ocupa cerca del 50 % del lienzo, no el 70 % pedido: se puede recortar el margen al integrarlo.</li></ul>
+</section>
+<section class="card">
+  <h2>iconos.png <span class="tag ok">OK</span></h2>
+  <img src="iconos.png" alt="iconos">
+  <p><b>Para qué es:</b> Hoja de 20 íconos en cuadrícula de 5 columnas × 4 filas. La app la corta en celdas iguales y pinta cada ícono del color que toque.</p>
+  <p><b>Lista de revisión:</b> Exactamente 20 íconos en 5 columnas × 4 filas, alineados, todos negros de línea sobre blanco, en el orden pedido, sin texto.</p>
+  <p><b>Tamaño:</b> pedido 5:4 a 1K, real 1152x928 · tarea 063d7d1123c9424f9720ee56a0f0027a</p>
+  <ul><li>20 íconos en 5 columnas × 4 filas, en el orden pedido, negros de línea sobre blanco y sin texto: cumple.</li><li>Tamaño real 1152×928 (el modelo entrega 1K más grande en 5:4); la proporción coincide.</li><li>Las celdas no son milimétricas: comprobar el corte en celdas iguales al integrarla.</li></ul>
+</section>
+<section class="card">
+  <h2>fondo_avatar.png <span class="tag ok">OK</span></h2>
+  <img src="fondo_avatar.png" alt="fondo_avatar">
+  <p><b>Para qué es:</b> Escenario donde se ve el avatar 3D dentro de la app (el avatar se dibuja encima).</p>
+  <p><b>Lista de revisión:</b> Fondo vacío, centro más claro, sin objetos ni personas ni texto.</p>
+  <p><b>Tamaño:</b> pedido 16:9 a 1K, real 1376x768 · tarea a8ae850b991344d08ddad395471e2862</p>
+  <ul><li>Fondo vacío con centro más claro y foco de luz en el piso, sin objetos, personas ni texto: cumple.</li><li>En los bordes izquierdo y derecho hay brillos naranja/ámbar que no se pidieron (solo violeta).</li><li>Tamaño real 1376×768 (16:9, 1K del modelo).</li></ul>
+</section>
+<section class="card">
+  <h2>fondo_inicio.png <span class="tag ok">OK</span></h2>
+  <img src="fondo_inicio.png" alt="fondo_inicio">
+  <p><b>Para qué es:</b> Pantalla de bienvenida. El tercio izquierdo queda oscuro para poner el nombre y los botones encima.</p>
+  <p><b>Lista de revisión:</b> Tercio izquierdo oscuro y limpio; formas fluidas a la derecha; sin personas ni texto.</p>
+  <p><b>Tamaño:</b> pedido 16:9 a 1K, real 1376x768 · tarea 48dd3a98dc04485698679f1d698bbe8f</p>
+  <ul><li>Tercio izquierdo oscuro y limpio, formas fluidas a la derecha con puntos conectados, sin personas ni texto: cumple.</li><li>Tamaño real 1376×768 (16:9, 1K del modelo).</li></ul>
+</section>
+<section class="card">
+  <h2>ilustraciones.png <span class="tag problemas">Con problemas</span></h2>
+  <img src="ilustraciones.png" alt="ilustraciones">
+  <p><b>Para qué es:</b> 4 ilustraciones para pantallas de ayuda y estados vacíos, en cuadrícula 2 × 2 (la app las recorta).</p>
+  <p><b>Lista de revisión:</b> 4 ilustraciones en 2 × 2, mismo estilo, fondo blanco, manos con 5 dedos, sin texto.</p>
+  <p><b>Tamaño:</b> pedido 1:1 a 1K, real 1024x1024 · tarea a0851574457f4e69bdc5c49217a44a2f</p>
+  <ul><li>4 ilustraciones en 2 × 2, mismo estilo, fondo blanco, sin texto: cumple.</li><li>Arriba a la derecha: la guía punteada no enmarca bien cabeza, hombros y codos; queda como un rectángulo partido con un recuadro aparte en un codo, y la persona saluda en lugar de estar frente a la cámara con los codos visibles.</li><li>Arriba a la izquierda: el avatar es una criatura tipo mascota, no un personaje 3D, y está abajo, no entre los dos.</li><li>Manos: en general tienen 5 dedos; la mano de puntos (abajo a la derecha) también.</li></ul>
+</section>
+</body></html>

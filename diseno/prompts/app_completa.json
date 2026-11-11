@@ -1,0 +1,115 @@
+{
+  "proyecto": "K'ab T'aan - imágenes para la versión completa de la app (aprender, diccionario, logros, escenarios del avatar)",
+  "salida": "diseno/generadas/app_completa",
+  "reglas_generales": [
+    "Modelo: Nano Banana 2.1, calidad 1K como máximo. Cada imagen lleva sus imágenes de referencia (campo 'referencias'): se usa el modo de edición, que ya probamos con el logo.",
+    "Las referencias son solo GUÍA DE ESTILO (trazo, paleta, luz, nivel de detalle): el contenido de cada imagen es nuevo.",
+    "Exactamente UNA generación por imagen (9 en total). Nunca reintentar, aunque el resultado no sea perfecto: se anota y se sigue.",
+    "Ninguna imagen lleva texto, letras ni números escritos (los números van como numerales mayas de puntos y barras cuando se pide).",
+    "Guardar en PNG con el nombre de 'archivo'."
+  ],
+  "estilo_comun": "Use the reference image(s) ONLY as a style guide: match their exact visual style, rendering technique, line weight, level of detail, lighting and color palette, but draw completely NEW content as described below; do not copy the reference's subjects or layout. Brand palette of K'ab T'aan (a Mexican Sign Language app whose name means 'language of the hands' in Yucatec Maya): deep navy #0F1724, jade teal #2EC4B6, Maya blue #3A86C8, violet #7C5CFF, coral #FF6B6B, warm amber #FFC857. Hands are always drawn simply and correctly, with exactly five fingers. Absolutely no text, no letters, no words, no Latin-script numbers, no watermark, no signature, no logo text.",
+  "negativo_comun": "text, letters, words, numbers, watermark, signature, blurry, low quality, distorted hands, extra fingers, missing fingers, cluttered, pyramids, feathered headdress, skulls",
+  "imagenes": [
+    {
+      "id": "iconos_2",
+      "archivo": "iconos_2.png",
+      "referencias": ["diseno/generadas/iconos.png"],
+      "para_que": "20 íconos nuevos para las funciones nuevas (aprender, diccionario, logros, escenarios, una/dos manos, recortar…). Misma hoja 5 × 4 que la primera, para cortarlos igual.",
+      "ancho": 1024,
+      "alto": 819,
+      "aspecto": "5:4",
+      "prompt": "A NEW sprite sheet of 20 user interface icons in exactly the same style as the reference sheet: consistent minimalist line icons, solid pure black strokes of the same uniform thickness with rounded caps, on a plain solid pure white background, arranged in a perfectly regular grid of 5 columns and 4 rows, every icon centered in its own equal square cell with lots of empty space around it, all the same visual size, no grid lines, no borders, no shadows, no color, no text, no labels. Row 1, left to right: an open book (dictionary); a graduation cap (learn); a trophy cup; a five-point star; a flame (streak). Row 2: two overlapping speech bubbles (conversation); a magnifying glass (search); a pair of scissors (trim); a stopwatch; a turtle seen from the side (slow motion). Row 3: one single open hand, palm facing the viewer; two open hands side by side; a check mark inside a circle; a small x inside a circle; a light bulb (tip). Row 4: a painter's palette (theme); a framed landscape picture with a mountain and a sun (background); an arrow leaving an open box (export); a lowercase letter-free information symbol drawn as a dot above a short vertical line inside a circle; two curved arrows forming a circle (repeat).",
+      "revision": "Exactamente 20 íconos en 5 × 4, en el orden pedido, mismo trazo que iconos.png, negros sobre blanco, sin texto."
+    },
+    {
+      "id": "insignias",
+      "archivo": "insignias.png",
+      "referencias": ["diseno/generadas/logo_kab_taan/concepto_dialogo.png"],
+      "para_que": "9 insignias de logros del modo Aprender (3 × 3). Medallones mayas; los conteos van con numerales mayas de puntos y barras.",
+      "ancho": 1024,
+      "alto": 1024,
+      "aspecto": "1:1",
+      "prompt": "A sheet of 9 achievement badges arranged in a perfectly regular 3 by 3 grid, each badge centered in its own equal square cell with generous empty margins, all the same size and the same style, on a plain solid pure white background, no grid lines, no text. Each badge is a round flat vector medallion inspired by carved ancient Maya jade and stone medallions: a deep navy outer rim decorated with a small stepped-fret (greca escalonada) pattern, a thin warm amber #FFC857 inner ring, and a jade teal or Maya blue center holding one simple bold white symbol. Counts are shown ONLY as Maya numerals made of dots and bars (one dot = 1, one bar = 5). Row 1: a single open hand with one small sparkle (first sign learned); a Maya numeral of two horizontal bars (ten signs learned); a flame above a Maya numeral of three dots (three-day streak). Row 2: a flame above a Maya numeral of one bar and two dots (seven-day streak); a waving open hand with a small sun (greetings master); a 3D-style friendly character head with a small motion arc (first avatar recording). Row 3: a brain made of connected dots (model trained); two overlapping speech bubbles (first full conversation); a compass rose with a four-petal Maya k'in sun center (explorer of all categories). Crisp, collectible, game-like but elegant.",
+      "revision": "9 medallones iguales en 3 × 3, borde con greca, centro jade/azul, símbolos en el orden pedido, conteos solo con puntos y barras mayas, sin texto."
+    },
+    {
+      "id": "bienvenida",
+      "archivo": "bienvenida.png",
+      "referencias": ["diseno/generadas/ilustraciones.png"],
+      "para_que": "Tutorial de bienvenida de 4 pasos (2 × 2) que se muestra la primera vez que se abre la app.",
+      "ancho": 1024,
+      "alto": 1024,
+      "aspecto": "1:1",
+      "prompt": "Four NEW spot illustrations in exactly the same flat vector style as the reference sheet, arranged in a perfectly regular 2 by 2 grid, each centered in its own equal quadrant with generous empty margins, on a plain solid pure white background, no grid lines, no borders, no text. Top left (step 1, get ready): a young Mexican adult sitting about one meter in front of a laptop with a webcam, seen from the side, the upper body from head to waist visible with both elbows, a soft dashed rounded frame around head, shoulders and elbows. Top right (step 2, sign): the same person facing the viewer, both hands raised making a sign, with three short curved motion lines next to the hands. Bottom left (step 3, the app understands): a laptop screen showing a large speech bubble with three thick horizontal bars (subtitles, no letters) and a speaker icon with sound waves. Bottom right (step 4, the avatar answers): a friendly 3D-style humanoid avatar character on a laptop screen signing back with both hands toward a smiling hearing person who waves. Same characters across the four scenes. Hands simple and correct with five fingers.",
+      "revision": "4 escenas en 2 × 2, mismo estilo y mismos personajes; paso 1 con codos visibles y marco punteado; sin texto; manos de 5 dedos."
+    },
+    {
+      "id": "categorias",
+      "archivo": "categorias.png",
+      "referencias": ["diseno/generadas/ilustraciones.png"],
+      "para_que": "6 ilustraciones de categorías para el Diccionario de señas (3 × 2).",
+      "ancho": 1024,
+      "alto": 683,
+      "aspecto": "3:2",
+      "prompt": "Six NEW small spot illustrations in exactly the same flat vector style as the reference sheet, arranged in a perfectly regular grid of 3 columns and 2 rows, each centered in its own equal cell with generous empty margins, all the same visual size, on a plain solid pure white background, no grid lines, no borders, no text. Top row, left to right: greetings (an open waving hand with a small rising sun behind it); courtesy (two open hands held together forming a heart shape); questions (a large rounded speech bubble with a big question-like curl drawn as a simple swirl, no letters). Bottom row: family (a simple family of three, two adults and a child, holding hands); emotions (two round faces side by side, one smiling and one sad); numbers (smooth jade and amber counting stones arranged as Maya numerals of dots and bars). Cheerful, simple, readable at small size.",
+      "revision": "6 ilustraciones en 3 × 2, en el orden pedido, mismo estilo que ilustraciones.png, sin texto ni números latinos."
+    },
+    {
+      "id": "estados",
+      "archivo": "estados.png",
+      "referencias": ["diseno/generadas/ilustraciones.png"],
+      "para_que": "4 ilustraciones de estado (2 × 2): ¡bien hecho!, inténtalo otra vez, sin internet y traductor entrenado.",
+      "ancho": 1024,
+      "alto": 1024,
+      "aspecto": "1:1",
+      "prompt": "Four NEW spot illustrations in exactly the same flat vector style as the reference sheet, arranged in a perfectly regular 2 by 2 grid, each centered in its own equal quadrant with generous empty margins, on a plain solid pure white background, no grid lines, no borders, no text. Top left (well done): two raised open hands with fingers spread, twisting in the air, which is the Deaf applause in sign language, surrounded by colorful confetti and a small amber star. Top right (try again): a friendly open hand next to a big circular retry arrow, calm and encouraging, not sad. Bottom left (no internet): a soft cloud with a diagonal slash and a small unplugged cable. Bottom right (translator trained): a brain made of connected dots and lines with a green check mark badge. Hands simple and correct with five fingers.",
+      "revision": "4 escenas en 2 × 2 en el orden pedido; aplauso sordo con manos arriba; sin texto; manos de 5 dedos."
+    },
+    {
+      "id": "portada",
+      "archivo": "portada.png",
+      "referencias": ["diseno/generadas/logo_kab_taan/concepto_dialogo.png", "diseno/generadas/fondo_inicio.png"],
+      "para_que": "Pantalla de carga de la app y portada (documentación, póster de Infomatrix). El tercio izquierdo queda oscuro para el nombre.",
+      "ancho": 1024,
+      "alto": 576,
+      "aspecto": "16:9",
+      "prompt": "A NEW wide hero artwork for the app's loading screen, combining the visual language of both references: the glowing flowing ribbons and dark navy atmosphere of the background reference, and the concept of the logo reference. On the right two thirds: a large solid jade teal human hand and a hand made of glowing Maya blue connected dots and lines (hand-tracking landmarks) reaching toward each other, fingertips almost touching, with a bright four-pointed amber star of light between them; behind them a large faint circle with a subtle Maya stepped-fret border, and soft flowing ribbons of teal, violet and amber with small connected tracking dots. The left third is calm, dark, nearly empty deep navy #0F1724 negative space for the app name. Smooth gradients, subtle depth, fine grain, hopeful and premium. No text, no letters, no people, no faces.",
+      "revision": "Mano sólida y mano de puntos con estrella al centro a la derecha; tercio izquierdo oscuro y limpio; sin texto ni personas."
+    },
+    {
+      "id": "escenario_maya",
+      "archivo": "escenario_maya.png",
+      "referencias": ["diseno/generadas/fondo_avatar.png"],
+      "para_que": "Escenario del avatar «Jade»: estudio con muro de piedra con grecas mayas. El avatar se dibuja encima, al centro.",
+      "ancho": 1024,
+      "alto": 576,
+      "aspecto": "16:9",
+      "prompt": "A NEW empty presentation backdrop for a 3D character, with the same calm studio lighting, composition and softness as the reference: a softly lit center where a character will stand and a gentle light spot on the floor at bottom center. The back wall is a smooth carved stone wall in deep jade and dark teal tones with an elegant band of ancient Maya stepped-fret (greca escalonada) relief running horizontally behind, subtly lit from above, the edges falling into deep navy shadow with a faint amber glow. Shallow depth of field so the wall is slightly blurred. Completely empty: no objects in the center, no people, no text. Calm, premium, uncluttered.",
+      "revision": "Escenario vacío, centro iluminado y limpio, muro de piedra jade con greca maya desenfocado, sin personas ni texto."
+    },
+    {
+      "id": "escenario_aula",
+      "archivo": "escenario_aula.png",
+      "referencias": ["diseno/generadas/fondo_avatar.png"],
+      "para_que": "Escenario del avatar «Aula»: salón de clases luminoso y desenfocado, para el modo Aprender.",
+      "ancho": 1024,
+      "alto": 576,
+      "aspecto": "16:9",
+      "prompt": "A NEW backdrop for a 3D character with the same framing as the reference (a clear, softly lit center where a character will stand, gentle light spot on the floor at bottom center): a bright, friendly modern classroom strongly blurred with shallow depth of field, soft daylight from large windows on one side, warm wood tones, a few colorful blurred shapes of books and plants on shelves, light teal and amber accents. The center area directly behind where the character stands is calm and uncluttered. No people, no readable text, no letters on boards or books.",
+      "revision": "Aula luminosa y muy desenfocada, centro tranquilo, sin personas ni texto legible."
+    },
+    {
+      "id": "escenario_plaza",
+      "archivo": "escenario_plaza.png",
+      "referencias": ["diseno/generadas/fondo_avatar.png"],
+      "para_que": "Escenario del avatar «Plaza»: calle colonial de Yucatán al atardecer, desenfocada.",
+      "ancho": 1024,
+      "alto": 576,
+      "aspecto": "16:9",
+      "prompt": "A NEW backdrop for a 3D character with the same framing as the reference (a clear, softly lit center where a character will stand, gentle light spot on the ground at bottom center): a colorful colonial street in Merida, Yucatan at golden hour, pastel facades in coral, amber, teal and soft yellow with arched doorways and iron balconies, warm string lights, strongly blurred with shallow depth of field and soft bokeh. The center behind where the character stands is calm and uncluttered. No people, no cars, no readable signs, no text.",
+      "revision": "Calle colonial yucateca desenfocada al atardecer, centro tranquilo, sin personas, autos ni texto."
+    }
+  ],
+  "modelo": "Nano Banana 2.1 (WaveSpeedAI), edición con imágenes de referencia, resolución 1K como máximo"
+}

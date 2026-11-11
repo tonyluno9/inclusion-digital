@@ -1,0 +1,39 @@
+{
+  "proyecto": "K'ab T'aan - Lengua de Señas Mexicana a texto, voz y avatar (Infomatrix)",
+  "nombre": "K'ab T'aan (maya yucateco: «lengua de manos»)",
+  "salida": "diseno/generadas/logo_kab_taan_v2",
+  "modo": "edicion",
+  "referencia": "diseno/generadas/logo_kab_taan/concepto_dialogo.png",
+  "reglas_generales": [
+    "Modelo: Nano Banana 2.1 en modo EDICIÓN (imagen de referencia + instrucciones), calidad 1K como máximo.",
+    "Exactamente UNA generación por imagen (2 en total). Nunca reintentar.",
+    "Se parte del concepto C «Diálogo», que la persona eligió: se conserva la composición (mano sólida a la izquierda, mano de puntos a la derecha, estrella en medio, aro) y se le agregan detalles mayas para que no se vea vacío.",
+    "Sin texto: el nombre se escribe después con una fuente real.",
+    "Guardar en PNG con el nombre de 'archivo'."
+  ],
+  "estilo_comun": "Edit the reference logo. KEEP its composition exactly: a solid jade teal human hand on the left and a hand drawn only as connected blue dots and lines (hand-tracking landmarks) on the right, fingertips almost touching, a small four-pointed amber star between them, all inside a circular emblem, centered on a plain solid pure white background outside the circle. Keep the flat vector logo style, crisp edges and the palette: jade teal #2EC4B6, Maya blue #3A86C8, deep navy #0F1724, warm amber #FFC857, plus a soft warm cream #F4ECDD. Add authentic ancient Maya design details so the emblem feels rich and complete instead of empty, in the style of carved Maya stone reliefs and codices, but clean, modern and legible as a logo. Both hands must stay clearly the main subject, each with exactly five fingers. No text, no letters, no numbers in Latin script, no pyramids, no feathered headdress, no skulls, no Aztec sun stone, no photorealism, no 3D render.",
+  "negativo_comun": "text, letters, words, watermark, signature, pyramid, temple, headdress, skull, aztec calendar, sun stone, clutter covering the hands, extra fingers, missing fingers, blurry, 3D, photo",
+  "imagenes": [
+    {
+      "id": "dialogo_maya_relieve",
+      "archivo": "dialogo_maya_relieve.png",
+      "para_que": "Versión rica en detalles: cartucho maya completo, para el póster y la portada de la documentación.",
+      "ancho": 1024,
+      "alto": 1024,
+      "aspecto": "1:1",
+      "prompt": "Changes: (1) Turn the thin outer ring into a bold circular border band in deep navy #0F1724, decorated all around with a continuous Maya stepped-fret (greca escalonada) pattern, and at the top, bottom, left and right four small square glyph cartouches containing Maya bar-and-dot numerals (dots and bars only). (2) Fill the inside of the circle with a soft warm cream #F4ECDD background with a very subtle, low-contrast carved-stone texture of tiny Maya geometric motifs, so the white is no longer empty but the hands still stand out strongly. (3) From the fingertips of each hand, add one curling Mesoamerican speech scroll (voluta) in Maya blue and jade that flow toward the center, meaning communication. (4) Make the central star a four-petal shape inspired by the Maya k'in (sun) glyph, amber #FFC857, with a small jade center and a soft glow. (5) Give the solid hand a jade bead bracelet at the wrist and a few fine carved-relief inner lines like a Maya stone carving; make the dots of the digital hand look like small polished jade beads connected by thin lines. Symmetric, balanced, iconic.",
+      "revision": "Se conserva la composición (mano sólida, mano de puntos, estrella); aro con greca escalonada y numerales mayas de puntos y barras; fondo crema con textura sutil; volutas de habla; estrella tipo glifo k'in; manos con 5 dedos; sin texto; las manos siguen siendo lo principal."
+    },
+    {
+      "id": "dialogo_maya_limpio",
+      "archivo": "dialogo_maya_limpio.png",
+      "para_que": "Versión más limpia: menos detalle para que se lea bien en tamaño chico (ícono de la app, encabezados).",
+      "ancho": 1024,
+      "alto": 1024,
+      "aspecto": "1:1",
+      "prompt": "Changes, keeping it simpler and bold so it still reads at small sizes: (1) Make the outer ring thicker, deep navy #0F1724, with a clean Maya stepped-fret (greca escalonada) pattern repeated around the whole ring in jade teal #2EC4B6 negative space. (2) Fill the inside of the circle with a flat soft warm cream #F4ECDD. (3) Add two simple curling Mesoamerican speech scrolls (volutas), one rising from each hand toward the center. (4) Make the central star a bold four-petal shape inspired by the Maya k'in (sun) glyph, amber #FFC857. (5) Add a simple jade bead bracelet on the wrist of the solid hand. Large simple shapes, no fine texture, very clear silhouette.",
+      "revision": "Igual que el anterior pero con formas grandes y simples; se entiende como ícono pequeño; sin texto; 5 dedos en cada mano."
+    }
+  ],
+  "modelo": "Nano Banana 2.1 (WaveSpeedAI), edición con imagen de referencia, resolución 1K como máximo"
+}

@@ -5,20 +5,29 @@ __pycache__/
 *.pyd
 .env
 venv/
+.venv/
 env/
 
-# Modelos pesados (no van en git)
-data/model.pkl
-data/vosk-model-small-es-0.42/
+# Modelos pesados o regenerables (no van en git)
+app/data/model.pkl
+app/data/models/
+app/data/vosk-model-small-es-0.42/
 
-# Dataset SÍ se sube
-# data/dataset.csv → se incluye
+# Respaldos automáticos del dataset
+app/data/backups/
+app/data/dataset_backup_*.csv
+backups/
+
+# Salidas de train_tensorflow.py
+app/data/model.tflite
+app/data/mean.npy
+app/data/std.npy
+app/data/clases.txt
 
 # Temporales y debug
 scratch/
 debug_*.jpg
 *.log
-backups/
 
 # VS Code
 .vscode/
@@ -26,3 +35,17 @@ backups/
 # Sistema
 .DS_Store
 Thumbs.db
+app/data/test_assets/
+
+# Datos grabados por cada persona (puntos del cuerpo): se comparten a propósito, no por defecto
+app/data/dataset_v2.csv
+app/data/avatar/
+app/data/dataset_v2.meta.json
+app/data/manos_por_sena.json
+app/data/progreso.json
+
+# Copias de respaldo que Blender crea al guardar
+*.blend1
+
+# Perfil del navegador de la ventana de la app (cookies, caché)
+app/data/navegador/

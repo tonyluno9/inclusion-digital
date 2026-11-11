@@ -1,0 +1,128 @@
+{
+  "modelo": "google/nano-banana-2.1/text-to-image",
+  "resolucion": "1k",
+  "imagenes": {
+    "logo": {
+      "archivo": "logo.png",
+      "modelo": "google/nano-banana-2.1/text-to-image",
+      "prompt_final": "Modern, clean, friendly and accessible visual style for an inclusive communication app for Deaf people who use Mexican Sign Language. Color palette: deep navy #0F1724, teal #2EC4B6, violet #7C5CFF, coral #FF6B6B, warm amber #FFC857. High quality, crisp, professional product design. Minimal modern app icon for a sign language communication app. A stylized open human hand making a gentle sign gesture, merged with a rounded speech bubble shape behind it. Flat vector illustration made of smooth geometric shapes, soft gradient from teal #2EC4B6 to violet #7C5CFF, one small warm amber #FFC857 accent dot. Perfectly centered, the symbol fills about 70% of the canvas, generous padding, plain solid pure white background, no shadow on the background. Clean crisp edges, balanced and iconic, works at small sizes. No text, no letters.",
+      "tamano_pedido": {
+        "aspecto": "1:1",
+        "resolucion": "1k",
+        "referencia": "1024x1024"
+      },
+      "id_tarea": "087716daae9a4538bae00b1eafbad732",
+      "fecha": "2026-11-04T07:25:08+00:00",
+      "tamano_real": "1024x1024",
+      "formato_entregado": "PNG",
+      "coincide_aspecto": true,
+      "tiempo_inferencia_ms": 12233,
+      "costo_usd": null,
+      "costo_documentado_usd": 0.04,
+      "revision_estado": "ok",
+      "revision_notas": [
+        "Una sola figura centrada sobre fondo blanco liso, sin texto: cumple.",
+        "Mano con 5 dedos (4 dedos y el pulgar): cumple, aunque los dedos se marcan con líneas finas del degradado y se ven algo irregulares.",
+        "El símbolo ocupa cerca del 50 % del lienzo, no el 70 % pedido: se puede recortar el margen al integrarlo."
+      ]
+    },
+    "iconos": {
+      "archivo": "iconos.png",
+      "modelo": "google/nano-banana-2.1/text-to-image",
+      "prompt_final": "Modern, clean, friendly and accessible visual style for an inclusive communication app for Deaf people who use Mexican Sign Language. Color palette: deep navy #0F1724, teal #2EC4B6, violet #7C5CFF, coral #FF6B6B, warm amber #FFC857. High quality, crisp, professional product design. A sprite sheet of 20 user interface icons arranged in a perfectly regular grid of 5 columns and 4 rows, every icon centered in its own equal square cell with lots of empty space around it, all icons the same visual size. Style: consistent minimalist line icons like the Lucide or Feather icon sets, solid pure black strokes of uniform thickness with rounded line caps, on a plain solid pure white background, no grid lines, no borders, no shadows, no color, no text, no labels. Row 1, left to right: an open human hand with three short motion lines (sign language); a webcam; a person bust with a small four-point sparkle (avatar); a speech bubble containing three horizontal lines (subtitles); a microphone. Row 2: a speaker with two sound waves; a speaker with a small x (muted); a record button (filled circle inside a ring); a stop button (rounded square); a play button (triangle). Row 3: an undo curved arrow; a trash can; a brain with a small sparkle (train model); a database cylinder; a bar chart. Row 4: a gear (settings); a question mark inside a circle (help); four arrows pointing to the corners (fullscreen); a person silhouette with a small plus sign (add person); a house (home).",
+      "tamano_pedido": {
+        "aspecto": "5:4",
+        "resolucion": "1k",
+        "referencia": "1024x819"
+      },
+      "id_tarea": "063d7d1123c9424f9720ee56a0f0027a",
+      "fecha": "2026-11-04T07:25:23+00:00",
+      "tamano_real": "1152x928",
+      "formato_entregado": "PNG",
+      "coincide_aspecto": true,
+      "tiempo_inferencia_ms": 14091,
+      "costo_usd": null,
+      "costo_documentado_usd": 0.04,
+      "revision_estado": "ok",
+      "revision_notas": [
+        "20 íconos en 5 columnas × 4 filas, en el orden pedido, negros de línea sobre blanco y sin texto: cumple.",
+        "Tamaño real 1152×928 (el modelo entrega 1K más grande en 5:4); la proporción coincide.",
+        "Las celdas no son milimétricas: comprobar el corte en celdas iguales al integrarla."
+      ]
+    },
+    "fondo_avatar": {
+      "archivo": "fondo_avatar.png",
+      "modelo": "google/nano-banana-2.1/text-to-image",
+      "prompt_final": "Modern, clean, friendly and accessible visual style for an inclusive communication app for Deaf people who use Mexican Sign Language. Color palette: deep navy #0F1724, teal #2EC4B6, violet #7C5CFF, coral #FF6B6B, warm amber #FFC857. High quality, crisp, professional product design. Empty minimalist photographic studio backdrop for a 3D character presentation. Seamless smooth gradient wall, deep navy #141A2E at the edges blending to a softly lit slate blue in the center where a character will stand, a gentle circular soft light spot on the floor at bottom center, subtle violet #7C5CFF rim glow on the far edges, very subtle vignette and fine film grain. Completely empty: no objects, no people, no furniture, no text. Calm, premium, uncluttered, 16:9.",
+      "tamano_pedido": {
+        "aspecto": "16:9",
+        "resolucion": "1k",
+        "referencia": "1024x576"
+      },
+      "id_tarea": "a8ae850b991344d08ddad395471e2862",
+      "fecha": "2026-11-04T07:25:40+00:00",
+      "tamano_real": "1376x768",
+      "formato_entregado": "PNG",
+      "coincide_aspecto": true,
+      "tiempo_inferencia_ms": 37440,
+      "costo_usd": null,
+      "costo_documentado_usd": 0.04,
+      "revision_estado": "ok",
+      "revision_notas": [
+        "Fondo vacío con centro más claro y foco de luz en el piso, sin objetos, personas ni texto: cumple.",
+        "En los bordes izquierdo y derecho hay brillos naranja/ámbar que no se pidieron (solo violeta).",
+        "Tamaño real 1376×768 (16:9, 1K del modelo)."
+      ]
+    },
+    "fondo_inicio": {
+      "archivo": "fondo_inicio.png",
+      "modelo": "google/nano-banana-2.1/text-to-image",
+      "prompt_final": "Modern, clean, friendly and accessible visual style for an inclusive communication app for Deaf people who use Mexican Sign Language. Color palette: deep navy #0F1724, teal #2EC4B6, violet #7C5CFF, coral #FF6B6B, warm amber #FFC857. High quality, crisp, professional product design. Abstract modern background for an inclusive communication app home screen. On the right two thirds: soft flowing translucent ribbons and rounded shapes that evoke the movement of signing hands and gentle sound waves, glowing teal #2EC4B6, violet #7C5CFF and a few warm amber #FFC857 accents, with small connected dots like motion-tracking points along the ribbons. The left third is calm, dark and nearly empty deep navy #0F1724 negative space for interface text. Smooth gradients, subtle depth of field, fine grain, elegant and hopeful. No people, no faces, no hands drawn realistically, no text.",
+      "tamano_pedido": {
+        "aspecto": "16:9",
+        "resolucion": "1k",
+        "referencia": "1024x576"
+      },
+      "id_tarea": "48dd3a98dc04485698679f1d698bbe8f",
+      "fecha": "2026-11-04T07:26:21+00:00",
+      "tamano_real": "1376x768",
+      "formato_entregado": "PNG",
+      "coincide_aspecto": true,
+      "tiempo_inferencia_ms": 24656,
+      "costo_usd": null,
+      "costo_documentado_usd": 0.04,
+      "revision_estado": "ok",
+      "revision_notas": [
+        "Tercio izquierdo oscuro y limpio, formas fluidas a la derecha con puntos conectados, sin personas ni texto: cumple.",
+        "Tamaño real 1376×768 (16:9, 1K del modelo)."
+      ]
+    },
+    "ilustraciones": {
+      "archivo": "ilustraciones.png",
+      "modelo": "google/nano-banana-2.1/text-to-image",
+      "prompt_final": "Modern, clean, friendly and accessible visual style for an inclusive communication app for Deaf people who use Mexican Sign Language. Color palette: deep navy #0F1724, teal #2EC4B6, violet #7C5CFF, coral #FF6B6B, warm amber #FFC857. High quality, crisp, professional product design. Four spot illustrations arranged in a perfectly regular 2 by 2 grid, each one centered in its own equal quadrant with generous empty margins, all in exactly the same flat vector style with soft rounded shapes, limited palette of teal #2EC4B6, violet #7C5CFF, coral #FF6B6B, warm amber #FFC857 and navy #0F1724, on a plain solid pure white background, no grid lines, no borders, no text. Top left: two diverse young Mexican adults in friendly conversation, one signing with both hands, the other listening and smiling, a small friendly 3D-style avatar character between them waving. Top right: a person seated at a desk facing a laptop webcam, upper body visible from head to waist including both elbows, with a dashed rounded rectangle guide framing the head, shoulders and elbows. Bottom left: a webcam with a soft diagonal slash and a small question mark, meaning camera not found. Bottom right: a stylized open hand made of connected dots and lines like motion-tracking landmarks, next to a small progress bar, meaning training. Hands drawn simply and correctly with five fingers.",
+      "tamano_pedido": {
+        "aspecto": "1:1",
+        "resolucion": "1k",
+        "referencia": "1024x1024"
+      },
+      "id_tarea": "a0851574457f4e69bdc5c49217a44a2f",
+      "fecha": "2026-11-04T07:26:47+00:00",
+      "tamano_real": "1024x1024",
+      "formato_entregado": "PNG",
+      "coincide_aspecto": true,
+      "tiempo_inferencia_ms": 28163,
+      "costo_usd": null,
+      "costo_documentado_usd": 0.04,
+      "revision_estado": "problemas",
+      "revision_notas": [
+        "4 ilustraciones en 2 × 2, mismo estilo, fondo blanco, sin texto: cumple.",
+        "Arriba a la derecha: la guía punteada no enmarca bien cabeza, hombros y codos; queda como un rectángulo partido con un recuadro aparte en un codo, y la persona saluda en lugar de estar frente a la cámara con los codos visibles.",
+        "Arriba a la izquierda: el avatar es una criatura tipo mascota, no un personaje 3D, y está abajo, no entre los dos.",
+        "Manos: en general tienen 5 dedos; la mano de puntos (abajo a la derecha) también."
+      ]
+    }
+  },
+  "acepta_prompt_negativo": false,
+  "costo_total_nota": "La API no informó el costo. Precio publicado: 0.04 USD por imagen a 1K, unos 0.20 USD en total."
+}

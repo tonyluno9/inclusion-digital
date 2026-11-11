@@ -1,0 +1,67 @@
+{
+  "modelo": "google/nano-banana-2.1/text-to-image",
+  "resolucion": "1k",
+  "imagenes": {
+    "concepto_glifo": {
+      "archivo": "concepto_glifo.png",
+      "modelo": "google/nano-banana-2.1/text-to-image",
+      "prompt_final": "Professional logo symbol design for K'ab T'aan, a student science-fair project (Infomatrix) that translates Mexican Sign Language into text and voice and answers back with a 3D signing avatar. The name means 'language of the hands' in Yucatec Maya. Modern flat vector logo, subtly inspired by the geometry of ancient Maya glyph blocks (rounded square cartouches, stepped fret 'greca' details, bold rounded strokes), but clean, contemporary and minimal, not a historical illustration. Color palette only: jade teal #2EC4B6, Maya blue #3A86C8, deep navy #0F1724 and one small warm amber #FFC857 accent. Solid flat colors with at most one subtle gradient, crisp clean edges, strong silhouette that is recognizable in one color and at small sizes (favicon) and also looks great printed large on a poster. Perfectly centered, the symbol fills about 70% of the canvas with generous even padding, on a plain solid pure white background, no shadow, no mockup, no frame, no background scene. Concept: a modern Maya glyph block. A rounded-square cartouche in deep navy #0F1724, like the frame of an ancient Maya hieroglyph, containing a bold stylized open human hand in jade teal #2EC4B6 raised in a friendly signing gesture, palm facing the viewer, exactly five clearly separated fingers (four fingers and one thumb). Two or three short curved 'speech scroll' marks in Maya blue #3A86C8 come out from the fingertips, like the speech scrolls used in Maya and Mesoamerican art to show someone speaking. One small amber #FFC857 dot accent. The cartouche border has a subtle stepped fret detail in one corner only. Symmetric, bold, iconic, no text.",
+      "tamano_pedido": {
+        "aspecto": "1:1",
+        "resolucion": "1k",
+        "referencia": "1024x1024"
+      },
+      "id_tarea": "2a43ed1340fa4b418bf33b7f4adbca04",
+      "fecha": "2026-11-04T18:28:47+00:00",
+      "tamano_real": "1024x1024",
+      "formato_entregado": "PNG",
+      "coincide_aspecto": true,
+      "tiempo_inferencia_ms": 31814,
+      "costo_usd": null,
+      "costo_documentado_usd": 0.04,
+      "revision_estado": "cumple, con detalles",
+      "revision_notas": "Mano con 5 dedos bien separados (4 + pulgar) dentro del cuadro redondeado tipo glifo, greca escalonada en una sola esquina, punto ámbar y sin texto. Se lee muy bien en pequeño. Detalles: las 2 volutas salen del costado de la mano, no de las puntas de los dedos; la mano no es simétrica (pulgar abierto a la derecha) y queda cortada por el borde inferior del cuadro. Las volutas son finas y a 32 px casi desaparecen."
+    },
+    "concepto_voluta": {
+      "archivo": "concepto_voluta.png",
+      "modelo": "google/nano-banana-2.1/text-to-image",
+      "prompt_final": "Professional logo symbol design for K'ab T'aan, a student science-fair project (Infomatrix) that translates Mexican Sign Language into text and voice and answers back with a 3D signing avatar. The name means 'language of the hands' in Yucatec Maya. Modern flat vector logo, subtly inspired by the geometry of ancient Maya glyph blocks (rounded square cartouches, stepped fret 'greca' details, bold rounded strokes), but clean, contemporary and minimal, not a historical illustration. Color palette only: jade teal #2EC4B6, Maya blue #3A86C8, deep navy #0F1724 and one small warm amber #FFC857 accent. Solid flat colors with at most one subtle gradient, crisp clean edges, strong silhouette that is recognizable in one color and at small sizes (favicon) and also looks great printed large on a poster. Perfectly centered, the symbol fills about 70% of the canvas with generous even padding, on a plain solid pure white background, no shadow, no mockup, no frame, no background scene. Concept: the hand that speaks. A single bold continuous shape: a stylized open human hand in a gentle signing gesture, palm facing the viewer, exactly five fingers (four fingers and one thumb), whose palm and wrist curl smoothly into a Mesoamerican speech scroll (a spiral 'voluta' like the ones that mean speech in Maya art). The hand is jade teal #2EC4B6 blending softly into Maya blue #3A86C8 along the spiral, and the negative space inside the palm forms a small rounded speech bubble shape. One small warm amber #FFC857 dot at the center of the spiral. Minimal, elegant, friendly, balanced, very simple geometry, no outline, no text.",
+      "tamano_pedido": {
+        "aspecto": "1:1",
+        "resolucion": "1k",
+        "referencia": "1024x1024"
+      },
+      "id_tarea": "ec54339f88114a6ba931f268b43062ab",
+      "fecha": "2026-11-04T18:29:21+00:00",
+      "tamano_real": "1024x1024",
+      "formato_entregado": "PNG",
+      "coincide_aspecto": true,
+      "tiempo_inferencia_ms": 28845,
+      "costo_usd": null,
+      "costo_documentado_usd": 0.04,
+      "revision_estado": "cumple a medias",
+      "revision_notas": "Hay 4 barras verticales como dedos y el pulgar se enrolla en una voluta con un punto ámbar al centro; dentro de la espiral hay una burbuja de diálogo con su colita. No es «una sola figura»: añade un marco azul marino lateral, dos grecas que no se pidieron y cortes blancos entre las piezas. Usa un solo degradado suave (permitido). La mano cuesta reconocerla: se ve más como un emblema abstracto que como una mano, sobre todo en pequeño. Sin texto."
+    },
+    "concepto_dialogo": {
+      "archivo": "concepto_dialogo.png",
+      "modelo": "google/nano-banana-2.1/text-to-image",
+      "prompt_final": "Professional logo symbol design for K'ab T'aan, a student science-fair project (Infomatrix) that translates Mexican Sign Language into text and voice and answers back with a 3D signing avatar. The name means 'language of the hands' in Yucatec Maya. Modern flat vector logo, subtly inspired by the geometry of ancient Maya glyph blocks (rounded square cartouches, stepped fret 'greca' details, bold rounded strokes), but clean, contemporary and minimal, not a historical illustration. Color palette only: jade teal #2EC4B6, Maya blue #3A86C8, deep navy #0F1724 and one small warm amber #FFC857 accent. Solid flat colors with at most one subtle gradient, crisp clean edges, strong silhouette that is recognizable in one color and at small sizes (favicon) and also looks great printed large on a poster. Perfectly centered, the symbol fills about 70% of the canvas with generous even padding, on a plain solid pure white background, no shadow, no mockup, no frame, no background scene. Concept: dialogue between a person and an avatar. Two stylized open hands facing each other at the same height, fingertips almost touching in the center, together forming a circular emblem. The left hand is a solid flat shape in jade teal #2EC4B6, representing the person. The right hand is drawn only as connected dots and straight lines in Maya blue #3A86C8, like computer-vision hand-tracking landmarks (21 dots: wrist, knuckles and finger joints), representing the digital avatar. Each hand has exactly five fingers. A thin circular ring in deep navy #0F1724 around both hands with a small stepped Maya fret motif at the top and bottom of the ring, and one small amber #FFC857 spark between the fingertips. Symmetric, clean, iconic, no text.",
+      "tamano_pedido": {
+        "aspecto": "1:1",
+        "resolucion": "1k",
+        "referencia": "1024x1024"
+      },
+      "id_tarea": "703777e723d94935b060f8b900001ddc",
+      "fecha": "2026-11-04T18:29:51+00:00",
+      "tamano_real": "1024x1024",
+      "formato_entregado": "PNG",
+      "coincide_aspecto": true,
+      "tiempo_inferencia_ms": 68041,
+      "costo_usd": null,
+      "costo_documentado_usd": 0.04,
+      "revision_estado": "cumple a medias",
+      "revision_notas": "Dos manos de 5 dedos frente a frente: la izquierda sólida (jade) y la derecha de puntos y líneas (azul), chispa ámbar al centro, aro azul marino con greca arriba y abajo, sin texto. Cuenta muy bien la idea del proyecto. Detalles: las manos no son simétricas ni están a la misma altura (la izquierda entra en diagonal desde abajo y la corta el aro); la red de puntos de la derecha no sigue con exactitud los 21 puntos de MediaPipe (hay líneas de más en la palma). El aro y las líneas son finos: a 64 px se ve regular y a 32 px se pierde."
+    }
+  },
+  "acepta_prompt_negativo": false
+}

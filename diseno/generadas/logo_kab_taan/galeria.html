@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="es"><head><meta charset="utf-8"><title>K'ab T'aan — conceptos de logo</title>
+<style>
+body{margin:0;font-family:system-ui,Segoe UI,sans-serif;background:#f4f6f8;color:#0F1724}
+header{padding:24px 32px} h1{margin:0 0 4px} header p{margin:0;color:#555}
+main{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;padding:0 32px 32px}
+article{background:#fff;border-radius:14px;padding:20px;box-shadow:0 1px 4px #0002}
+h2{margin:0 0 12px;color:#3A86C8}
+.grande{width:100%;aspect-ratio:1;border:1px solid #e3e7ec;border-radius:10px}
+.para{font-size:15px} .estado{margin:8px 0 2px} .notas{font-size:13px;color:#444;line-height:1.45}
+.mini{display:flex;flex-direction:column;gap:8px;margin-top:12px}
+.fila{display:flex;align-items:center;gap:16px;padding:10px 14px;border-radius:10px}
+.fila span{margin-left:auto;font-size:12px;opacity:.7}
+.claro{background:#fff;border:1px solid #e3e7ec} .oscuro{background:#0F1724;color:#fff}
+footer{padding:0 32px 32px;font-size:13px;color:#555}
+@media (max-width:1100px){main{grid-template-columns:1fr}}
+</style></head><body>
+<header><h1>K'ab T'aan — 3 conceptos de logo</h1>
+<p>Modelo: google/nano-banana-2.1/text-to-image · resolución 1k · una sola generación por imagen. Solo el símbolo; el nombre se pondrá después con una fuente real.</p></header>
+<main>
+<article>
+  <h2>Glifo</h2>
+  <img class="grande" src="concepto_glifo.png" alt="Glifo">
+  <p class="para">Concepto A «Glifo»: la mano dentro de un bloque de glifo maya. Es el más «maya» y el más fácil de reconocer como ícono.</p>
+  <p class="estado">Revisión: <b>cumple, con detalles</b></p>
+  <p class="notas">Mano con 5 dedos bien separados (4 + pulgar) dentro del cuadro redondeado tipo glifo, greca escalonada en una sola esquina, punto ámbar y sin texto. Se lee muy bien en pequeño. Detalles: las 2 volutas salen del costado de la mano, no de las puntas de los dedos; la mano no es simétrica (pulgar abierto a la derecha) y queda cortada por el borde inferior del cuadro. Las volutas son finas y a 32 px casi desaparecen.</p>
+  <div class="mini">
+    <div class="fila claro"><img src="vista_transparente_concepto_glifo.png" width="64" height="64" alt=""><img src="vista_transparente_concepto_glifo.png" width="32" height="32" alt=""><span>fondo claro</span></div>
+    <div class="fila oscuro"><img src="vista_transparente_concepto_glifo.png" width="64" height="64" alt=""><img src="vista_transparente_concepto_glifo.png" width="32" height="32" alt=""><span>#0F1724</span></div>
+  </div>
+</article>
+<article>
+  <h2>Mano que habla</h2>
+  <img class="grande" src="concepto_voluta.png" alt="Mano que habla">
+  <p class="para">Concepto B «Mano que habla»: una sola forma; la mano y la voluta de la palabra son la misma figura. El más limpio y moderno.</p>
+  <p class="estado">Revisión: <b>cumple a medias</b></p>
+  <p class="notas">Hay 4 barras verticales como dedos y el pulgar se enrolla en una voluta con un punto ámbar al centro; dentro de la espiral hay una burbuja de diálogo con su colita. No es «una sola figura»: añade un marco azul marino lateral, dos grecas que no se pidieron y cortes blancos entre las piezas. Usa un solo degradado suave (permitido). La mano cuesta reconocerla: se ve más como un emblema abstracto que como una mano, sobre todo en pequeño. Sin texto.</p>
+  <div class="mini">
+    <div class="fila claro"><img src="vista_transparente_concepto_voluta.png" width="64" height="64" alt=""><img src="vista_transparente_concepto_voluta.png" width="32" height="32" alt=""><span>fondo claro</span></div>
+    <div class="fila oscuro"><img src="vista_transparente_concepto_voluta.png" width="64" height="64" alt=""><img src="vista_transparente_concepto_voluta.png" width="32" height="32" alt=""><span>#0F1724</span></div>
+  </div>
+</article>
+<article>
+  <h2>Diálogo</h2>
+  <img class="grande" src="concepto_dialogo.png" alt="Diálogo">
+  <p class="para">Concepto C «Diálogo»: la mano humana y la mano del avatar (hecha de puntos de seguimiento) se encuentran. Cuenta toda la idea del proyecto: persona ↔ sistema ↔ avatar.</p>
+  <p class="estado">Revisión: <b>cumple a medias</b></p>
+  <p class="notas">Dos manos de 5 dedos frente a frente: la izquierda sólida (jade) y la derecha de puntos y líneas (azul), chispa ámbar al centro, aro azul marino con greca arriba y abajo, sin texto. Cuenta muy bien la idea del proyecto. Detalles: las manos no son simétricas ni están a la misma altura (la izquierda entra en diagonal desde abajo y la corta el aro); la red de puntos de la derecha no sigue con exactitud los 21 puntos de MediaPipe (hay líneas de más en la palma). El aro y las líneas son finos: a 64 px se ve regular y a 32 px se pierde.</p>
+  <div class="mini">
+    <div class="fila claro"><img src="vista_transparente_concepto_dialogo.png" width="64" height="64" alt=""><img src="vista_transparente_concepto_dialogo.png" width="32" height="32" alt=""><span>fondo claro</span></div>
+    <div class="fila oscuro"><img src="vista_transparente_concepto_dialogo.png" width="64" height="64" alt=""><img src="vista_transparente_concepto_dialogo.png" width="32" height="32" alt=""><span>#0F1724</span></div>
+  </div>
+</article>
+</main>
+<footer>Las vistas pequeñas usan una copia con el fondo blanco vuelto transparente (vista_transparente_*.png), para ver cómo queda el símbolo sobre azul marino. Las partes azul marino del símbolo se pierden sobre ese fondo: el modo oscuro necesitará una versión con esos trazos en claro.</footer>
+</body></html>
