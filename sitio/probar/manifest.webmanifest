@@ -1,0 +1,19 @@
+{
+  "name": "K'ab T'aan · Pruébalo",
+  "short_name": "K'ab T'aan",
+  "description": "Lengua de Señas Mexicana a texto, voz y avatar, en tu navegador. Tu video no sale de tu dispositivo.",
+  "lang": "es-MX",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#0F1724",
+  "theme_color": "#0F1724",
+  "categories": ["education", "accessibility"],
+  "icons": [
+    { "src": "../assets/img/icono-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "../assets/img/icono-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "../assets/img/icono-maskable-192.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
+    { "src": "../assets/img/icono-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

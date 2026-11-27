@@ -1,0 +1,250 @@
+/* «Pruébalo»: solo lo que no existe en la app de escritorio (app.css es la copia de la app). */
+
+/* Cámara apagada: botón para encenderla y explicación del permiso */
+.camara-vacia { padding: 24px; text-align: center; }
+.camara-vacia img { width: 150px; }
+.encender-titulo { margin: 4px 0 0; font-size: 18px; font-weight: 600; color: var(--texto); }
+.encender-nota { margin: 0; max-width: 440px; font-size: 14px; color: var(--texto-2); }
+.camara-vacia .boton { margin: 6px 0 2px; }
+.carga-barra.mini { width: 200px; }
+.camara > canvas[data-video] { transform: none; }
+.btn-apagar-camara {
+  position: absolute; top: 12px; right: 12px; z-index: 2;
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 6px 12px; border-radius: 999px; cursor: pointer;
+  background: rgba(7, 11, 18, .72); border: 1px solid rgba(255, 255, 255, .18); color: var(--texto);
+  font-size: 13px; backdrop-filter: blur(4px);
+}
+.btn-apagar-camara .icono { width: 16px; height: 16px; }
+.btn-apagar-camara:hover { border-color: var(--coral); color: #FFD0D0; }
+.camara.sin-senal .btn-apagar-camara { display: none; }
+
+/* Aviso de prueba de concepto (Inicio) */
+.aviso-poc {
+  display: flex; gap: 14px; align-items: flex-start;
+  max-width: 720px; margin: 0 0 26px; padding: 14px 18px;
+  border-radius: 14px; border: 1px solid rgba(255, 200, 87, .45); background: rgba(18, 24, 38, .9);
+  backdrop-filter: blur(6px);
+  font-size: 15px; line-height: 1.5; color: var(--texto);
+}
+.aviso-poc > .icono { color: var(--ambar); margin-top: 2px; }
+.aviso-poc b { color: var(--ambar); }
+.poc-privacidad { display: block; margin-top: 6px; color: var(--texto-2); font-size: 14px; }
+
+/* Ayuda: tus datos y privacidad */
+label.boton { cursor: pointer; }
+.lista-privacidad { margin: 0; padding-left: 20px; color: var(--texto-2); font-size: 14px; line-height: 1.55; }
+.lista-privacidad li { margin-bottom: 6px; }
+.lista-privacidad b { color: var(--texto); }
+#pagina-ayuda .rejilla.abajo { margin-top: 18px; }
+
+/* Diálogo antes de dictar */
+.botones.centro { justify-content: center; }
+
+/* Navegador sin WebGL o sin cámara */
+.aviso-navegador {
+  position: fixed; left: 50%; bottom: 18px; transform: translateX(-50%); z-index: 60;
+  max-width: min(680px, calc(100vw - 32px)); padding: 12px 18px; border-radius: 12px;
+  background: #3A1F14; border: 1px solid var(--naranja); color: var(--texto); font-size: 14px; box-shadow: var(--sombra);
+}
+
+/* Enlace «El proyecto» en la barra lateral: igual que los botones */
+a.nav { text-decoration: none; }
+
+/* Foco visible con teclado (la app no lo marcaba en todos los botones) */
+:focus-visible { outline: 3px solid var(--ambar); outline-offset: 2px; }
+.nav:focus-visible, .boton:focus-visible { outline-offset: -3px; }
+
+/* Aviso de modo rápido (computadoras lentas) */
+.aviso-rapido { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.aviso-rapido .boton { padding: 6px 12px; }
+
+/* Sin animaciones para quien las desactivó en su sistema */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+  .confeti { display: none; }
+}
+
+/* ======================================================================
+   Celular y tableta (js/movil.js agrega .tactil y .camara-encendida a <html>)
+   ====================================================================== */
+.nav-mas, .hoja-mas, .hoja-fondo { display: none; }
+.tactil .solo-teclado { display: none; }
+.tactil .lt-asa { width: 28px; height: 42px; top: 7px; margin-left: -14px; }
+.tarjeta-instalar .boton { margin-top: 12px; }
+
+@keyframes subir { from { transform: translateY(16px); opacity: 0; } to { transform: none; opacity: 1; } }
+
+/* Celular de pie (un celular acostado tiene su propio bloque al final) */
+@media (max-width: 760px) and (min-height: 521px) {
+  html, body { height: auto; min-height: 100%; }
+  body { display: block; overflow-x: hidden; overflow-y: auto; }
+  main { display: block; padding-bottom: calc(76px + env(safe-area-inset-bottom)); }
+
+  /* Barra de abajo: cuatro pantallas y «Más» (Entrenar, Avatar, Ayuda, el proyecto, voz…) */
+  .lateral {
+    position: fixed; z-index: 30; left: 0; right: 0; bottom: 0; width: 100%; height: auto;
+    flex-direction: row; align-items: stretch; overflow: visible;
+    padding: 4px 6px calc(4px + env(safe-area-inset-bottom));
+    border-right: 0; border-top: 1px solid var(--borde);
+    background: rgba(11, 17, 28, .96); backdrop-filter: blur(10px);
+  }
+  .lateral-logo, .lateral-pie, .lateral .nav-secundario { display: none; }
+  .lateral nav { flex-direction: row; width: 100%; gap: 2px; }
+  .lateral nav .nav { flex: 1 1 0; width: auto; min-width: 0; min-height: 56px; padding: 7px 2px 6px; gap: 3px; font-size: 11px; border-radius: 12px; }
+  .lateral nav .nav .icono { width: 24px; height: 24px; }
+  .lateral nav .nav-mas { display: flex; }
+  .hoja-fondo { display: block; position: fixed; inset: 0; z-index: 28; background: rgba(4, 7, 12, .55); }
+  .hoja-mas {
+    display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px;
+    position: fixed; z-index: 29; left: 8px; right: 8px; bottom: calc(72px + env(safe-area-inset-bottom));
+    padding: 12px; border-radius: 20px; background: var(--superficie); border: 1px solid var(--borde);
+    box-shadow: 0 -12px 40px rgba(0, 0, 0, .5); animation: subir .18s ease-out;
+  }
+  .opcion-mas {
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px;
+    min-height: 76px; padding: 12px 6px; border-radius: 14px; cursor: pointer; text-align: center;
+    background: var(--superficie-2); border: 1px solid transparent; color: var(--texto); font: 600 13px "Lexend", system-ui, sans-serif;
+  }
+  .opcion-mas .icono { width: 26px; height: 26px; }
+  .opcion-mas.activa { border-color: var(--turquesa); color: var(--turquesa); }
+  .opcion-mas.apagado { color: var(--coral); }
+  .opcion-mas.destacada { background: rgba(46, 196, 182, .14); color: var(--turquesa); }
+
+  /* Encabezado: título y, debajo, los indicadores en una sola fila que se desliza */
+  .barra { flex-wrap: wrap; padding: calc(10px + env(safe-area-inset-top)) 14px 4px; gap: 6px; }
+  .barra h1 { font-size: 21px; }
+  .chips { width: 100%; flex-wrap: nowrap; justify-content: flex-start; gap: 6px; overflow-x: auto; scrollbar-width: none; }
+  .chips::-webkit-scrollbar { display: none; }
+  .chip { flex: none; padding: 5px 10px; font-size: 12px; }
+  .chip.aviso-encuadre { font-size: 13px; }
+
+  .pagina { padding: 8px 12px 16px; overflow: visible; }
+  .pagina.visible { gap: 12px; }
+  .tarjeta { padding: 14px; border-radius: 16px; }
+  .boton { min-height: 44px; padding: 10px 14px; }
+  .boton.mini { min-height: 38px; }
+  .campos input, .fila-form input, .buscador input { font-size: 16px; }   /* el iPhone no hace zoom al escribir */
+
+  /* Inicio */
+  .inicio { padding: 20px 14px; background-position: 70% center; }
+  .inicio-logo { width: 84px; height: 84px; }
+  .inicio h2 { font-size: 42px; }
+  .lema { font-size: 16px; margin-bottom: 18px; }
+  .aviso-poc { font-size: 14px; padding: 12px 14px; }
+  .tarjetas-inicio { grid-template-columns: 1fr; }
+
+  /* Cámara: la caja toma la forma del video (vertical en el celular) */
+  .camara { min-height: 0; }
+  .camara.sin-senal { min-height: 300px; }
+  .camara:not(.sin-senal) { aspect-ratio: var(--aspecto-camara, .75); max-height: 60svh; }
+  .camara-vacia { padding: 16px; gap: 6px; }
+  .camara-vacia img { width: 84px; }
+  .encender-titulo { font-size: 17px; }
+  .btn-apagar-camara { top: 8px; right: 8px; padding: 6px 10px; }
+  .escenario { min-height: 260px; }
+  .escenario-pie { padding: 8px 12px; font-size: 13px; min-height: 0; }
+
+  /* Con la cámara encendida, cámara y avatar lado a lado (Traducir, Aprender, Avatar) */
+  .camara-encendida .rejilla.dos:has(> .camara-tarjeta):has(> .escenario-tarjeta) { grid-template-columns: 1fr 1fr !important; gap: 8px; }
+  .camara-encendida .rejilla.dos:has(> .camara-tarjeta):has(> .escenario-tarjeta) .escenario { min-height: 0; height: 100%; }
+  .camara-encendida .rejilla.dos:has(> .camara-tarjeta):has(> .escenario-tarjeta) .escenario-pie { display: none; }
+  .camara-encendida .rejilla.dos:has(> .camara-tarjeta):has(> .escenario-tarjeta) .btn-apagar-camara span:last-child { display: none; }
+
+  /* El menú de escenarios sube desde abajo (dentro de la tarjeta no cabe) */
+  .menu-escenario {
+    position: fixed; left: 12px; right: 12px; top: auto; bottom: calc(80px + env(safe-area-inset-bottom));
+    width: auto; z-index: 31; grid-template-columns: repeat(4, minmax(0, 1fr)); box-shadow: 0 -12px 40px rgba(0, 0, 0, .5);
+  }
+
+  /* Traducir */
+  .subtitulo .palabra { font-size: 40px; }
+  .subtitulo .palabra.esperando { font-size: 20px; padding: 8px 0; }
+  .barra-conf { flex-basis: 110px; }
+  .historial { margin: 8px 0 10px; }
+  .oracion, .interlocutor-texto { font-size: 21px; }
+  .fila-form { flex-wrap: wrap; }
+  .fila-form .boton { flex: 1 1 100%; }
+
+  /* Aprender: primero la seña que hay que hacer, luego cámara y avatar */
+  #pagina-aprender .apr-barra { order: 0; }
+  #pagina-aprender .apr-reto, #pagina-aprender #apr-vacio { order: 1; }
+  #pagina-aprender .apr-vista { order: 2; }
+  .apr-barra { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)) auto; gap: 6px; padding: 10px 12px; }
+  .apr-dato { gap: 6px; }
+  .apr-dato .icono.grande { width: 24px; height: 24px; }
+  .apr-dato b { font-size: 17px; }
+  .apr-dato small { font-size: 11px; line-height: 1.2; display: block; }
+  .apr-logros { margin-left: 0; padding: 8px 10px; }
+  .apr-logros > span { font-size: 0; }
+  .apr-logros > span b { font-size: 14px; }
+  .apr-cabeza { gap: 8px; }
+  .apr-palabra { font-size: 34px; margin: 2px 0 8px; }
+  .estrellas i { width: 20px; height: 20px; }
+  .apr-estado { min-height: 0; padding: 10px 12px; margin-bottom: 10px; font-size: 15px; gap: 10px; }
+  .apr-estado img { width: 64px; height: 64px; }
+  .apr-estado > .icono { width: 26px; height: 26px; margin: 0 2px; }
+  .apr-reto .botones .boton { flex: 1 1 auto; }
+
+  /* Diccionario: el avatar arriba y fijo, compacto; las señas debajo */
+  .dic-rejilla { display: flex; flex-direction: column; }
+  .dic-lateral { order: -1; position: sticky; top: 0; z-index: 5; box-shadow: 0 10px 24px rgba(0, 0, 0, .45); }
+  .dic-lateral .escenario { height: 26svh; min-height: 160px; }
+  .dic-detalle { padding: 8px 12px 10px; max-height: none; overflow: visible; }
+  .dic-detalle h2 { font-size: 22px; margin: 0 0 4px; }
+  .dic-estado { flex-direction: row; flex-wrap: wrap; gap: 2px 12px; margin-bottom: 8px; font-size: 13px; }
+  .dic-estado .icono { width: 18px; height: 18px; }
+  .dic-detalle .botones { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; padding-bottom: 2px; }
+  .dic-detalle .botones::-webkit-scrollbar { display: none; }
+  .dic-detalle .botones .boton { flex: none; min-height: 40px; padding: 8px 12px; font-size: 14px; }
+  .dic-palabras { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .dic-seccion header img, .dic-otras { width: 48px; height: 48px; }
+
+  /* Entrenar y Avatar */
+  .segmentado { width: 100%; }
+  .segmentado button { flex: 1 1 auto; justify-content: center; padding: 10px 8px; min-height: 44px; }
+  .linea-tiempo { margin: 10px 14px 2px; }
+
+  /* Diálogos */
+  .capa { padding: 12px; }
+  .dialogo { max-height: calc(100svh - 24px); border-radius: 18px; }
+  .tutorial > img { max-height: 200px; padding: 14px; }
+  .tutorial-texto { padding: 20px; }
+  .tutorial-texto p { font-size: 16px; }
+  .tutorial-texto .botones { flex-wrap: nowrap; }
+  .celebracion img { width: 140px; height: 140px; }
+  .logros { padding: 18px 16px 20px; }
+  .logros-rejilla { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .logro img { width: 76px; height: 76px; }
+  .avisos { left: 12px; right: 12px; bottom: calc(84px + env(safe-area-inset-bottom)); }
+  .aviso { max-width: none; }
+  .aviso-navegador { left: 12px; right: 12px; bottom: calc(84px + env(safe-area-inset-bottom)); transform: none; max-width: none; }
+  .contador { flex-wrap: wrap; row-gap: 2px; }
+  .contador b.tenue { font-size: 19px; }
+  .apr-dato b, .apr-dato small { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .apr-dato > div { min-width: 0; }
+}
+
+/* Celular acostado: barra lateral delgada y cámara y avatar lado a lado */
+@media (orientation: landscape) and (max-height: 520px) {
+  .lateral { width: 76px; padding: 6px 4px calc(6px + env(safe-area-inset-bottom)) calc(4px + env(safe-area-inset-left)); overflow-y: auto; }
+  .lateral-logo { width: 38px; height: 38px; margin-bottom: 6px; }
+  .nav, .nav.chico { padding: 6px 2px; font-size: 10.5px; gap: 2px; }
+  .nav .icono, .nav.chico .icono { width: 20px; height: 20px; }
+  .barra { padding: 8px 16px 2px; }
+  .barra h1 { font-size: 20px; }
+  .chip { padding: 4px 9px; font-size: 12px; }
+  .pagina { padding: 6px 14px 14px; }
+  .rejilla.dos, .subtitulos-fila { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important; gap: 10px; }
+  .camara { min-height: 0; }
+  .camara:not(.sin-senal) { aspect-ratio: var(--aspecto-camara, 1.333); max-height: 74svh; }
+  .camara.sin-senal { min-height: 240px; }
+  .escenario { min-height: 220px; }
+  .inicio { padding: 16px 24px; }
+  .inicio h2 { font-size: 40px; }
+  .dic-lateral .escenario { height: 46svh; min-height: 0; }
+  .boton { min-height: 40px; }
+  .dialogo { max-height: calc(100svh - 16px); }
+  .tutorial { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  .tutorial > img { max-height: none; }
+}

@@ -1,0 +1,38 @@
+{
+  "nota": "Categorías del Diccionario y de las insignias. Las palabras van normalizadas: minúsculas, sin acentos ni signos (igual que norm() de web/js/texto.js). Se pueden agregar palabras o categorías.",
+  "categorias": [
+    {
+      "id": "saludos",
+      "nombre": "Saludos",
+      "palabras": ["hola", "adios", "buenos dias", "buenas tardes", "buenas noches", "bienvenido", "hasta luego",
+                   "mucho gusto", "como estas", "nos vemos"]
+    },
+    {
+      "id": "cortesia",
+      "nombre": "Cortesía",
+      "palabras": ["gracias", "por favor", "de nada", "denada", "perdon", "lo siento", "con permiso", "disculpa",
+                   "ayuda"]
+    },
+    {
+      "id": "preguntas",
+      "nombre": "Preguntas",
+      "palabras": ["que", "quien", "donde", "cuando", "como", "por que", "cuanto", "cual", "como te llamas"]
+    },
+    {
+      "id": "familia",
+      "nombre": "Familia",
+      "palabras": ["familia", "mama", "papa", "hermano", "hermana", "hijo", "hija", "abuelo", "abuela", "bebe",
+                   "amigo", "amiga"]
+    },
+    {
+      "id": "emociones",
+      "nombre": "Emociones",
+      "palabras": ["feliz", "triste", "enojado", "cansado", "bien", "mal", "amor", "miedo", "sorpresa", "te quiero"]
+    },
+    {
+      "id": "numeros",
+      "nombre": "Números",
+      "palabras": ["cero", "uno", "dos", "tres", "cuatro", "cinco", "seis", "siete", "ocho", "nueve", "diez"]
+    }
+  ]
+}
